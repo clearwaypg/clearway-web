@@ -1,0 +1,129 @@
+{
+  "Nav": {
+    "getInTouch": "Get in Touch",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "links": {
+      "clubs": "Clubs",
+      "players": "Players",
+      "methodology": "Methodology",
+      "about": "James Fox"
+    },
+    "linksLead": {
+      "clubs": "For",
+      "players": "For",
+      "methodology": "Our",
+      "about": "About"
+    }
+  },
+  "Logo": {
+    "tagline": "Performance Group"
+  },
+  "Hero": {
+    "eyebrow": "Welcome to Clearway",
+    "headline": "Great talents don't happen by chance.",
+    "paragraph": "We identify, evaluate and place elite talent from across the world into English clubs — through a rigorous process that clubs trust and players depend on.",
+    "ctaClub": "I'm a Club",
+    "ctaPlayer": "I'm a Player",
+    "scroll": "Scroll",
+    "modelPlaceholder": "3D Model — Scroll to interact"
+  },
+  "Pathways": {
+    "clubs": {
+      "tag": "For Clubs",
+      "title": "Elite talent,",
+      "titleEmphasis": "Pre-vetted",
+      "description": "Long-term relationships. No speculative sends. No wasted trials. We only present players we are confident about — after a minimum 3-month evaluation.",
+      "cta": "Learn more"
+    },
+    "players": {
+      "tag": "For Players",
+      "title": "Your path",
+      "titleEmphasis": "To England",
+      "description": "We accept 7% of applicants. If we take you on, it means we believe in you. We guide every step — from first evaluation to signed contract and beyond.",
+      "cta": "Apply now"
+    }
+  },
+  "Philosophy": {
+    "eyebrow": "Our Philosophy",
+    "quoteLead": "Talent without",
+    "quoteEmphasis": "HARD WORK",
+    "quoteScript": "means nothing.",
+    "paragraphs": [
+      "We built Clearway on <strong>30 years of elite sports experience</strong> — as an athlete, coach, and manager. Alongside world No.1s, Olympic champions, Wimbledon winners, and Premier League players.",
+      "What that experience taught us: the right environment, rigorous structure, and relentless work ethic are what separate a good player from an exportable one.",
+      "We are <strong>not scouts. We are not agents.</strong> We are international talent identification professionals who refuse to present a player until we are certain they are ready."
+    ]
+  },
+  "Stats": {
+    "items": [
+      {"number": "7", "unit": "%", "label": "Application acceptance rate"},
+      {"number": "25", "unit": "+", "label": "Countries represented"},
+      {"number": "3", "unit": "", "label": "Month minimum evaluation period"},
+      {"number": "30", "unit": "+", "label": "Years elite sports experience"}
+    ]
+  },
+  "Process": {
+    "eyebrow": "The Method",
+    "titleLead": "A process built on",
+    "titleScript": "clarity",
+    "titleEmphasis": "AND PRECISION",
+    "intro": "Every player goes through the same rigorous pathway. No shortcuts. No exceptions. The same standards that make clubs trust us are what make players succeed.",
+    "steps": [
+      {"title": "Initial Assessment", "description": "Application review. Honest briefing on requirements, process and realistic expectations from day one."},
+      {"title": "Live Evaluation", "description": "3–5 matches, 3–5 training sessions. Assessment of attitude, character, lifestyle and full physical profile."},
+      {"title": "Player Profile", "description": "Trial video, physical data, medical records, academics and statistics — a complete professional dossier."},
+      {"title": "Club Strategy", "description": "Targeted club selection based on the player's exact profile. Direct presentations to the right clubs."},
+      {"title": "Trial & Support", "description": "Full trial coordination and ongoing support throughout the process — for the player and the family."}
+    ]
+  },
+  "Evaluation": {
+    "eyebrow": "Evaluation Standards",
+    "titleLead": "What we measure",
+    "titleEmphasis": "IN EVERY PLAYER",
+    "intro": "English football is one of the most physically demanding environments in the world. These five pillars determine whether a player is truly ready.",
+    "cards": [
+      {"title": "Technical", "description": "First touch, passing precision and decision-making under pressure at high tempo."},
+      {"title": "Tactical", "description": "Positional discipline, reading of the game and ability to adapt to different systems."},
+      {"title": "Physical", "description": "Speed, endurance and recovery capacity. English football demands an absolute physical machine."},
+      {"title": "Mental", "description": "Competitive edge, resilience under pressure and professional standards on and off the pitch."},
+      {"title": "Character", "description": "Attitude, cultural eligibility, family environment and willingness to adapt."}
+    ]
+  },
+  "Contact": {
+    "panelEyebrow": "clearway.com",
+    "panelTitleLead": "ELITE",
+    "panelTitleScript": "talent",
+    "panelTitleEmphasis": "RECRUITING",
+    "formEyebrow": "Get in Touch",
+    "formTitleLead": "Let's start",
+    "formTitleEmphasis": "THE CONVERSATION",
+    "formIntro": "Whether you're a club looking for the right talent or a player ready to take the next step — we want to hear from you.",
+    "fields": {
+      "name": "Your name",
+      "club": "Club or current team",
+      "email": "Email address",
+      "rolePlaceholder": "I am a...",
+      "roleClub": "Club / Academy",
+      "rolePlayer": "Player",
+      "roleOther": "Other",
+      "message": "Tell us about your situation"
+    },
+    "submit": "Send Message"
+  },
+  "Footer": {
+    "tagline": "International talent identification and club recruitment. Built on elite experience. Driven by transparency.",
+    "navigate": "Navigate",
+    "legal": "Legal",
+    "links": {
+      "clubs": "For Clubs",
+      "players": "For Players",
+      "methodology": "Methodology",
+      "about": "About James Fox",
+      "contact": "Contact",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    },
+    "copyright": "© 2026 Clearway Performance Group. All rights reserved."
+  }
+}

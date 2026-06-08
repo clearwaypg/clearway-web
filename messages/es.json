@@ -1,0 +1,129 @@
+{
+  "Nav": {
+    "getInTouch": "Contáctanos",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "links": {
+      "clubs": "Clubes",
+      "players": "Jugadores",
+      "methodology": "Metodología",
+      "about": "James Fox"
+    },
+    "linksLead": {
+      "clubs": "Para",
+      "players": "Para",
+      "methodology": "Nuestra",
+      "about": "Sobre"
+    }
+  },
+  "Logo": {
+    "tagline": "Performance Group"
+  },
+  "Hero": {
+    "eyebrow": "Bienvenido a Clearway",
+    "headline": "Los grandes talentos no ocurren por casualidad.",
+    "paragraph": "Identificamos, evaluamos y colocamos talento de élite de todo el mundo en clubes ingleses — a través de un proceso riguroso en el que los clubes confían y del que los jugadores dependen.",
+    "ctaClub": "Soy un Club",
+    "ctaPlayer": "Soy Jugador",
+    "scroll": "Desplázate",
+    "modelPlaceholder": "Modelo 3D — Desplázate para interactuar"
+  },
+  "Pathways": {
+    "clubs": {
+      "tag": "Para Clubes",
+      "title": "Talento de élite,",
+      "titleEmphasis": "Pre-validado",
+      "description": "Relaciones a largo plazo. Sin envíos especulativos. Sin pruebas perdidas. Solo presentamos jugadores en los que confiamos — tras una evaluación mínima de 3 meses.",
+      "cta": "Conoce más"
+    },
+    "players": {
+      "tag": "Para Jugadores",
+      "title": "Tu camino",
+      "titleEmphasis": "A Inglaterra",
+      "description": "Aceptamos al 7% de los aspirantes. Si te tomamos, es porque creemos en ti. Te guiamos en cada paso — desde la primera evaluación hasta el contrato firmado y más allá.",
+      "cta": "Aplicar ahora"
+    }
+  },
+  "Philosophy": {
+    "eyebrow": "Nuestra Filosofía",
+    "quoteLead": "El talento sin",
+    "quoteEmphasis": "TRABAJO DURO",
+    "quoteScript": "no significa nada.",
+    "paragraphs": [
+      "Construimos Clearway sobre <strong>30 años de experiencia en deporte de élite</strong> — como atleta, entrenador y mánager. Junto a números 1 del mundo, campeones olímpicos, ganadores de Wimbledon y jugadores de la Premier League.",
+      "Lo que esa experiencia nos enseñó: el entorno correcto, una estructura rigurosa y una ética de trabajo implacable son lo que separa a un buen jugador de uno exportable.",
+      "<strong>No somos cazatalentos. No somos agentes.</strong> Somos profesionales de identificación internacional de talento que no presentan a un jugador hasta tener la certeza de que está listo."
+    ]
+  },
+  "Stats": {
+    "items": [
+      {"number": "7", "unit": "%", "label": "Tasa de aceptación de aspirantes"},
+      {"number": "25", "unit": "+", "label": "Países representados"},
+      {"number": "3", "unit": "", "label": "Meses mínimos de evaluación"},
+      {"number": "30", "unit": "+", "label": "Años de experiencia en deporte de élite"}
+    ]
+  },
+  "Process": {
+    "eyebrow": "El Método",
+    "titleLead": "Un proceso construido sobre",
+    "titleScript": "claridad",
+    "titleEmphasis": "Y PRECISIÓN",
+    "intro": "Cada jugador atraviesa el mismo camino riguroso. Sin atajos. Sin excepciones. Los mismos estándares que hacen que los clubes confíen en nosotros son los que hacen que los jugadores triunfen.",
+    "steps": [
+      {"title": "Evaluación Inicial", "description": "Revisión de la aplicación. Briefing honesto sobre requisitos, proceso y expectativas reales desde el primer día."},
+      {"title": "Evaluación en Vivo", "description": "3–5 partidos, 3–5 entrenamientos. Evaluación de actitud, carácter, estilo de vida y perfil físico completo."},
+      {"title": "Perfil del Jugador", "description": "Video de prueba, datos físicos, expediente médico, académico y estadísticas — un dossier profesional completo."},
+      {"title": "Estrategia de Clubes", "description": "Selección de clubes basada en el perfil exacto del jugador. Presentación directa a los clubes adecuados."},
+      {"title": "Prueba y Apoyo", "description": "Coordinación completa de la prueba y apoyo continuo durante todo el proceso — para el jugador y la familia."}
+    ]
+  },
+  "Evaluation": {
+    "eyebrow": "Estándares de Evaluación",
+    "titleLead": "Lo que medimos",
+    "titleEmphasis": "EN CADA JUGADOR",
+    "intro": "El fútbol inglés es uno de los entornos más exigentes físicamente del mundo. Estos cinco pilares determinan si un jugador está verdaderamente listo.",
+    "cards": [
+      {"title": "Técnico", "description": "Primer toque, precisión en el pase y toma de decisiones bajo presión a alto ritmo."},
+      {"title": "Táctico", "description": "Disciplina posicional, lectura del juego y capacidad de adaptarse a distintos sistemas."},
+      {"title": "Físico", "description": "Velocidad, resistencia y capacidad de recuperación. El fútbol inglés exige una máquina física absoluta."},
+      {"title": "Mental", "description": "Hambre competitiva, resiliencia bajo presión y estándares profesionales dentro y fuera del campo."},
+      {"title": "Carácter", "description": "Actitud, elegibilidad cultural, entorno familiar y disposición a adaptarse."}
+    ]
+  },
+  "Contact": {
+    "panelEyebrow": "clearway.com",
+    "panelTitleLead": "RECLUTAMIENTO",
+    "panelTitleScript": "de talento",
+    "panelTitleEmphasis": "DE ÉLITE",
+    "formEyebrow": "Contáctanos",
+    "formTitleLead": "Empecemos",
+    "formTitleEmphasis": "LA CONVERSACIÓN",
+    "formIntro": "Ya seas un club buscando al talento adecuado o un jugador listo para dar el siguiente paso — queremos escucharte.",
+    "fields": {
+      "name": "Tu nombre",
+      "club": "Club o equipo actual",
+      "email": "Correo electrónico",
+      "rolePlaceholder": "Soy un...",
+      "roleClub": "Club / Academia",
+      "rolePlayer": "Jugador",
+      "roleOther": "Otro",
+      "message": "Cuéntanos sobre tu situación"
+    },
+    "submit": "Enviar Mensaje"
+  },
+  "Footer": {
+    "tagline": "Identificación internacional de talento y reclutamiento de clubes. Construido sobre experiencia de élite. Impulsado por la transparencia.",
+    "navigate": "Navegar",
+    "legal": "Legal",
+    "links": {
+      "clubs": "Para Clubes",
+      "players": "Para Jugadores",
+      "methodology": "Metodología",
+      "about": "Sobre James Fox",
+      "contact": "Contacto",
+      "privacy": "Política de Privacidad",
+      "terms": "Términos del Servicio"
+    },
+    "copyright": "© 2026 Clearway Performance Group. Todos los derechos reservados."
+  }
+}
