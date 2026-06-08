@@ -20,7 +20,6 @@ function Statue() {
         });
       }
     });
-
     const box = new THREE.Box3().setFromObject(scene);
     const c = new THREE.Vector3();
     const size = new THREE.Vector3();
