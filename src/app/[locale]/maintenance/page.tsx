@@ -16,27 +16,16 @@ export default function MaintenancePage() {
         fontFamily: 'var(--font-sans)'
       }}
     >
-      <div
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/Logotipos/clearway-white.svg"
+        alt="Clearway Performance Group"
         style={{
-          fontSize: 'clamp(2.5rem, 8vw, 5rem)',
-          letterSpacing: '0.05em',
-          lineHeight: 1
+          width: 'clamp(220px, 40vw, 420px)',
+          height: 'auto',
+          display: 'block'
         }}
-      >
-        <span style={{fontWeight: 300}}>CLEAR</span>
-        <span style={{fontWeight: 700}}>WAY</span>
-      </div>
-      <div
-        style={{
-          marginTop: '0.75rem',
-          fontSize: '0.75rem',
-          letterSpacing: '0.3em',
-          textTransform: 'uppercase',
-          opacity: 0.8
-        }}
-      >
-        Performance Group
-      </div>
+      />
       <p
         style={{
           marginTop: '2.5rem',
