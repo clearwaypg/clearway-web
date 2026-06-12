@@ -44,7 +44,7 @@ export default function MaintenancePage() {
           opacity: 0.85
         }}
       >
-        We&rsquo;ll be ready shortly.
+        We are currently working on this site. Please check back later.
       </p>
     </main>
   );
