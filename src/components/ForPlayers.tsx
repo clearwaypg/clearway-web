@@ -238,10 +238,14 @@ export function ForPlayers() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [active, setActive] = useState('hero');
+  const [scrolled, setScrolled] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
   const [struck, setStruck] = useState(false);
   const [filterNum, setFilterNum] = useState(100);
   const [filterDone, setFilterDone] = useState(false);
 
+  const pageRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLElement>(null);
   const truthRef = useRef<HTMLElement>(null);
   const filterRef = useRef<HTMLElement>(null);
   const jamesRef = useRef<HTMLElement>(null);
@@ -261,6 +265,37 @@ export function ForPlayers() {
       {locale: next}
     );
   }
+
+  // Honour prefers-reduced-motion — skip the hero background video entirely.
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReduceMotion(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  // Expose the real header height so the hero pitch can start exactly at the
+  // header's bottom edge (kept in sync on resize).
+  useEffect(() => {
+    const nav = navRef.current;
+    const page = pageRef.current;
+    if (!nav || !page) return;
+    const set = () =>
+      page.style.setProperty('--header-h', `${nav.offsetHeight}px`);
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(nav);
+    return () => ro.disconnect();
+  }, []);
+
+  // Header gains a solid white background once scrolled off the hero.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener('scroll', onScroll, {passive: true});
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   // Scroll-spy — track the most visible section to highlight it in the menu.
   useEffect(() => {
@@ -457,9 +492,9 @@ export function ForPlayers() {
   const marquee = [...t.countries, ...t.countries];
 
   return (
-    <div className={cx('page')}>
+    <div className={cx('page')} ref={pageRef}>
       {/* NAV */}
-      <nav className={cx('nav')}>
+      <nav className={cx('nav', scrolled && 'scrolled')} ref={navRef}>
         <div className={cx('nav-lang')}>
           {routing.locales.map((l) => (
             <button
@@ -472,11 +507,20 @@ export function ForPlayers() {
             </button>
           ))}
         </div>
-        <Link href="/" className={cx('nav-logo')}>
-          <div className={cx('nav-logo-main')}>
-            CLEAR<b>WAY</b>
-          </div>
-          <div className={cx('nav-logo-sub')}>{t.navSub}</div>
+        <Link
+          href="/"
+          className={cx('nav-logo')}
+          aria-label="Clearway Performance Group"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={
+              scrolled
+                ? '/Logotipos/clearway-black.svg'
+                : '/Logotipos/clearway-white.svg'
+            }
+            alt="Clearway Performance Group"
+          />
         </Link>
         <button
           type="button"
@@ -544,20 +588,37 @@ export function ForPlayers() {
 
       {/* HERO */}
       <section className={cx('hero')} id="hero">
+        {/* Faint background video — behind the pitch SVG and the content,
+            above the solid navy. Skipped under prefers-reduced-motion. */}
+        <div className={cx('hero-video')} aria-hidden="true">
+          {!reduceMotion && (
+            <video
+              src="/players-1.mp4"
+              muted
+              loop
+              autoPlay
+              playsInline
+              preload="auto"
+            />
+          )}
+          <span className={cx('hero-video-veil')} />
+        </div>
         <div className={cx('hero-grid')} aria-hidden="true">
           <svg
-            viewBox="0 0 1200 700"
-            preserveAspectRatio="xMidYMid slice"
+            viewBox="0 0 1200 620"
+            preserveAspectRatio="xMidYMin slice"
             fill="none"
             stroke="#d0d8e2"
             strokeWidth="1"
             opacity="0.18"
           >
-            <rect x="40" y="40" width="1120" height="620" />
-            <line x1="600" y1="40" x2="600" y2="660" />
-            <circle cx="600" cy="350" r="110" />
-            <rect x="40" y="220" width="150" height="260" />
-            <rect x="1010" y="220" width="150" height="260" />
+            {/* Top touchline sits at y=0 so it lands exactly on the header's
+                bottom edge once the grid is offset by --header-h. */}
+            <rect x="40" y="0" width="1120" height="600" />
+            <line x1="600" y1="0" x2="600" y2="600" />
+            <circle cx="600" cy="300" r="110" />
+            <rect x="40" y="170" width="150" height="260" />
+            <rect x="1010" y="170" width="150" height="260" />
           </svg>
         </div>
         <div className={cx('hero-eyebrow')}>
@@ -976,13 +1037,21 @@ export function ForPlayers() {
           </div>
           <div className={cx('foot-bottom')}>
             <span className={cx('foot-copy')}>{t.footCopy}</span>
-            <Image
-              src="/White-webtag.svg"
-              alt="Created by SCNDAL"
-              width={148}
-              height={18}
-              style={{height: 18, width: 'auto', opacity: 0.4}}
-            />
+            <a
+              href="https://scndal.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Created by SCNDAL"
+              style={{display: 'block', lineHeight: 0}}
+            >
+              <Image
+                src="/White-webtag.svg"
+                alt="Created by SCNDAL"
+                width={148}
+                height={18}
+                style={{height: 18, width: 'auto', opacity: 0.4}}
+              />
+            </a>
           </div>
         </div>
       </footer>

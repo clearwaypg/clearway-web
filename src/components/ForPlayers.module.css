@@ -11,6 +11,7 @@
   --dew: #d0d8e2;
   --bg: #f3f3f3;
   --white: #fcfcfc;
+  --header-h: 78px; /* fallback; set precisely from the real nav height in JS */
 
   font-family: var(--font-sans);
   background: var(--navy);
@@ -30,7 +31,13 @@
   align-items: center;
   justify-content: space-between;
   padding: 1.5rem 2.5rem;
-  mix-blend-mode: difference;
+  background: transparent;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+/* Scrolled off the hero: solid white header, dark elements for contrast. */
+.nav.scrolled {
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(7, 44, 104, 0.08);
 }
 .nav-lang {
   display: flex;
@@ -46,13 +53,16 @@
   color: #fff;
   text-decoration: none;
   opacity: 0.45;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, color 0.3s ease;
   font: inherit;
   letter-spacing: inherit;
   padding: 0;
 }
 .nav-lang button.active {
   opacity: 1;
+}
+.nav.scrolled .nav-lang button {
+  color: var(--navy);
 }
 .nav-logo {
   position: absolute;
@@ -61,20 +71,10 @@
   text-align: center;
   text-decoration: none;
 }
-.nav-logo-main {
-  font-size: 1.05rem;
-  letter-spacing: 0.14em;
-  color: #fff;
-}
-.nav-logo-main b {
-  font-weight: 800;
-}
-.nav-logo-sub {
-  font-size: 0.46rem;
-  letter-spacing: 0.24em;
-  opacity: 0.55;
-  text-transform: uppercase;
-  margin-top: 0.15rem;
+.nav-logo img {
+  height: 30px;
+  width: auto;
+  display: block;
 }
 .nav-burger {
   display: flex;
@@ -89,6 +89,10 @@
   width: 24px;
   height: 1.5px;
   background: #fff;
+  transition: background-color 0.3s ease;
+}
+.nav.scrolled .nav-burger span {
+  background: var(--navy);
 }
 
 /* SECTION MENU OVERLAY */
@@ -213,15 +217,38 @@
 .hero {
   min-height: 100vh;
   position: relative;
+  isolation: isolate; /* contain the z-index:-1 background video */
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 0 2.5rem;
   overflow: hidden;
 }
-.hero-grid {
+/* Background video layer — sits at the very back of the hero, above the navy. */
+.hero-video {
   position: absolute;
   inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.hero-video video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.12;
+}
+.hero-video-veil {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 44, 104, 0.35);
+}
+.hero-grid {
+  position: absolute;
+  top: var(--header-h);
+  left: 0;
+  right: 0;
+  bottom: 0;
   opacity: 0.5;
   pointer-events: none;
 }

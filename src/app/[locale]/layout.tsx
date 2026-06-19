@@ -5,6 +5,7 @@ import {notFound} from 'next/navigation';
 import {Plus_Jakarta_Sans, Cormorant_Garamond} from 'next/font/google';
 
 import {routing} from '@/i18n/routing';
+import {SmoothScroll} from '@/components/SmoothScroll';
 
 import '../globals.css';
 
@@ -52,7 +53,9 @@ export default async function RootLayout({
       className={`${jakarta.variable} ${cormorant.variable}`}
     >
       <body>
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <SmoothScroll>{children}</SmoothScroll>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

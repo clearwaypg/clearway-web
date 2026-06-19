@@ -88,13 +88,21 @@ export function FooterHome({ref}: Props) {
         }}
       >
         <span style={{fontSize: '0.62rem', color: '#777'}}>{c.copyright}</span>
-        <Image
-          src="/White-webtag.svg"
-          alt="SCNDAL"
-          width={164}
-          height={20}
-          style={{height: 20, width: 'auto', display: 'block', opacity: 0.85}}
-        />
+        <a
+          href="https://scndal.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Created by SCNDAL"
+          style={{display: 'block', lineHeight: 0}}
+        >
+          <Image
+            src="/White-webtag.svg"
+            alt="Created by SCNDAL"
+            width={164}
+            height={20}
+            style={{height: 20, width: 'auto', display: 'block', opacity: 0.85}}
+          />
+        </a>
       </div>
     </footer>
   );
