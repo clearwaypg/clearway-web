@@ -5,7 +5,6 @@ import {notFound} from 'next/navigation';
 import {Plus_Jakarta_Sans, Cormorant_Garamond} from 'next/font/google';
 
 import {routing} from '@/i18n/routing';
-import {Nav} from '@/components/Nav';
 
 import '../globals.css';
 
@@ -53,10 +52,7 @@ export default async function RootLayout({
       className={`${jakarta.variable} ${cormorant.variable}`}
     >
       <body>
-        <NextIntlClientProvider>
-          <Nav />
-          {children}
-        </NextIntlClientProvider>
+        <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
     </html>
   );

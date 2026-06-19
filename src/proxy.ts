@@ -3,7 +3,7 @@ import {NextResponse} from 'next/server';
 import type {NextRequest} from 'next/server';
 import {routing} from './i18n/routing';
 
-const MAINTENANCE = true;
+const MAINTENANCE = false;
 
 const intl = createMiddleware(routing);
 

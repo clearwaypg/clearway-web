@@ -19,6 +19,40 @@
   "Logo": {
     "tagline": "Performance Group"
   },
+  "Pages": {
+    "backHome": "Back to home",
+    "forClubs": "For Clubs",
+    "forPlayers": "For Players",
+    "about": "About",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  },
+  "Landing": {
+    "performanceGroup": "Performance Group",
+    "tagline": "we form champions",
+    "forClubs": "For Clubs",
+    "forPlayers": "For Players",
+    "scroll": "scroll",
+    "menu": {
+      "clubs": "For Clubs",
+      "players": "For Players",
+      "about": "About James Fox",
+      "legal": "Legal",
+      "close": "close"
+    },
+    "footer": {
+      "navigate": "Navigate",
+      "legal": "Legal",
+      "clubs": "For Clubs",
+      "players": "For Players",
+      "about": "About James Fox",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "consent": "Consent & Minors",
+      "copyright": "© 2026 Clearway Performance Group. Est. 2023.",
+      "email": "james@clearwayperformancegroup.com"
+    }
+  },
   "Hero": {
     "eyebrow": "Welcome to Clearway",
     "headline": "Great talents don't happen by chance.",

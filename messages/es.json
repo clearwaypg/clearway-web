@@ -19,6 +19,40 @@
   "Logo": {
     "tagline": "Performance Group"
   },
+  "Pages": {
+    "backHome": "Volver al inicio",
+    "forClubs": "Para Clubes",
+    "forPlayers": "Para Jugadores",
+    "about": "Sobre",
+    "privacy": "Política de Privacidad",
+    "terms": "Términos del Servicio"
+  },
+  "Landing": {
+    "performanceGroup": "Performance Group",
+    "tagline": "formamos campeones",
+    "forClubs": "Para Clubes",
+    "forPlayers": "Para Jugadores",
+    "scroll": "desliza",
+    "menu": {
+      "clubs": "Para Clubes",
+      "players": "Para Jugadores",
+      "about": "Sobre James Fox",
+      "legal": "Legal",
+      "close": "cerrar"
+    },
+    "footer": {
+      "navigate": "Navegar",
+      "legal": "Legal",
+      "clubs": "Para Clubes",
+      "players": "Para Jugadores",
+      "about": "Sobre James Fox",
+      "privacy": "Política de Privacidad",
+      "terms": "Términos del Servicio",
+      "consent": "Consentimiento y Menores",
+      "copyright": "© 2026 Clearway Performance Group. Est. 2023.",
+      "email": "james@clearwayperformancegroup.com"
+    }
+  },
   "Hero": {
     "eyebrow": "Bienvenido a Clearway",
     "headline": "Los grandes talentos no ocurren por casualidad.",
