@@ -35,3 +35,56 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
+
+/* =========================================================
+   ROUTE VIEW TRANSITIONS
+   Home split panel → destination navy hero. The clicked panel
+   shares a view-transition-name with the destination hero
+   background, so the navy morphs (expands) from the panel into
+   the full-screen hero. The rest of the home crossfades out.
+   ========================================================= */
+
+/* Cinematic panel → hero morph (~0.9s, soft ease-out). */
+::view-transition-group(.morph) {
+  animation-duration: 900ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1; /* expanding navy sits above the crossfading root */
+}
+::view-transition-image-pair(.morph) {
+  animation-duration: 900ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Root crossfade — the losing panel and the rest of the home fade out while
+   the destination fades in. Both are snapshots, so there is no white flash.
+   The incoming page is held back slightly so its hero content reads as
+   arriving after the navy has expanded. */
+::view-transition-old(root) {
+  animation: 550ms ease both vt-fade-out;
+}
+::view-transition-new(root) {
+  animation: 650ms ease 250ms both vt-fade-in;
+}
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Reduced motion: no animation → the browser swaps instantly. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}

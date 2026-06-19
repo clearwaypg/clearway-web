@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState, ViewTransition} from 'react';
 import {useLocale} from 'next-intl';
 import {useParams} from 'next/navigation';
 import Image from 'next/image';
@@ -588,6 +588,11 @@ export function ForPlayers() {
 
       {/* HERO */}
       <section className={cx('hero')} id="hero">
+        {/* Shared navy surface — morphs (expands) from the clicked home panel
+            into this full-screen hero via the View Transitions API. */}
+        <ViewTransition name="hero-players" share="morph">
+          <div className={cx('hero-bg')} aria-hidden="true" />
+        </ViewTransition>
         {/* Faint background video — behind the pitch SVG and the content,
             above the solid navy. Skipped under prefers-reduced-motion. */}
         <div className={cx('hero-video')} aria-hidden="true">

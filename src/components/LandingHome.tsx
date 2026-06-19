@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useRef, useState, useTransition} from 'react';
+import {useEffect, useRef, useState, useTransition, ViewTransition} from 'react';
 import {useLocale, useTranslations} from 'next-intl';
 import {useParams} from 'next/navigation';
 import Image from 'next/image';
@@ -364,8 +364,11 @@ export function LandingHome() {
           style={{background: DEW}}
         />
 
-        {/* Split background panels (hover only) */}
+        {/* Split background panels (hover only). Each panel shares a
+            view-transition-name with its destination hero so the navy morphs
+            (expands) from the clicked panel into the full-screen hero. */}
         <div className="fixed inset-0 z-[1] flex">
+          <ViewTransition name="hero-clubs" share="morph">
           <Link
             href="/for-clubs"
             aria-label={t('forClubs')}
@@ -404,6 +407,8 @@ export function LandingHome() {
               style={{background: NAVY}}
             />
           </Link>
+          </ViewTransition>
+          <ViewTransition name="hero-players" share="morph">
           <Link
             href="/for-players"
             aria-label={t('forPlayers')}
@@ -442,6 +447,7 @@ export function LandingHome() {
               style={{background: BLACK}}
             />
           </Link>
+          </ViewTransition>
         </div>
 
         {/* NAV */}

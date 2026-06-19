@@ -10,5 +10,12 @@ export default async function ForClubsPage({
 
   const t = await getTranslations('Pages');
 
-  return <PlaceholderPage title={t('forClubs')} backLabel={t('backHome')} />;
+  return (
+    <PlaceholderPage
+      title={t('forClubs')}
+      backLabel={t('backHome')}
+      tone="navy"
+      viewName="hero-clubs"
+    />
+  );
 }
