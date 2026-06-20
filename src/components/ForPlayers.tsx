@@ -1,1065 +1,1133 @@
 'use client';
 
 import {useEffect, useRef, useState, ViewTransition} from 'react';
-import {useLocale} from 'next-intl';
-import {useParams} from 'next/navigation';
-import Image from 'next/image';
 
-import {Link, usePathname, useRouter} from '@/i18n/navigation';
-import {routing, type Locale} from '@/i18n/routing';
+import {Link} from '@/i18n/navigation';
+import {Ball3D} from './Ball3D';
 import styles from './ForPlayers.module.css';
 
-/* Join scoped module classes by their guide names, dropping falsy values:
-   cx('proc-card', active && 'kept') → "ForPlayers_proc-card__x ForPlayers_kept__y" */
+/* Join scoped module classes by their guide names, dropping falsy values. */
 const cx = (...names: Array<string | false | null | undefined>) =>
   names
     .filter(Boolean)
     .map((n) => styles[n as string] ?? (n as string))
     .join(' ');
 
-/* The 7 of 100 dots that "advance" through the Clearway filter. */
-const KEPT = [12, 27, 34, 46, 58, 63, 79];
-
-/* Full language names in their own language, for the section-menu toggle. */
-const LOCALE_NAMES: Record<string, string> = {en: 'English', es: 'Español'};
-
-type Copy = {
-  navSub: string;
-  menuEyebrow: string;
-  menu: {href: string; label: string}[];
-  heroEyebrow: string;
-  heroSub: string;
-  heroCta: string;
-  heroScroll: string;
-  countries: string[];
-  truthLabel: string;
-  filterLabel: string;
-  filterP: string;
-  filterCountLabel: string;
-  filterCountLabelDone: string;
-  processLabel: string;
-  procCards: {num: string; title: string; body: string; tag: string}[];
-  procHint: string;
-  jamesEyebrow: string;
-  jamesName1: string;
-  jamesName2: string;
-  jamesTitle: string;
-  jamesBio: string;
-  jamesPhotoLabel: string;
-  ctaEyebrow: string;
-  ctaTag: string;
-  ctaRightP: string;
-  ctaList: string[];
-  ctaBtn: string;
-  formSoon: string;
-  footTag: string;
-  footNavigate: string;
-  footLegal: string;
-  footCopy: string;
-};
-
-const COPY: Record<'en' | 'es', Copy> = {
-  es: {
-    navSub: 'Performance Group',
-    menuEyebrow: 'Secciones',
-    menu: [
-      {href: '#hero', label: 'Inicio'},
-      {href: '#truth', label: 'Sin letras chiquitas'},
-      {href: '#filter', label: 'El filtro'},
-      {href: '#process', label: 'El recorrido'},
-      {href: '#james', label: 'James Fox'},
-      {href: '#cta', label: 'Aplicar'}
-    ],
-    heroEyebrow: 'we form champions',
-    heroSub:
-      'Evaluamos jugadores de México y el mundo, y los ponemos frente a clubes en Europa que ya quieren verlos. Hombres y mujeres.',
-    heroCta: 'Aplicar ahora',
-    heroScroll: 'Desliza',
-    countries: [
-      'Inglaterra',
-      'España',
-      'Francia',
-      'Italia',
-      'Alemania',
-      'Austria',
-      'Bélgica',
-      'Hungría'
-    ],
-    truthLabel: 'Sin letras chiquitas',
-    filterLabel: 'The Clearway Filter',
-    filterP:
-      'No mandamos a todos. Solo ponemos frente a un club a quien sabemos que ese club querría ver. Es el mismo estándar que aplican ellos — preferimos aplicarlo nosotros primero.',
-    filterCountLabel: 'jugadores\nevaluados',
-    filterCountLabelDone: 'avanzan a\nuna prueba',
-    processLabel: 'El recorrido',
-    procCards: [
-      {
-        num: '01',
-        title: 'Llena tu perfil',
-        body: 'Quién eres, en qué posición juegas, tu material de video. Esta parte no cuesta nada.',
-        tag: 'Sin costo'
-      },
-      {
-        num: '02',
-        title: 'James te revisa',
-        body: 'Cada aplicación la evalúa él. Sin algoritmo. Si tienes lo que buscamos, te contacta directo.',
-        tag: 'Revisión personal'
-      },
-      {
-        num: '03',
-        title: 'Firmas el contrato',
-        body: 'Tres meses de evaluación con todo por escrito. Lo que hacemos y lo que puedes esperar, sin ambigüedad.',
-        tag: 'Evaluación 3 meses'
-      },
-      {
-        num: '04',
-        title: 'Tu prueba real',
-        body: 'Frente a un club que ya quiere verte. Garantizamos la prueba, no el fichaje. Eso es exactamente lo que hacemos.',
-        tag: 'Prueba garantizada'
-      }
-    ],
-    procHint: '← Desliza para ver el recorrido →',
-    jamesEyebrow: 'Quién te evalúa',
-    jamesName1: 'James',
-    jamesName2: 'Fox.',
-    jamesTitle: 'Fundador, Clearway Performance Group',
-    jamesBio:
-      'Más de 30 años en el deporte profesional como atleta, entrenador y manager. Ha trabajado junto a campeones olímpicos, campeones de Wimbledon, números uno del mundo y futbolistas de la EFL. Fundó Clearway en 2023 con una idea simple: el talento existe, lo que falta es que alguien lo vea.',
-    jamesPhotoLabel: 'James Fox',
-    ctaEyebrow: 'Tu inscripción',
-    ctaTag: 'we form champions',
-    ctaRightP:
-      'Aplicar no cuesta nada. Llenas tu perfil, compartes tus mejores jugadas y James lo revisa. Si tienes lo que buscamos, te lo decimos. Si no, también.',
-    ctaList: [
-      'Aplicación completamente gratuita',
-      'Revisión personal por James Fox',
-      'Respuesta directa, sin intermediarios'
-    ],
-    ctaBtn: 'Enviar mi inscripción',
-    formSoon: 'Formulario de inscripción — próximamente',
-    footTag: 'we form champions',
-    footNavigate: 'Navegar',
-    footLegal: 'Legal',
-    footCopy: '© 2026 Clearway Performance Group'
-  },
-  en: {
-    navSub: 'Performance Group',
-    menuEyebrow: 'Sections',
-    menu: [
-      {href: '#hero', label: 'Home'},
-      {href: '#truth', label: 'No fine print'},
-      {href: '#filter', label: 'The filter'},
-      {href: '#process', label: 'The journey'},
-      {href: '#james', label: 'James Fox'},
-      {href: '#cta', label: 'Apply'}
-    ],
-    heroEyebrow: 'we form champions',
-    heroSub:
-      'We evaluate players from Mexico and the world, and put them in front of clubs in Europe that already want to see them. Men and women.',
-    heroCta: 'Apply now',
-    heroScroll: 'Scroll',
-    countries: [
-      'England',
-      'Spain',
-      'France',
-      'Italy',
-      'Germany',
-      'Austria',
-      'Belgium',
-      'Hungary'
-    ],
-    truthLabel: 'No fine print',
-    filterLabel: 'The Clearway Filter',
-    filterP:
-      "We don't send everyone. We only put in front of a club someone we know that club would want to see. It's the same standard they apply — we'd rather apply it first.",
-    filterCountLabel: 'players\nevaluated',
-    filterCountLabelDone: 'advance to\na trial',
-    processLabel: 'The journey',
-    procCards: [
-      {
-        num: '01',
-        title: 'Fill out your profile',
-        body: 'Who you are, what position you play, your video material. This part costs nothing.',
-        tag: 'No cost'
-      },
-      {
-        num: '02',
-        title: 'James reviews you',
-        body: 'He evaluates every application himself. No algorithm. If you have what we look for, he contacts you directly.',
-        tag: 'Personal review'
-      },
-      {
-        num: '03',
-        title: 'You sign the contract',
-        body: 'Three months of evaluation with everything in writing. What we do and what you can expect, no ambiguity.',
-        tag: '3-month evaluation'
-      },
-      {
-        num: '04',
-        title: 'Your real trial',
-        body: "In front of a club that already wants to see you. We guarantee the trial, not the signing. That's exactly what we do.",
-        tag: 'Guaranteed trial'
-      }
-    ],
-    procHint: '← Slide to see the journey →',
-    jamesEyebrow: 'Who evaluates you',
-    jamesName1: 'James',
-    jamesName2: 'Fox.',
-    jamesTitle: 'Founder, Clearway Performance Group',
-    jamesBio:
-      "Over 30 years in professional sport as an athlete, coach and manager. He has worked alongside Olympic champions, Wimbledon champions, world number ones and EFL footballers. He founded Clearway in 2023 with a simple idea: talent exists, what's missing is for someone to see it.",
-    jamesPhotoLabel: 'James Fox',
-    ctaEyebrow: 'Your application',
-    ctaTag: 'we form champions',
-    ctaRightP:
-      "Applying costs nothing. You fill out your profile, share your best plays and James reviews it. If you have what we look for, we'll tell you. If not, we'll tell you too.",
-    ctaList: [
-      'Completely free application',
-      'Personal review by James Fox',
-      'Direct response, no middlemen'
-    ],
-    ctaBtn: 'Send my application',
-    formSoon: 'Application form — coming soon',
-    footTag: 'we form champions',
-    footNavigate: 'Navigate',
-    footLegal: 'Legal',
-    footCopy: '© 2026 Clearway Performance Group'
-  }
-};
+const STEP_NAMES = [
+  'The essentials',
+  'Who you are',
+  'Your game',
+  'Your record',
+  'Your footage'
+];
 
 export function ForPlayers() {
-  const locale = useLocale() as Locale;
-  const t = COPY[locale === 'es' ? 'es' : 'en'];
-  const isEs = locale === 'es';
-
-  const router = useRouter();
-  const pathname = usePathname();
-  const params = useParams();
-
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [active, setActive] = useState('hero');
-  const [scrolled, setScrolled] = useState(false);
-  const [reduceMotion, setReduceMotion] = useState(false);
-  const [struck, setStruck] = useState(false);
-  const [filterNum, setFilterNum] = useState(100);
-  const [filterDone, setFilterDone] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [step, setStep] = useState(0);
+  const [submitted, setSubmitted] = useState(false);
+  const [errors, setErrors] = useState<Set<string>>(new Set());
+  const [card, setCard] = useState({name: '', pos: '', age: '', eu: ''});
 
   const pageRef = useRef<HTMLDivElement>(null);
-  const navRef = useRef<HTMLElement>(null);
+  const ballRef = useRef<HTMLDivElement>(null);
   const truthRef = useRef<HTMLElement>(null);
-  const filterRef = useRef<HTMLElement>(null);
-  const jamesRef = useRef<HTMLElement>(null);
-  const dotsRef = useRef<(HTMLSpanElement | null)[]>([]);
-  const curtainRef = useRef<HTMLDivElement>(null);
-  const nameRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const titleRef = useRef<HTMLParagraphElement>(null);
-  const bioRef = useRef<HTMLSpanElement>(null);
-  const cursorRef = useRef<HTMLSpanElement>(null);
-  const credsRef = useRef<HTMLDivElement>(null);
+  const voicesRef = useRef<HTMLElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
+  const modalCardRef = useRef<HTMLDivElement>(null);
 
-  function switchTo(next: Locale) {
-    if (next === locale) return;
-    router.replace(
-      // @ts-expect-error -- pathname/params share the same shape; next-intl types this strictly
-      {pathname, params},
-      {locale: next}
-    );
-  }
+  const u = (s: string, fb: string) => (s.trim() ? s.toUpperCase() : fb);
 
-  // Honour prefers-reduced-motion — skip the hero background video entirely.
+  /* Entrance animations (mirrors the guide's body.play). */
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const update = () => setReduceMotion(mq.matches);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
+    const raf = requestAnimationFrame(() => setPlaying(true));
+    const t = setTimeout(() => setPlaying(true), 400);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(t);
+    };
   }, []);
 
-  // Expose the real header height so the hero pitch can start exactly at the
-  // header's bottom edge (kept in sync on resize).
+  /* Scroll reveals. */
   useEffect(() => {
-    const nav = navRef.current;
-    const page = pageRef.current;
-    if (!nav || !page) return;
-    const set = () =>
-      page.style.setProperty('--header-h', `${nav.offsetHeight}px`);
-    set();
-    const ro = new ResizeObserver(set);
-    ro.observe(nav);
-    return () => ro.disconnect();
-  }, []);
-
-  // Header gains a solid white background once scrolled off the hero.
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
-    window.addEventListener('scroll', onScroll, {passive: true});
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  // Scroll-spy — track the most visible section to highlight it in the menu.
-  useEffect(() => {
-    const ids = t.menu.map((m) => m.href.slice(1));
-    const els = ids
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => el !== null);
-    if (!els.length) return;
-
-    const ratios = new Map<string, number>();
+    const root = pageRef.current;
+    if (!root) return;
+    const els = root.querySelectorAll<HTMLElement>(`.${styles.reveal}`);
     const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) =>
-          ratios.set(e.target.id, e.isIntersecting ? e.intersectionRatio : 0)
-        );
-        let bestId = '';
-        let bestR = 0;
-        ratios.forEach((r, id) => {
-          if (r > bestR) {
-            bestR = r;
-            bestId = id;
+      (es) =>
+        es.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add(styles.in);
+            io.unobserve(e.target);
           }
-        });
-        if (bestId) setActive(bestId);
-      },
-      {threshold: [0.1, 0.25, 0.5, 0.75]}
+        }),
+      {threshold: 0.12, rootMargin: '0px 0px -50px 0px'}
     );
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, [t.menu]);
+  }, []);
 
-  // Section menu — lock scroll while open, close on Escape.
+  /* Ball that travels across the pitch following the scroll, between the
+     "truth" and "voices" sections. (Placeholder for the future 3D ball.) */
   useEffect(() => {
-    if (!menuOpen) return;
+    const ball = ballRef.current;
+    const truth = truthRef.current;
+    const voices = voicesRef.current;
+    if (!ball || !truth || !voices) return;
+    const vw = () => window.innerWidth;
+    function onScroll() {
+      const startY = truth!.offsetTop;
+      const endY = voices!.offsetTop + 200;
+      const y = window.scrollY + window.innerHeight * 0.5;
+      if (y < startY - 200 || y > endY + 200) {
+        ball!.classList.remove(styles.show);
+        return;
+      }
+      ball!.classList.add(styles.show);
+      let p = (y - startY) / (endY - startY);
+      p = Math.max(0, Math.min(1, p));
+      const margin = 80;
+      const span = vw() - margin * 2;
+      const xWave = Math.sin(p * Math.PI * 2.4) * 0.5 + 0.5;
+      const x = margin + xWave * span;
+      const topPx = window.innerHeight * 0.5;
+      ball!.style.transform = `translate(${x}px,calc(${topPx}px - 50%))`;
+    }
+    window.addEventListener('scroll', onScroll, {passive: true});
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  /* Lock scroll + Escape close while the modal is open. */
+  useEffect(() => {
+    if (!modalOpen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setMenuOpen(false);
-    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setModalOpen(false);
+    };
     window.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = prev;
       window.removeEventListener('keydown', onKey);
     };
-  }, [menuOpen]);
+  }, [modalOpen]);
 
-  // TRUTH — strike-through when the statement scrolls into view.
+  /* Tactical canvas behind the modal — players drift, pass the ball and react
+     to the cursor when it is outside the form card. */
   useEffect(() => {
-    const el = truthRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setTimeout(() => setStruck(true), 400);
-          io.disconnect();
-        }
-      },
-      {threshold: 0.5}
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
+    if (!modalOpen) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-  // FILTER — dim 93 dots, count 100→7, then light the 7 kept.
-  useEffect(() => {
-    const el = filterRef.current;
-    if (!el) return;
-    let ran = false;
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (!entries[0].isIntersecting || ran) return;
-        ran = true;
-        io.disconnect();
+    let raf = 0;
+    let W = 0;
+    let H = 0;
+    const mouse = {x: -9999, y: -9999, active: false};
+    type P = {
+      hx: number;
+      hy: number;
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      phase: number;
+      roam: number;
+    };
+    const players: P[] = [];
+    const ball: {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      target: P | null;
+      holder: P | null;
+      traveling: boolean;
+      cool: number;
+    } = {x: 0, y: 0, vx: 0, vy: 0, target: null, holder: null, traveling: false, cool: 0};
 
-        const dots = dotsRef.current;
-        let dim = 0;
-        dots.forEach((d, i) => {
-          if (!d || KEPT.includes(i)) return;
-          const t0 = setTimeout(
-            () => d.classList.add(styles.dimmed),
-            600 + dim * 22
-          );
-          timers.push(t0);
-          dim++;
+    const resize = () => {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    };
+
+    const seed = () => {
+      players.length = 0;
+      const form: [number, number][] = [
+        [0.5, 0.12],
+        [0.2, 0.3],
+        [0.4, 0.32],
+        [0.6, 0.32],
+        [0.8, 0.3],
+        [0.3, 0.55],
+        [0.5, 0.55],
+        [0.7, 0.55],
+        [0.28, 0.8],
+        [0.5, 0.82],
+        [0.72, 0.8]
+      ];
+      for (const [fx, fy] of form) {
+        players.push({
+          hx: fx,
+          hy: fy,
+          x: fx * W,
+          y: fy * H,
+          vx: 0,
+          vy: 0,
+          phase: Math.random() * Math.PI * 2,
+          roam: 18 + Math.random() * 22
         });
-
-        const startCount = setTimeout(() => {
-          let n = 100;
-          const iv = setInterval(() => {
-            n -= Math.ceil((n - 7) / 8);
-            if (n <= 7) {
-              n = 7;
-              clearInterval(iv);
-              setFilterNum(7);
-              setFilterDone(true);
-              KEPT.forEach((k, i) => {
-                const t1 = setTimeout(
-                  () => dotsRef.current[k]?.classList.add(styles.kept),
-                  i * 90
-                );
-                timers.push(t1);
-              });
-            } else {
-              setFilterNum(n);
-            }
-          }, 45);
-          timers.push(iv as unknown as ReturnType<typeof setTimeout>);
-        }, 700);
-        timers.push(startCount);
-      },
-      {threshold: 0.4}
-    );
-    io.observe(el);
-    return () => {
-      io.disconnect();
-      timers.forEach((tm) => clearTimeout(tm));
+      }
+      const s = players[5];
+      ball.x = s.x;
+      ball.y = s.y;
+      ball.holder = s;
+      ball.traveling = false;
+      ball.cool = 0;
     };
-  }, []);
 
-  // JAMES — curtain lift, name slide, title fade, typewriter bio, creds stagger.
-  useEffect(() => {
-    const el = jamesRef.current;
-    if (!el) return;
-    let ran = false;
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (!entries[0].isIntersecting || ran) return;
-        ran = true;
-        io.disconnect();
-
-        const curtain = curtainRef.current;
-        if (curtain) {
-          curtain.style.transition =
-            'transform 1.2s cubic-bezier(.16,1,.3,1)';
-          curtain.style.transform = 'scaleY(0)';
+    const passBall = () => {
+      const from = ball.holder || players[0];
+      let best: P | null = null;
+      let bestScore = -1;
+      for (const p of players) {
+        if (p === from) continue;
+        const dx = p.x - from.x;
+        const dy = p.y - from.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist < 60 || dist > W * 0.55) continue;
+        const forward = (from.y - p.y) / H;
+        const score = forward * 1.5 + Math.random() * 0.8 - Math.abs(dist - W * 0.25) / W;
+        if (score > bestScore) {
+          bestScore = score;
+          best = p;
         }
-
-        timers.push(
-          setTimeout(() => {
-            nameRefs.current.forEach((s) => s?.classList.add(styles.vis));
-          }, 400)
-        );
-        timers.push(
-          setTimeout(() => titleRef.current?.classList.add(styles.vis), 800)
-        );
-
-        timers.push(
-          setTimeout(() => {
-            const cursor = cursorRef.current;
-            const bioEl = bioRef.current;
-            if (cursor) cursor.style.display = 'inline-block';
-            if (!bioEl) return;
-            const txt = t.jamesBio;
-            let i = 0;
-            bioEl.textContent = '';
-            const tick = () => {
-              if (i < txt.length) {
-                bioEl.textContent += txt[i++];
-                timers.push(setTimeout(tick, 16));
-              } else {
-                timers.push(
-                  setTimeout(() => {
-                    if (cursor) cursor.style.display = 'none';
-                  }, 1000)
-                );
-                const creds = credsRef.current?.children;
-                if (creds) {
-                  Array.from(creds).forEach((cr, idx) =>
-                    timers.push(
-                      setTimeout(
-                        () => cr.classList.add(styles.vis),
-                        idx * 180
-                      )
-                    )
-                  );
-                }
-              }
-            };
-            tick();
-          }, 1200)
-        );
-      },
-      {threshold: 0.35}
-    );
-    io.observe(el);
-    return () => {
-      io.disconnect();
-      timers.forEach((tm) => clearTimeout(tm));
+      }
+      if (!best) best = players[Math.floor(Math.random() * players.length)];
+      ball.holder = null;
+      ball.traveling = true;
+      ball.target = best;
+      const dx = best.x - ball.x;
+      const dy = best.y - ball.y;
+      const d = Math.hypot(dx, dy) || 1;
+      const speed = Math.min(14, 6 + d * 0.02);
+      ball.vx = (dx / d) * speed;
+      ball.vy = (dy / d) * speed;
     };
-  }, [t.jamesBio]);
 
-  const marquee = [...t.countries, ...t.countries];
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      for (const p of players) {
+        p.phase += 0.012;
+        let tx = p.hx * W + Math.cos(p.phase) * p.roam;
+        let ty = p.hy * H + Math.sin(p.phase * 0.8) * p.roam;
+        const db = Math.hypot(ball.x - p.x, ball.y - p.y);
+        if (p === ball.target || p === ball.holder || db < 140) {
+          tx = tx * 0.6 + ball.x * 0.4;
+          ty = ty * 0.6 + ball.y * 0.4;
+        }
+        if (mouse.active) {
+          const dmx = p.x - mouse.x;
+          const dmy = p.y - mouse.y;
+          const dm = Math.hypot(dmx, dmy);
+          if (dm < 200) {
+            tx += (dmx / dm) * (200 - dm) * 0.5;
+            ty += (dmy / dm) * (200 - dm) * 0.5;
+          }
+        }
+        p.vx += (tx - p.x) * 0.008;
+        p.vy += (ty - p.y) * 0.008;
+        p.vx *= 0.9;
+        p.vy *= 0.9;
+        p.x += p.vx;
+        p.y += p.vy;
+      }
+
+      if (ball.traveling) {
+        ball.x += ball.vx;
+        ball.y += ball.vy;
+        const tg = ball.target;
+        if (tg && Math.hypot(tg.x - ball.x, tg.y - ball.y) < 16) {
+          ball.traveling = false;
+          ball.holder = tg;
+          ball.cool = 40 + Math.random() * 50;
+        }
+      } else if (ball.holder) {
+        ball.x = ball.holder.x;
+        ball.y = ball.holder.y;
+        ball.cool--;
+        if (ball.cool <= 0) passBall();
+      }
+
+      ctx.lineWidth = 1;
+      for (let i = 0; i < players.length; i++) {
+        for (let j = i + 1; j < players.length; j++) {
+          const dx = players[i].x - players[j].x;
+          const dy = players[i].y - players[j].y;
+          const d = Math.hypot(dx, dy);
+          if (d < 210) {
+            ctx.globalAlpha = (1 - d / 210) * 0.5;
+            ctx.strokeStyle = 'rgba(208,216,226,0.5)';
+            ctx.beginPath();
+            ctx.moveTo(players[i].x, players[i].y);
+            ctx.lineTo(players[j].x, players[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      ctx.globalAlpha = 1;
+
+      if (ball.traveling) {
+        ctx.globalAlpha = 0.25;
+        ctx.strokeStyle = 'rgba(208,216,226,0.9)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(ball.x, ball.y);
+        ctx.lineTo(ball.x - ball.vx * 3, ball.y - ball.vy * 3);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+
+      for (const p of players) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 4.5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(208,216,226,0.6)';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(208,216,226,0.2)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, 5.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#fcfcfc';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(7,44,104,0.6)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      raf = requestAnimationFrame(draw);
+    };
+
+    const onMove = (e: MouseEvent) => {
+      const r = modalCardRef.current?.getBoundingClientRect();
+      if (r) {
+        const inside =
+          e.clientX >= r.left &&
+          e.clientX <= r.right &&
+          e.clientY >= r.top &&
+          e.clientY <= r.bottom;
+        mouse.active = !inside;
+      }
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    };
+    const onResize = () => resize();
+
+    resize();
+    seed();
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('resize', onResize);
+    raf = requestAnimationFrame(draw);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [modalOpen]);
+
+  const openModal = () => setModalOpen(true);
+  const closeModal = () => setModalOpen(false);
+
+  const validateStep = (n: number) => {
+    const f = formRef.current;
+    const bad = new Set<string>();
+    if (!f) return bad;
+    const val = (name: string) =>
+      (f.querySelector(`[name="${name}"]`) as HTMLInputElement | null)?.value.trim() ?? '';
+    const checked = (name: string) => !!f.querySelector(`[name="${name}"]:checked`);
+    if (n === 0) {
+      if (!val('position')) bad.add('position');
+      if (!val('age_category')) bad.add('age_category');
+      if (!checked('eu_passport')) bad.add('eu_passport');
+      if (!val('sporting_nationality')) bad.add('sporting_nationality');
+    }
+    if (n === 1) {
+      if (!val('full_name')) bad.add('full_name');
+      if (!val('dob')) bad.add('dob');
+      if (!val('country')) bad.add('country');
+      if (!val('email')) bad.add('email');
+      if (!checked('has_representative')) bad.add('has_representative');
+    }
+    if (n === 4) {
+      if (!val('video_links')) bad.add('video_links');
+      if (!(f.querySelector('#mPriv') as HTMLInputElement | null)?.checked)
+        bad.add('consent_terms');
+      if (!(f.querySelector('#mAge') as HTMLInputElement | null)?.checked)
+        bad.add('consent_age');
+    }
+    return bad;
+  };
+
+  const onNext = () => {
+    const bad = validateStep(step);
+    if (bad.size > 0) {
+      setErrors(bad);
+      return;
+    }
+    setErrors(new Set());
+    if (step < STEP_NAMES.length - 1) {
+      setStep(step + 1);
+      modalCardRef.current?.scrollTo(0, 0);
+    } else {
+      setSubmitted(true);
+    }
+  };
+  const onBack = () => {
+    if (step > 0) setStep(step - 1);
+  };
+
+  const errCls = (name: string) => (errors.has(name) ? styles.err : undefined);
+  const stepLabel = submitted
+    ? 'Application sent'
+    : `Step ${step + 1} of 5 · ${STEP_NAMES[step]}`;
 
   return (
-    <div className={cx('page')} ref={pageRef}>
+    <div className={cx('page', playing && 'play')} ref={pageRef}>
+      {/* Film grain */}
+      <div className={cx('grain')}>
+        <svg xmlns="http://www.w3.org/2000/svg">
+          <filter id="grainNoise">
+            <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" />
+          </filter>
+          <rect width="100%" height="100%" filter="url(#grainNoise)" />
+        </svg>
+      </div>
+
+      {/* Ball that follows the scroll — 3D GLB model */}
+      <div className={cx('ball')} ref={ballRef} aria-hidden="true">
+        <Ball3D />
+      </div>
+
       {/* NAV */}
-      <nav className={cx('nav', scrolled && 'scrolled')} ref={navRef}>
-        <div className={cx('nav-lang')}>
-          {routing.locales.map((l) => (
-            <button
-              key={l}
-              type="button"
-              onClick={() => switchTo(l)}
-              className={cx(l === locale && 'active')}
-            >
-              {l.toUpperCase()}
-            </button>
-          ))}
-        </div>
-        <Link
-          href="/"
-          className={cx('nav-logo')}
-          aria-label="Clearway Performance Group"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={
-              scrolled
-                ? '/Logotipos/clearway-black.svg'
-                : '/Logotipos/clearway-white.svg'
-            }
-            alt="Clearway Performance Group"
-          />
-        </Link>
-        <button
-          type="button"
-          aria-label="Menu"
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen(true)}
-          className={cx('nav-burger')}
-        >
-          <span />
-          <span />
-          <span />
+      <nav className={cx('nav')}>
+        <span className={cx('logo')}>
+          <span className={cx('c')}>CLEAR</span>
+          <span className={cx('w')}>WAY</span>
+        </span>
+        <button type="button" className={cx('nav-cta')} onClick={openModal}>
+          Build my profile →
         </button>
       </nav>
 
-      {/* SECTION MENU */}
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-hidden={!menuOpen}
-        className={cx('menu-overlay', menuOpen && 'open')}
-      >
-        <div className={cx('menu-lang')}>
-          {routing.locales.map((l) => (
-            <button
-              key={l}
-              type="button"
-              onClick={() => switchTo(l)}
-              className={cx(l === locale && 'active')}
-            >
-              {LOCALE_NAMES[l]}
-            </button>
-          ))}
-        </div>
-        <div className={cx('menu-logo')}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/Logotipos/clearway-white.svg"
-            alt="Clearway Performance Group"
-          />
-        </div>
-        <button
-          type="button"
-          aria-label={isEs ? 'Cerrar' : 'Close'}
-          onClick={() => setMenuOpen(false)}
-          className={cx('menu-close')}
-        >
-          <span>{isEs ? 'Cerrar' : 'Close'}</span>×
-        </button>
-        <div className={cx('menu-eyebrow')}>{t.menuEyebrow}</div>
-        <nav className={cx('menu-list')}>
-          {t.menu.map((item, i) => (
-            <a
-              key={item.href}
-              href={item.href}
-              onClick={() => setMenuOpen(false)}
-              className={cx(active === item.href.slice(1) && 'active')}
-              aria-current={active === item.href.slice(1) ? 'true' : undefined}
-            >
-              <span>{String(i + 1).padStart(2, '0')}</span>
-              {item.label}
-            </a>
-          ))}
-        </nav>
-      </div>
-
-      {/* HERO */}
+      {/* ===== CAP 01 · HERO ===== */}
       <section className={cx('hero')} id="hero">
-        {/* Shared navy surface — morphs (expands) from the clicked home panel
-            into this full-screen hero via the View Transitions API. */}
+        {/* Shared navy surface — morphs (expands) from the home panel. */}
         <ViewTransition name="hero-players" share="morph">
           <div className={cx('hero-bg')} aria-hidden="true" />
         </ViewTransition>
-        {/* Faint background video — behind the pitch SVG and the content,
-            above the solid navy. Skipped under prefers-reduced-motion. */}
-        <div className={cx('hero-video')} aria-hidden="true">
-          {!reduceMotion && (
-            <video
-              src="/players-1.mp4"
-              muted
-              loop
-              autoPlay
-              playsInline
-              preload="auto"
-            />
-          )}
-          <span className={cx('hero-video-veil')} />
+        <div className={cx('chapter')}>
+          <b>01</b> &nbsp;The invisible player
         </div>
-        <div className={cx('hero-grid')} aria-hidden="true">
+        <div className={cx('stage')}>
+          <div className={cx('bgword')}>Seen</div>
+          <div className={cx('player-slot')}>
+            <div className={cx('player-ph')}>
+              Silueta de jugador
+              <br />
+              imagen real
+              <br />
+              (PNG con licencia)
+            </div>
+          </div>
+          <div className={cx('headline')}>
+            <span className={cx('hl', 'hl1', 'reveal-line')}>
+              <span>
+                You can be <b>good</b>
+              </span>
+            </span>
+            <span className={cx('hl', 'hl2', 'reveal-line')}>
+              <span>and still</span>
+            </span>
+            <span className={cx('hl', 'hl3', 'anim', 'd4')}>never get seen.</span>
+          </div>
+          <div className={cx('undertext', 'anim', 'd5')}>
+            <p className={cx('lead')}>
+              Measured against the same standard a professional club uses.{' '}
+              <b>Most do not meet it yet.</b>
+            </p>
+            <div className={cx('stats')}>
+              <div className={cx('stat')}>
+                <div className={cx('n')}>7/100</div>
+                <div className={cx('l')}>past the filter</div>
+              </div>
+              <div className={cx('stat')}>
+                <div className={cx('n')}>100+</div>
+                <div className={cx('l')}>clubs in Europe</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className={cx('cardcol', 'anim', 'd4')}>
+          <div className={cx('fifa')}>
+            <div className={cx('fifa-top')}>
+              <div className={cx('fifa-rating')}>CW</div>
+              <div className={cx('fifa-pos')}>{u(card.pos, 'POS')}</div>
+            </div>
+            <div className={cx('fifa-logo')}>
+              <span className={cx('c')}>CLEAR</span>WAY
+            </div>
+            <div className={cx('fifa-slot')}>
+              <div className={cx('ph')}>silueta</div>
+            </div>
+            <div className={cx('fifa-name')}>{u(card.name, 'YOUR NAME')}</div>
+            <div className={cx('fifa-meta')}>
+              <span>
+                <b>{u(card.eu, '—')}</b>EU PASS
+              </span>
+              <span>
+                <b>{u(card.age, '—')}</b>AGE CAT
+              </span>
+            </div>
+          </div>
+          <button type="button" className={cx('card-cta')} onClick={openModal}>
+            This could be your card. <b>Build it →</b>
+          </button>
+          <div className={cx('card-note')}>
+            Free to build · Players from Mexico and the world
+          </div>
+        </div>
+        <div className={cx('scroll-cue', 'anim', 'd5')}>
+          <span className={cx('bar')} />
+          <span>The story begins</span>
+        </div>
+      </section>
+
+      {/* ===== CAP 02 · TRUTH ===== */}
+      <section className={cx('truth')} ref={truthRef}>
+        <div className={cx('wrap')}>
+          <div className={cx('chapnum', 'reveal', 'light')}>
+            <b>02</b> &nbsp;The honest part
+          </div>
+          <div className={cx('head', 'reveal')}>
+            <h2 className={cx('disp')}>
+              The bit <span className={cx('it')}>others skip.</span>
+            </h2>
+          </div>
+          <div className={cx('tgrid')}>
+            <div className={cx('tcard', 'reveal')} data-d="1">
+              <div className={cx('tn')}>i</div>
+              <h3>Your trial is real</h3>
+              <p>
+                Some charge you to stand on a pitch and hope someone watches.{' '}
+                <strong>
+                  Yours is with a club that already said they want to see you.
+                </strong>
+              </p>
+            </div>
+            <div className={cx('tcard', 'reveal')} data-d="2">
+              <div className={cx('tn')}>ii</div>
+              <h3>What it costs, plainly</h3>
+              <p>
+                Building your profile is free.{' '}
+                <strong>The three month evaluation has a cost</strong>, written
+                into a Clearway contract. You cover your video and travel.
+              </p>
+            </div>
+            <div className={cx('tcard', 'reveal')} data-d="3">
+              <div className={cx('tn')}>iii</div>
+              <h3>What we promise</h3>
+              <p>
+                We guarantee the <strong>trial, not the signing</strong>. Nobody
+                can promise a contract honestly. What we promise is the door, and
+                the work permit and GBE paperwork for England.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== CAP 03 · FILTER ===== */}
+      <section className={cx('filter')}>
+        <div className={cx('wrap')}>
+          <div className={cx('chapnum', 'reveal', 'light')}>
+            <b>03</b> &nbsp;The standard
+          </div>
+          <div className={cx('big', 'reveal')}>
+            7<em>/</em>100
+          </div>
+          <h2 className={cx('reveal')}>Seven of every hundred go through.</h2>
+          <p className={cx('reveal')}>
+            That number is low on purpose. It is not us being difficult, it is us
+            being honest about what professional football actually asks for. We
+            would rather tell you the truth early than waste your summer.
+          </p>
+          <button type="button" className={cx('inline-cta', 'reveal')} onClick={openModal}>
+            Think you are one of the seven? <b>Show us →</b>
+          </button>
+        </div>
+      </section>
+
+      {/* ===== CAP 04 · GUIDES ===== */}
+      <section className={cx('guides')}>
+        <div className={cx('wrap')}>
+          <div className={cx('chapnum', 'reveal', 'light')}>
+            <b>04</b> &nbsp;You are not alone
+          </div>
+          <div className={cx('head', 'reveal')}>
+            <h2 className={cx('disp')}>
+              Not a form in a folder.{' '}
+              <span className={cx('it')}>People who have done this.</span>
+            </h2>
+          </div>
+          <div className={cx('team')}>
+            <div className={cx('gcard', 'reveal')} data-d="1">
+              <div className={cx('gphoto')}>
+                <span className={cx('ph')}>Foto James</span>
+                <div className={cx('nm')}>
+                  <span>James</span>
+                  <br />
+                  Fox.
+                </div>
+              </div>
+              <div className={cx('grole')}>Founder and CEO</div>
+              <ul className={cx('glist')}>
+                <li>
+                  <strong>
+                    Registered with The Football Association in Talent
+                    Identification.
+                  </strong>
+                </li>
+                <li>
+                  <strong>Access to more than 100 clubs</strong> across eight
+                  countries in England and Europe. FIFA licensed agents available.
+                </li>
+                <li>
+                  <strong>The work permit and GBE for England, handled.</strong> We
+                  do all the paperwork.
+                </li>
+                <li>
+                  <strong>The day you walk into a club, he is there too.</strong>
+                </li>
+              </ul>
+            </div>
+            <div className={cx('gcard', 'reveal')} data-d="2">
+              <div className={cx('gphoto')}>
+                <span className={cx('ph')}>Foto Cyril</span>
+                <div className={cx('nm')}>
+                  <span>Cyril</span>
+                  <br />
+                  Rool.
+                </div>
+              </div>
+              <div className={cx('grole')}>Director of European Football</div>
+              <ul className={cx('glist')}>
+                <li>
+                  <strong>Over 15 years in Ligue 1</strong> with RC Lens, Girondins
+                  de Bordeaux, OGC Nice and Olympique de Marseille.
+                </li>
+                <li>
+                  <strong>France Under 21 international.</strong>
+                </li>
+                <li>
+                  <strong>Has represented and placed several players</strong> in
+                  Europe and Mexico.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== CAP 05 · VOICES ===== */}
+      <section className={cx('voices')} ref={voicesRef}>
+        <div className={cx('wrap')}>
+          <div className={cx('chapnum', 'reveal')} style={{color: 'rgba(252,252,252,.7)'}}>
+            <b style={{color: '#fff'}}>05</b> &nbsp;The ones already living it
+          </div>
+          <div className={cx('head', 'reveal')}>
+            <h2 className={cx('disp')}>
+              Real voices. <span className={cx('it')}>Real pathways.</span>
+            </h2>
+            <p>From families already on the journey. No names, that is the point.</p>
+          </div>
+        </div>
+        <div className={cx('vmarquee')}>
+          <div className={cx('vrow', 'r1')}>
+            {VOICES_R1.concat(VOICES_R1).map((v, i) => (
+              <div className={cx('vcard')} key={`r1-${i}`}>
+                <p>{v.quote}</p>
+                <span className={cx('who')}>{v.who}</span>
+              </div>
+            ))}
+          </div>
+          <div className={cx('vrow', 'r2')}>
+            {VOICES_R2.concat(VOICES_R2).map((v, i) => (
+              <div className={cx('vcard')} key={`r2-${i}`}>
+                <p>{v.quote}</p>
+                <span className={cx('who')}>{v.who}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== CAP 06 · CLOSE ===== */}
+      <section className={cx('close')}>
+        <div className={cx('crowd-close')} aria-hidden="true">
           <svg
-            viewBox="0 0 1200 620"
-            preserveAspectRatio="xMidYMin slice"
-            fill="none"
-            stroke="#d0d8e2"
-            strokeWidth="1"
-            opacity="0.18"
+            viewBox="0 0 1400 240"
+            preserveAspectRatio="xMidYMax slice"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            {/* Top touchline sits at y=0 so it lands exactly on the header's
-                bottom edge once the grid is offset by --header-h. */}
-            <rect x="40" y="0" width="1120" height="600" />
-            <line x1="600" y1="0" x2="600" y2="600" />
-            <circle cx="600" cy="300" r="110" />
-            <rect x="40" y="170" width="150" height="260" />
-            <rect x="1010" y="170" width="150" height="260" />
+            <g fill="var(--navy)">
+              <g opacity=".28">
+                <path d="M20 240 L20 150 Q20 130 38 130 Q56 130 56 150 L56 240 Z M28 130 L16 100 M48 130 L60 98" />
+                <circle cx="38" cy="116" r="11" />
+                <path d="M120 240 L120 158 Q120 138 138 138 Q156 138 156 158 L156 240 Z M128 138 L116 110 M148 138 L160 108" />
+                <circle cx="138" cy="124" r="10" />
+                <path d="M230 240 L230 150 Q230 130 248 130 Q266 130 266 150 L266 240 Z M238 130 L226 100 M258 130 L270 98" />
+                <circle cx="248" cy="116" r="11" />
+                <path d="M340 240 L340 160 Q340 140 358 140 Q376 140 376 160 L376 240 Z M348 140 L336 112 M368 140 L380 110" />
+                <circle cx="358" cy="126" r="10" />
+                <path d="M450 240 L450 150 Q450 130 468 130 Q486 130 486 150 L486 240 Z M458 130 L446 100 M478 130 L490 98" />
+                <circle cx="468" cy="116" r="11" />
+                <path d="M560 240 L560 158 Q560 138 578 138 Q596 138 596 158 L596 240 Z M568 138 L556 110 M588 138 L600 108" />
+                <circle cx="578" cy="124" r="10" />
+                <path d="M670 240 L670 150 Q670 130 688 130 Q706 130 706 150 L706 240 Z M678 130 L666 100 M698 130 L710 98" />
+                <circle cx="688" cy="116" r="11" />
+                <path d="M780 240 L780 160 Q780 140 798 140 Q816 140 816 160 L816 240 Z M788 140 L776 112 M808 140 L820 110" />
+                <circle cx="798" cy="126" r="10" />
+                <path d="M890 240 L890 150 Q890 130 908 130 Q926 130 926 150 L926 240 Z M898 130 L886 100 M918 130 L930 98" />
+                <circle cx="908" cy="116" r="11" />
+                <path d="M1000 240 L1000 158 Q1000 138 1018 138 Q1036 138 1036 158 L1036 240 Z M1008 138 L996 110 M1028 138 L1040 108" />
+                <circle cx="1018" cy="124" r="10" />
+                <path d="M1110 240 L1110 150 Q1110 130 1128 130 Q1146 130 1146 150 L1146 240 Z M1118 130 L1106 100 M1138 130 L1150 98" />
+                <circle cx="1128" cy="116" r="11" />
+                <path d="M1220 240 L1220 160 Q1220 140 1238 140 Q1256 140 1256 160 L1256 240 Z M1228 140 L1216 112 M1248 140 L1260 110" />
+                <circle cx="1238" cy="126" r="10" />
+                <path d="M1330 240 L1330 150 Q1330 130 1348 130 Q1366 130 1366 150 L1366 240 Z M1338 130 L1326 100 M1358 130 L1370 98" />
+                <circle cx="1348" cy="116" r="11" />
+              </g>
+              <path d="M70 240 L70 140 Q70 116 92 116 Q114 116 114 140 L114 240 Z M80 116 L64 76 M104 116 L120 74" />
+              <circle cx="92" cy="96" r="15" />
+              <path d="M200 240 L200 152 Q200 128 222 128 Q244 128 244 152 L244 240 Z M210 128 L194 90 M234 128 L250 88" />
+              <circle cx="222" cy="108" r="14" />
+              <path d="M330 240 L330 138 Q330 114 352 114 Q374 114 374 138 L374 240 Z M340 114 L324 72 M364 114 L380 72" />
+              <circle cx="352" cy="94" r="16" />
+              <path d="M470 240 L470 150 Q470 126 492 126 Q514 126 514 150 L514 240 Z M480 126 L464 88 M504 126 L520 86" />
+              <circle cx="492" cy="106" r="14" />
+              <path d="M600 240 L600 140 Q600 116 622 116 Q644 116 644 140 L644 240 Z M610 116 L594 76 M634 116 L650 74" />
+              <circle cx="622" cy="96" r="15" />
+              <path d="M740 240 L740 152 Q740 128 762 128 Q784 128 784 152 L784 240 Z M750 128 L734 90 M774 128 L790 88" />
+              <circle cx="762" cy="108" r="14" />
+              <path d="M870 240 L870 136 Q870 112 892 112 Q914 112 914 136 L914 240 Z M880 112 L864 70 M904 112 L920 70" />
+              <circle cx="892" cy="92" r="16" />
+              <path d="M1010 240 L1010 150 Q1010 126 1032 126 Q1054 126 1054 150 L1054 240 Z M1020 126 L1004 88 M1044 126 L1060 86" />
+              <circle cx="1032" cy="106" r="14" />
+              <path d="M1140 240 L1140 140 Q1140 116 1162 116 Q1184 116 1184 140 L1184 240 Z M1150 116 L1134 76 M1174 116 L1190 74" />
+              <circle cx="1162" cy="96" r="15" />
+              <path d="M1280 240 L1280 152 Q1280 128 1302 128 Q1324 128 1324 152 L1324 240 Z M1290 128 L1274 90 M1314 128 L1330 88" />
+              <circle cx="1302" cy="108" r="14" />
+            </g>
           </svg>
         </div>
-        <div className={cx('hero-eyebrow')}>
-          <span>{t.heroEyebrow}</span>
-        </div>
-        <h1 className={cx('hero-h1')}>
-          {isEs ? (
-            <>
-              <span className={cx('line')}>
-                <span>El talento</span>
-              </span>
-              <span className={cx('line')}>
-                <span>
-                  existe. <em>Ser visto</em>
-                </span>
-              </span>
-              <span className={cx('line')}>
-                <span>es lo difícil.</span>
-              </span>
-            </>
-          ) : (
-            <>
-              <span className={cx('line')}>
-                <span>Talent</span>
-              </span>
-              <span className={cx('line')}>
-                <span>
-                  exists. <em>Being seen</em>
-                </span>
-              </span>
-              <span className={cx('line')}>
-                <span>is the hard part.</span>
-              </span>
-            </>
-          )}
-        </h1>
-        <div className={cx('hero-bottom')}>
-          <p className={cx('hero-sub')}>{t.heroSub}</p>
-          <a href="#cta" className={cx('hero-cta')}>
-            {t.heroCta} <span>→</span>
-          </a>
-        </div>
-        <div className={cx('hero-scroll')}>{t.heroScroll}</div>
-      </section>
-
-      {/* MARQUEE */}
-      <div className={cx('marquee')} aria-hidden="true">
-        <div className={cx('marquee-track')}>
-          {marquee.map((country, i) => (
-            <span key={`${country}-${i}`}>
-              {country}
-              <b> · </b>
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* TRUTH */}
-      <section className={cx('truth')} id="truth" ref={truthRef}>
-        <div className={cx('truth-inner')}>
-          <div className={cx('truth-label')}>{t.truthLabel}</div>
-          <p className={cx('truth-statement')}>
-            {isEs ? (
-              <>
-                Hay quien te cobra por{' '}
-                <span className={cx('strike', struck && 'struck')}>
-                  pararte en una cancha a que alguien te mire
-                </span>
-                . Aquí no.{' '}
-                <b>Tu prueba es con un club real que ya quiere verte.</b>
-              </>
-            ) : (
-              <>
-                Some charge you to{' '}
-                <span className={cx('strike', struck && 'struck')}>
-                  stand on a pitch hoping someone watches
-                </span>
-                . Not here.{' '}
-                <b>Your trial is with a real club that already wants to see you.</b>
-              </>
-            )}
-          </p>
-          <div className={cx('truth-foot')}>
-            {isEs ? (
-              <>
-                <p>
-                  Aplicar y armar tu perfil es <b>gratis</b>. Lo que cuesta es
-                  la evaluación de tres meses, con un contrato Clearway claro
-                  donde sabes exactamente qué esperar.
-                </p>
-                <p>
-                  Garantizamos la <b>prueba</b>, no el fichaje. Y hacemos todo
-                  el papeleo del permiso de trabajo y GBE para Inglaterra — eso
-                  ningún competidor lo cubre.
-                </p>
-              </>
-            ) : (
-              <>
-                <p>
-                  Applying and building your profile is <b>free</b>. What you
-                  pay for is the three-month evaluation, with a clear Clearway
-                  contract where you know exactly what to expect.
-                </p>
-                <p>
-                  We guarantee the <b>trial</b>, not the signing. And we handle
-                  all the work-permit and GBE paperwork for England — no
-                  competitor covers that.
-                </p>
-              </>
-            )}
+        <div className={cx('wrap')}>
+          <div className={cx('chapnum', 'reveal')}>
+            <b>06</b> &nbsp;Your move
           </div>
-        </div>
-      </section>
-
-      {/* FILTER */}
-      <section className={cx('filter')} id="filter" ref={filterRef}>
-        <div className={cx('filter-inner')}>
-          <div className={cx('filter-copy')}>
-            <div className={cx('filter-copy-label')}>{t.filterLabel}</div>
-            <h2>
-              {isEs ? (
-                <>
-                  De cada cien,
-                  <br />
-                  <em>siete</em> avanzan.
-                </>
-              ) : (
-                <>
-                  Of every hundred,
-                  <br />
-                  <em>seven</em> advance.
-                </>
-              )}
-            </h2>
-            <p>{t.filterP}</p>
-          </div>
-          <div className={cx('filter-viz')}>
-            <div className={cx('dot-grid')}>
-              {Array.from({length: 100}).map((_, i) => (
-                <span
-                  key={i}
-                  className={cx('dot')}
-                  ref={(el) => {
-                    dotsRef.current[i] = el;
-                  }}
-                />
-              ))}
-            </div>
-            <div className={cx('filter-count')}>
-              <div
-                className={cx('filter-count-num')}
-                style={filterDone ? {color: '#d0d8e2'} : undefined}
-              >
-                {filterNum}
-              </div>
-              <div
-                className={cx('filter-count-label')}
-                style={{whiteSpace: 'pre-line'}}
-              >
-                {filterDone ? t.filterCountLabelDone : t.filterCountLabel}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* PROCESS */}
-      <section className={cx('process')} id="process">
-        <div className={cx('process-head')}>
-          <div className={cx('truth-label')}>{t.processLabel}</div>
-          <h2>
-            {isEs ? (
-              <>
-                De tu perfil a la cancha,
-                <br />
-                en cuatro pasos.
-              </>
-            ) : (
-              <>
-                From your profile to the pitch,
-                <br />
-                in four steps.
-              </>
-            )}
+          <h2 className={cx('disp', 'reveal')}>
+            From invisible <span className={cx('it')}>to seen.</span>
           </h2>
-        </div>
-        <div className={cx('process-rail')}>
-          {t.procCards.map((card) => (
-            <div className={cx('proc-card')} key={card.num}>
-              <div className={cx('proc-num')}>{card.num}</div>
-              <h3>{card.title}</h3>
-              <p>{card.body}</p>
-              <span className={cx('proc-tag')}>{card.tag}</span>
-            </div>
-          ))}
-        </div>
-        <div className={cx('proc-hint')}>{t.procHint}</div>
-      </section>
-
-      {/* JAMES */}
-      <section className={cx('james')} id="james" ref={jamesRef}>
-        <div className={cx('james-photo-wrap')}>
-          <div className={cx('james-photo')}>
-            <div className={cx('james-curtain')} ref={curtainRef} />
-            <div className={cx('james-photo-grid')} aria-hidden="true">
-              <svg
-                viewBox="0 0 400 600"
-                preserveAspectRatio="xMidYMid slice"
-                fill="none"
-                stroke="#d0d8e2"
-                strokeWidth="1"
-              >
-                <line x1="0" y1="300" x2="400" y2="300" />
-                <circle cx="200" cy="300" r="70" />
-                <rect x="120" y="0" width="160" height="90" />
-                <rect x="120" y="510" width="160" height="90" />
-              </svg>
-            </div>
-            <div className={cx('james-photo-label')}>{t.jamesPhotoLabel}</div>
-          </div>
-        </div>
-        <div className={cx('james-content')}>
-          <div className={cx('james-eyebrow')}>{t.jamesEyebrow}</div>
-          <div className={cx('james-name')}>
-            <span
-              ref={(el) => {
-                nameRefs.current[0] = el;
-              }}
-            >
-              {t.jamesName1}
-            </span>
-          </div>
-          <div className={cx('james-name')}>
-            <span
-              ref={(el) => {
-                nameRefs.current[1] = el;
-              }}
-              style={{transitionDelay: '.12s'}}
-            >
-              {t.jamesName2}
-            </span>
-          </div>
-          <p className={cx('james-title')} ref={titleRef}>
-            {t.jamesTitle}
+          <p className={cx('reveal')}>
+            Build your profile. If it fits, you will hear from the Clearway team.
+            If it does not, you will hear that too. Either way, no guessing.
           </p>
-          <p className={cx('james-bio')}>
-            <span ref={bioRef} />
-            <span
-              className={cx('james-cursor')}
-              ref={cursorRef}
-              style={{display: 'none'}}
-            />
-          </p>
-          <div className={cx('james-creds')} ref={credsRef}>
-            {isEs ? (
-              <>
-                <div className={cx('james-cred')}>
-                  <i />
-                  <span>
-                    <b>FA Talent Identification</b> — registrado en The Football
-                    Association de Inglaterra.
-                  </span>
-                </div>
-                <div className={cx('james-cred')}>
-                  <i />
-                  <span>
-                    Acceso a <b>más de 100 clubes</b> en ocho países vía socio
-                    con licencia FIFA.
-                  </span>
-                </div>
-                <div className={cx('james-cred')}>
-                  <i />
-                  <span>
-                    Gestión completa del <b>permiso de trabajo y GBE</b> para
-                    Inglaterra.
-                  </span>
-                </div>
-                <div className={cx('james-cred')}>
-                  <i />
-                  <span>
-                    Revisa <b>cada aplicación él mismo.</b> Sin intermediario.
-                  </span>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className={cx('james-cred')}>
-                  <i />
-                  <span>
-                    <b>FA Talent Identification</b> — registered with The
-                    Football Association of England.
-                  </span>
-                </div>
-                <div className={cx('james-cred')}>
-                  <i />
-                  <span>
-                    Access to <b>more than 100 clubs</b> across eight countries
-                    via a FIFA-licensed partner.
-                  </span>
-                </div>
-                <div className={cx('james-cred')}>
-                  <i />
-                  <span>
-                    Full management of the <b>work permit and GBE</b> for
-                    England.
-                  </span>
-                </div>
-                <div className={cx('james-cred')}>
-                  <i />
-                  <span>
-                    Reviews <b>every application himself.</b> No middleman.
-                  </span>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className={cx('cta')} id="cta">
-        <div className={cx('cta-watermark')} aria-hidden="true">
-          apply
-        </div>
-        <div className={cx('cta-inner')}>
-          <div>
-            <div className={cx('cta-eyebrow')}>{t.ctaEyebrow}</div>
-            <h2>
-              {isEs ? (
-                <>
-                  El primer
-                  <br />
-                  paso es tuyo.
-                </>
-              ) : (
-                <>
-                  The first
-                  <br />
-                  step is yours.
-                </>
-              )}
-            </h2>
-            <p className={cx('cta-tag')}>{t.ctaTag}</p>
-          </div>
-          <div className={cx('cta-right')}>
-            <p>{t.ctaRightP}</p>
-            <div className={cx('cta-list')}>
-              {t.ctaList.map((item) => (
-                <div key={item}>
-                  <i />
-                  {item}
-                </div>
-              ))}
-            </div>
-            <button
-              type="button"
-              className={cx('cta-btn')}
-              onClick={() => window.alert(t.formSoon)}
-            >
-              {t.ctaBtn} <span>→</span>
-            </button>
-            <p className={cx('cta-legal')}>
-              {isEs ? (
-                <>
-                  Al continuar aceptas nuestra{' '}
-                  <Link href="/privacy">Política de Privacidad</Link> y{' '}
-                  <Link href="/terms">Términos y Condiciones</Link>.
-                </>
-              ) : (
-                <>
-                  By continuing you accept our{' '}
-                  <Link href="/privacy">Privacy Policy</Link> and{' '}
-                  <Link href="/terms">Terms &amp; Conditions</Link>.
-                </>
-              )}
-            </p>
-          </div>
+          <button type="button" className={cx('cta', 'reveal')} onClick={openModal}>
+            Build my profile <span>→</span>
+          </button>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className={cx('footer')}>
-        <div className={cx('foot-inner')}>
-          <div className={cx('foot-top')}>
-            <div>
-              <div className={cx('foot-logo-main')}>
-                CLEAR<b>WAY</b>
-              </div>
-              <div className={cx('foot-tag')}>{t.footTag}</div>
-            </div>
-            <div>
-              <div className={cx('foot-col-label')}>{t.footNavigate}</div>
-              <div className={cx('foot-links')}>
-                <Link href="/for-clubs">
-                  {isEs ? 'Para Clubes' : 'For Clubs'}
-                </Link>
-                <Link href="/for-players">
-                  {isEs ? 'Para Jugadores' : 'For Players'}
-                </Link>
-                <Link href="/about">
-                  {isEs ? 'Sobre James Fox' : 'About James Fox'}
-                </Link>
-              </div>
-            </div>
-            <div>
-              <div className={cx('foot-col-label')}>{t.footLegal}</div>
-              <div className={cx('foot-links')}>
-                <Link href="/privacy">
-                  {isEs ? 'Política de Privacidad' : 'Privacy Policy'}
-                </Link>
-                <Link href="/terms">
-                  {isEs ? 'Términos y Condiciones' : 'Terms & Conditions'}
-                </Link>
-              </div>
-            </div>
+      <footer className={cx('foot')}>
+        <div className={cx('wrap')}>
+          <div>
+            <span className={cx('mark')}>
+              <span className={cx('c')}>CLEAR</span>
+              <span className={cx('w')}>WAY</span>
+            </span>
+            <div className={cx('serif')}>we form champions</div>
           </div>
-          <div className={cx('foot-bottom')}>
-            <span className={cx('foot-copy')}>{t.footCopy}</span>
-            <a
-              href="https://scndal.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Created by SCNDAL"
-              style={{display: 'block', lineHeight: 0}}
-            >
-              <Image
-                src="/White-webtag.svg"
-                alt="Created by SCNDAL"
-                width={148}
-                height={18}
-                style={{height: 18, width: 'auto', opacity: 0.4}}
-              />
-            </a>
+          <div className={cx('foot-col')}>
+            <h4>Navigate</h4>
+            <Link href="/for-clubs">For Clubs</Link>
+            <Link href="/for-players">For Players</Link>
+            <Link href="/about">About James Fox</Link>
+          </div>
+          <div className={cx('foot-col')}>
+            <h4>Legal</h4>
+            <Link href="/privacy">Privacy Policy</Link>
+            <Link href="/terms">Terms &amp; Conditions</Link>
           </div>
         </div>
+        <div className={cx('foot-bot')}>
+          © 2026 Clearway Performance Group · Created by SCNDAL
+        </div>
       </footer>
+
+      {/* ===== MODAL · application form ===== */}
+      <div
+        className={cx('modal', modalOpen && 'open')}
+        role="dialog"
+        aria-modal="true"
+        aria-hidden={!modalOpen}
+      >
+        <div className={cx('modal-bg')} onClick={closeModal}>
+          <canvas className={cx('tactics')} ref={canvasRef} />
+        </div>
+        <div className={cx('modal-card')} ref={modalCardRef}>
+          <div className={cx('modal-head')}>
+            <div className={cx('row')}>
+              <div>
+                <div className={cx('kick')}>Player application · Clearway</div>
+                <div className={cx('t')}>Build your player profile</div>
+              </div>
+              <button
+                type="button"
+                className={cx('x')}
+                onClick={closeModal}
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+            <div className={cx('sub')}>{stepLabel}</div>
+            <div className={cx('mprogress')}>
+              {[0, 1, 2, 3, 4].map((n) => (
+                <span
+                  key={n}
+                  className={cx('mpdot', (submitted || n <= step) && 'on')}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className={cx('modal-body')}>
+            <div ref={formRef} style={{display: submitted ? 'none' : 'block'}}>
+              {/* STEP 1 */}
+              <div className={cx('mstep', step === 0 && 'active')}>
+                <div className={cx('mstepn')}>The essentials</div>
+                <div className={cx('mrow2')}>
+                  <div className={cx('mf')}>
+                    <label>
+                      Main position <span className={cx('req')}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="position"
+                      placeholder="e.g. Striker, Centre back"
+                      className={errCls('position')}
+                      onChange={(e) => setCard((c) => ({...c, pos: e.target.value}))}
+                    />
+                  </div>
+                  <div className={cx('mf')}>
+                    <label>
+                      Age category <span className={cx('req')}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="age_category"
+                      placeholder="U17, U20, senior"
+                      className={errCls('age_category')}
+                      onChange={(e) => setCard((c) => ({...c, age: e.target.value}))}
+                    />
+                  </div>
+                </div>
+                <div className={cx('mf')}>
+                  <label>
+                    Do you hold a European or EU passport?{' '}
+                    <span className={cx('req')}>*</span>
+                  </label>
+                  <div className={cx('mseg', errors.has('eu_passport') && 'err')}>
+                    {['Yes', 'No', 'In process'].map((v) => (
+                      <label key={v}>
+                        <input
+                          type="radio"
+                          name="eu_passport"
+                          value={v}
+                          onChange={() => setCard((c) => ({...c, eu: v}))}
+                        />
+                        <span>{v}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <div className={cx('hint')}>
+                    This changes how we place you. There is a pathway either way.
+                  </div>
+                </div>
+                <div className={cx('mf')}>
+                  <label>
+                    Sporting nationality <span className={cx('req')}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="sporting_nationality"
+                    placeholder="e.g. Mexican, Spanish, dual"
+                    className={errCls('sporting_nationality')}
+                  />
+                </div>
+              </div>
+
+              {/* STEP 2 */}
+              <div className={cx('mstep', step === 1 && 'active')}>
+                <div className={cx('mstepn')}>Who you are</div>
+                <div className={cx('mf')}>
+                  <label>
+                    Full name <span className={cx('req')}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="full_name"
+                    className={errCls('full_name')}
+                    onChange={(e) => setCard((c) => ({...c, name: e.target.value}))}
+                  />
+                </div>
+                <div className={cx('mrow2')}>
+                  <div className={cx('mf')}>
+                    <label>
+                      Date of birth <span className={cx('req')}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="dob"
+                      placeholder="DD/MM/YYYY"
+                      className={errCls('dob')}
+                    />
+                  </div>
+                  <div className={cx('mf')}>
+                    <label>
+                      Current country <span className={cx('req')}>*</span>
+                    </label>
+                    <input type="text" name="country" className={errCls('country')} />
+                  </div>
+                </div>
+                <div className={cx('mrow2')}>
+                  <div className={cx('mf')}>
+                    <label>
+                      Email <span className={cx('req')}>*</span>
+                    </label>
+                    <input type="email" name="email" className={errCls('email')} />
+                  </div>
+                  <div className={cx('mf')}>
+                    <label>WhatsApp</label>
+                    <input type="text" name="whatsapp" />
+                  </div>
+                </div>
+                <div className={cx('mf')}>
+                  <label>
+                    Do you currently have a representative or agent?{' '}
+                    <span className={cx('req')}>*</span>
+                  </label>
+                  <div className={cx('mseg', errors.has('has_representative') && 'err')}>
+                    {['Yes', 'No'].map((v) => (
+                      <label key={v}>
+                        <input type="radio" name="has_representative" value={v} />
+                        <span>{v}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* STEP 3 */}
+              <div className={cx('mstep', step === 2 && 'active')}>
+                <div className={cx('mstepn')}>Your game</div>
+                <div className={cx('mrow2')}>
+                  <div className={cx('mf')}>
+                    <label>Secondary position</label>
+                    <input type="text" name="secondary_position" />
+                  </div>
+                  <div className={cx('mf')}>
+                    <label>Strong foot</label>
+                    <input type="text" name="strong_foot" placeholder="Left / Right / Both" />
+                  </div>
+                </div>
+                <div className={cx('mrow2')}>
+                  <div className={cx('mf')}>
+                    <label>Height (cm)</label>
+                    <input type="text" name="height_cm" />
+                  </div>
+                  <div className={cx('mf')}>
+                    <label>Weight (kg)</label>
+                    <input type="text" name="weight_kg" />
+                  </div>
+                </div>
+              </div>
+
+              {/* STEP 4 */}
+              <div className={cx('mstep', step === 3 && 'active')}>
+                <div className={cx('mstepn')}>Your record</div>
+                <div className={cx('mf')}>
+                  <label>Current club and league</label>
+                  <input type="text" name="current_club" />
+                </div>
+                <div className={cx('mrow2')}>
+                  <div className={cx('mf')}>
+                    <label>Previous clubs</label>
+                    <input type="text" name="previous_clubs" />
+                  </div>
+                  <div className={cx('mf')}>
+                    <label>Level</label>
+                    <input type="text" name="level" placeholder="Amateur / Semipro / Pro" />
+                  </div>
+                </div>
+                <div className={cx('mf')}>
+                  <label>This season (games, goals, assists)</label>
+                  <input type="text" name="season_stats" />
+                </div>
+              </div>
+
+              {/* STEP 5 */}
+              <div className={cx('mstep', step === 4 && 'active')}>
+                <div className={cx('mstepn')}>Your footage</div>
+                <div className={cx('mf')}>
+                  <label>
+                    Video links (YouTube, Vimeo or Drive){' '}
+                    <span className={cx('req')}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="video_links"
+                    placeholder="Paste one or more, separated by commas"
+                    className={errCls('video_links')}
+                  />
+                  <div className={cx('hint')}>
+                    The more match footage the better. This is what matters most.
+                  </div>
+                </div>
+                <div className={cx('mrow2')}>
+                  <div className={cx('mf')}>
+                    <label>Instagram</label>
+                    <input type="text" name="instagram" />
+                  </div>
+                  <div className={cx('mf')}>
+                    <label>Coach reference and contact</label>
+                    <input type="text" name="coach_reference" />
+                  </div>
+                </div>
+                <div className={cx('mconsent')}>
+                  <label>
+                    <input type="checkbox" name="consent_terms" id="mPriv" />
+                    <span>
+                      I accept the{' '}
+                      <Link href="/privacy" target="_blank">
+                        Privacy Policy
+                      </Link>{' '}
+                      and{' '}
+                      <Link href="/terms" target="_blank">
+                        Terms
+                      </Link>
+                      . <span className={cx('req')}>*</span>
+                    </span>
+                  </label>
+                  <label>
+                    <input type="checkbox" name="consent_age" id="mAge" />
+                    <span>
+                      I am over 18, or a parent or guardian authorises this
+                      application and will be the contact.{' '}
+                      <span className={cx('req')}>*</span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* success */}
+            <div className={cx('msuccess', submitted && 'show')}>
+              <div className={cx('chk')}>✓</div>
+              <h3>That is your profile.</h3>
+              <p>
+                This is what the Clearway team sees. If it fits what a club is
+                looking for, they get in touch themselves.
+              </p>
+            </div>
+
+            {!submitted && (
+              <div className={cx('modal-foot')}>
+                <button
+                  type="button"
+                  className={cx('mbtn', 'mbtn-ghost')}
+                  onClick={onBack}
+                  style={{visibility: step === 0 ? 'hidden' : 'visible'}}
+                >
+                  Back
+                </button>
+                <button type="button" className={cx('mbtn', 'mbtn-solid')} onClick={onNext}>
+                  {step === STEP_NAMES.length - 1 ? 'Send to Clearway →' : 'Next →'}
+                </button>
+              </div>
+            )}
+            <div className={cx('mfoot-note')}>
+              Building your profile is free. The three month evaluation has a cost,
+              set out in the Clearway contract. <Link href="/terms">Terms</Link>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
+
+const VOICES_R1 = [
+  {
+    quote:
+      '"Your professionalism at every stage has been incredible. We already feel Clearway, and your son, as if JP were with his family from England."',
+    who: 'Parent of a player'
+  },
+  {
+    quote:
+      '"It is always very professional, clear and exciting getting news from you."',
+    who: 'Parent of a player'
+  },
+  {
+    quote: '"Thank you for this initiative. It is really motivating us."',
+    who: 'Parent of a player'
+  },
+  {
+    quote:
+      '"I had not realised you would be there in person on the first day. That is truly priceless."',
+    who: 'Parent of a player'
+  },
+  {
+    quote:
+      '"Sounds amazing. We are very excited to train in a new environment. Thank you."',
+    who: 'Player'
+  }
+];
+
+const VOICES_R2 = [
+  {
+    quote:
+      '"Everything has been a wonderful experience so far, and it is great that you will be there during those days."',
+    who: "A player's mum"
+  },
+  {
+    quote:
+      '"Thank you for your support. This will be a great summer experience for us."',
+    who: 'Parent of a player'
+  },
+  {
+    quote:
+      '"Reading your messages is highly motivating. We will follow your recommendations with absolute discipline."',
+    who: 'Parent of a player'
+  },
+  {quote: '"We feel very fortunate to have you."', who: 'Parent of a player'},
+  {quote: '"When I grow up, I want to be like you."', who: 'Parent of a player'}
+];
