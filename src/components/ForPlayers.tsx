@@ -417,10 +417,10 @@ export function ForPlayers() {
 
       {/* NAV */}
       <nav className={cx('nav')}>
-        <span className={cx('logo')}>
-          <span className={cx('c')}>CLEAR</span>
-          <span className={cx('w')}>WAY</span>
-        </span>
+        <Link href="/" className={cx('logo')} aria-label="Clearway Performance Group">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/Logotipos/clearway-white.svg" alt="Clearway Performance Group" />
+        </Link>
         <button type="button" className={cx('nav-cta')} onClick={openModal}>
           Build my profile →
         </button>

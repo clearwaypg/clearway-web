@@ -53,13 +53,14 @@
   mix-blend-mode: difference;
 }
 .nav .logo {
-  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  mix-blend-mode: normal; /* keep the white logo pure white over the dark nav */
 }
-.nav .logo .c {
-  font-weight: 300;
-}
-.nav .logo .w {
-  font-weight: 900;
+.nav .logo img {
+  height: 26px;
+  width: auto;
+  display: block;
 }
 .nav .pin {
   font-size: 0.68rem;
