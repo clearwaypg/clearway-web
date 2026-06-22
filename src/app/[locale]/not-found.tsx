@@ -1,11 +1,10 @@
-import {setRequestLocale} from 'next-intl/server';
 import {Archivo, EB_Garamond} from 'next/font/google';
 
-import {ForClubs} from '@/components/ForClubs';
+import {NotFound} from '@/components/NotFound';
 
 const archivo = Archivo({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700', '800', '900'],
+  weight: ['300', '400', '700', '800', '900'],
   variable: '--font-archivo',
   display: 'swap'
 });
@@ -18,15 +17,10 @@ const ebGaramond = EB_Garamond({
   display: 'swap'
 });
 
-export default async function ForClubsPage({
-  params
-}: PageProps<'/[locale]/for-clubs'>) {
-  const {locale} = await params;
-  setRequestLocale(locale);
-
+export default function NotFoundPage() {
   return (
     <div className={`${archivo.variable} ${ebGaramond.variable}`}>
-      <ForClubs />
+      <NotFound />
     </div>
   );
 }

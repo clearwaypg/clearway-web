@@ -1,0 +1,182 @@
+/* =========================================================
+   404 — Clearway Performance Group
+   Faithful port of the 404 design guide. Full-screen, no
+   scroll: a ball is fired at the goal behind a giant ghost
+   "404", looping. Brand tokens scoped to .page; fonts come
+   from next/font (Archivo + EB Garamond italic).
+   ========================================================= */
+.page {
+  --navy: #072c68;
+  --dew: #d0d8e2;
+  --white: #fcfcfc;
+  --font: var(--font-archivo), Archivo, sans-serif;
+  --serif: var(--font-eb), 'EB Garamond', Georgia, serif;
+
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  font-family: var(--font);
+  background: #050f24;
+  color: var(--white);
+  -webkit-font-smoothing: antialiased;
+}
+.page * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  pointer-events: none;
+  opacity: 0.045;
+  mix-blend-mode: overlay;
+}
+.grain svg {
+  width: 100%;
+  height: 100%;
+}
+
+.nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px clamp(24px, 5vw, 60px);
+}
+.logo {
+  display: block;
+  line-height: 0;
+  text-decoration: none;
+  color: #fff;
+}
+.logo img {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+.navLinks {
+  display: flex;
+  gap: 24px;
+}
+.navLinks a {
+  color: rgba(255, 255, 255, 0.65);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: 0.2s;
+}
+.navLinks a:hover {
+  color: #fff;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ghost {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(9rem, 28vw, 22rem);
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.04);
+  letter-spacing: -0.04em;
+  pointer-events: none;
+  user-select: none;
+  transition: color 0.1s;
+}
+.ghost.hit {
+  color: rgba(255, 255, 255, 0.09);
+}
+
+.copy {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+  padding: 20px;
+}
+.copyInner {
+  pointer-events: auto;
+  margin-top: clamp(90px, 18vw, 210px);
+}
+.eyebrow {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--dew);
+  margin-bottom: 14px;
+}
+.title {
+  font-size: clamp(2rem, 6vw, 5rem);
+  font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.title .thin {
+  font-weight: 300;
+}
+.sub {
+  font-size: clamp(0.88rem, 1.4vw, 1.05rem);
+  color: rgba(208, 216, 226, 0.65);
+  max-width: 44ch;
+  margin: 0 auto 30px;
+  line-height: 1.6;
+}
+.btns {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.86rem;
+  padding: 0.8em 1.75em;
+  border-radius: 7px;
+  transition: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btnSolid {
+  background: var(--white);
+  color: #050f24;
+}
+.btnSolid:hover {
+  background: var(--dew);
+  transform: translateY(-2px);
+}
+.btnGhost {
+  color: #fff;
+  border: 1.5px solid rgba(208, 216, 226, 0.3);
+}
+.btnGhost:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(208, 216, 226, 0.65);
+}

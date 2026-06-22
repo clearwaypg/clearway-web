@@ -825,9 +825,9 @@ export function LandingHome() {
 
       {/* NAV */}
       <nav className={cx('nav')}>
-        <Link href="/" className={cx('logo')}>
-          <span className={cx('c')}>CLEAR</span>
-          <span className={cx('w')}>WAY</span>
+        <Link href="/" className={cx('logo')} aria-label="Clearway Performance Group">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/Logotipos/clearway-white.svg" alt="Clearway Performance Group" />
         </Link>
         <div className={cx('links')}>
           <Link href="/for-clubs">{c.nav.clubs}</Link>
@@ -870,10 +870,13 @@ export function LandingHome() {
         <div className={cx('heroInner')}>
           <div className={cx('tagline')}>{c.hero.tagline}</div>
           <div className={cx('logoBig')}>
-            <span>CLEAR</span>
-            <b>WAY</b>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className={cx('logoSvg')}
+              src="/Logotipos/clearway-white.svg"
+              alt="Clearway Performance Group"
+            />
           </div>
-          <div className={cx('pg')}>{c.hero.pg}</div>
           <p className={cx('sub')}>{c.hero.sub}</p>
           <div className={cx('heroCta')}>
             <Link
@@ -1022,6 +1025,8 @@ export function LandingHome() {
           <div className={cx('teamGrid')}>
             <div className={cx('tcard', 'reveal')} data-d="1">
               <div className={cx('tphoto')}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/james.png" alt="James Fox" />
                 <div className={cx('nm')}>
                   <span>James</span>
                   <br />
@@ -1037,6 +1042,8 @@ export function LandingHome() {
             </div>
             <div className={cx('tcard', 'reveal')} data-d="2">
               <div className={cx('tphoto')}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/Cyril.png" alt="Cyril Rool" />
                 <div className={cx('nm')}>
                   <span>Cyril</span>
                   <br />

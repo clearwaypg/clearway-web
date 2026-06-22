@@ -586,7 +586,8 @@ export function ForPlayers() {
           <div className={cx('team')}>
             <div className={cx('gcard', 'reveal')} data-d="1">
               <div className={cx('gphoto')}>
-                <span className={cx('ph')}>Foto James</span>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/james.png" alt="James Fox" />
                 <div className={cx('nm')}>
                   <span>James</span>
                   <br />
@@ -616,7 +617,8 @@ export function ForPlayers() {
             </div>
             <div className={cx('gcard', 'reveal')} data-d="2">
               <div className={cx('gphoto')}>
-                <span className={cx('ph')}>Foto Cyril</span>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/Cyril.png" alt="Cyril Rool" />
                 <div className={cx('nm')}>
                   <span>Cyril</span>
                   <br />

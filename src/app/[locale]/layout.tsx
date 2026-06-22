@@ -51,6 +51,11 @@ export default async function RootLayout({
       lang={locale}
       data-scroll-behavior="smooth"
       className={`${jakarta.variable} ${cormorant.variable}`}
+      // Browser extensions (e.g. Google Tag Assistant) inject attributes like
+      // data-tag-assistant-present onto <html> before React hydrates, which
+      // triggers a harmless hydration attribute mismatch. Suppress it on this
+      // element only — it does not affect children.
+      suppressHydrationWarning
     >
       <body>
         <NextIntlClientProvider>

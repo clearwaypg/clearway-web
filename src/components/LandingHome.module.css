@@ -59,15 +59,16 @@
   mix-blend-mode: difference;
 }
 .nav .logo {
+  display: block;
   font-size: 1.15rem;
   text-decoration: none;
   color: #fff;
+  line-height: 0;
 }
-.nav .logo .c {
-  font-weight: 300;
-}
-.nav .logo .w {
-  font-weight: 900;
+.nav .logo img {
+  height: 24px;
+  width: auto;
+  display: block;
 }
 .nav .links {
   display: flex;
@@ -179,15 +180,14 @@
   animation: rise 1s ease 0.2s forwards;
 }
 .logoBig {
-  font-weight: 300;
-  font-size: clamp(3rem, 11vw, 9rem);
-  letter-spacing: -0.03em;
-  line-height: 0.9;
   opacity: 0;
   animation: rise 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;
 }
-.logoBig b {
-  font-weight: 900;
+.logoSvg {
+  width: min(680px, 82vw);
+  height: auto;
+  display: block;
+  margin: 0 auto;
 }
 .pg {
   font-size: clamp(0.7rem, 1.4vw, 0.95rem);
@@ -674,6 +674,31 @@
   display: flex;
   align-items: flex-end;
   padding: 22px;
+}
+.tphoto img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* Fill the defined box, centered, without distorting the photo. */
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  z-index: 0;
+}
+/* Bottom scrim so the overlaid name stays legible over the photo. */
+.tphoto::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(7, 14, 28, 0.78) 0%,
+    rgba(7, 14, 28, 0.15) 38%,
+    transparent 65%
+  );
 }
 .tphoto .ph {
   position: absolute;
