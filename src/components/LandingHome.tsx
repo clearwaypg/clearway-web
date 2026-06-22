@@ -1027,35 +1027,35 @@ export function LandingHome() {
               <div className={cx('tphoto')}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/james.png" alt="James Fox" />
-                <div className={cx('nm')}>
-                  <span>James</span>
-                  <br />
-                  Fox.
-                </div>
               </div>
-              <div className={cx('trole')}>{c.team.jamesRole}</div>
-              <ul className={cx('tcreds')}>
-                {c.team.jamesCreds.map((line, i) => (
-                  <li key={i}>{rich(line)}</li>
-                ))}
-              </ul>
+              <div className={cx('tinfo')}>
+                <div className={cx('tname')}>
+                  <span>James</span> Fox.
+                </div>
+                <div className={cx('trole')}>{c.team.jamesRole}</div>
+                <ul className={cx('tcreds')}>
+                  {c.team.jamesCreds.map((line, i) => (
+                    <li key={i}>{rich(line)}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
             <div className={cx('tcard', 'reveal')} data-d="2">
               <div className={cx('tphoto')}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/Cyril.png" alt="Cyril Rool" />
-                <div className={cx('nm')}>
-                  <span>Cyril</span>
-                  <br />
-                  Rool.
-                </div>
               </div>
-              <div className={cx('trole')}>{c.team.cyrilRole}</div>
-              <ul className={cx('tcreds')}>
-                {c.team.cyrilCreds.map((line, i) => (
-                  <li key={i}>{rich(line)}</li>
-                ))}
-              </ul>
+              <div className={cx('tinfo')}>
+                <div className={cx('tname')}>
+                  <span>Cyril</span> Rool.
+                </div>
+                <div className={cx('trole')}>{c.team.cyrilRole}</div>
+                <ul className={cx('tcreds')}>
+                  {c.team.cyrilCreds.map((line, i) => (
+                    <li key={i}>{rich(line)}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </div>

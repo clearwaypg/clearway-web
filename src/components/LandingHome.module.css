@@ -56,7 +56,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 24px clamp(20px, 5vw, 60px);
-  mix-blend-mode: difference;
+  /* No mix-blend-mode here: difference inverted the white logo to a cream
+     tone over the navy hero. The logo (left) sits over dark sections, and the
+     links carry a soft shadow for legibility over the light split panels. */
 }
 .nav .logo {
   display: block;
@@ -86,6 +88,7 @@
   background: none;
   border: 0;
   cursor: pointer;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
 }
 .lang {
   display: flex;
@@ -626,16 +629,37 @@
 .teamGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  gap: clamp(32px, 5vw, 64px);
 }
 .tcard {
   position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) 1fr;
+  gap: clamp(18px, 2.2vw, 28px);
+  align-items: center;
   background: rgba(252, 252, 252, 0.03);
   border: 1px solid rgba(208, 216, 226, 0.14);
   border-radius: 14px;
-  padding: 30px;
+  padding: clamp(20px, 2.4vw, 28px);
   transition: 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
+}
+.tinfo {
+  min-width: 0;
+}
+.tname {
+  font-size: clamp(1.4rem, 2.1vw, 1.9rem);
+  font-weight: 900;
+  color: #fff;
+  line-height: 0.95;
+  margin-bottom: 8px;
+  transition: 0.45s;
+}
+.tname span {
+  font-weight: 300;
+}
+.tcard:last-child:hover .tname {
+  color: var(--navy);
 }
 .teamGrid:hover .tcard:not(:hover) {
   opacity: 0.5;
@@ -665,15 +689,12 @@
   background: var(--navy);
 }
 .tphoto {
-  aspect-ratio: 16 / 10;
-  border-radius: 9px;
-  margin-bottom: 22px;
+  /* Square box + square source photo → the founder is shown in full, no crop. */
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
   position: relative;
   overflow: hidden;
   background: linear-gradient(150deg, #0a3a86, #04193f);
-  display: flex;
-  align-items: flex-end;
-  padding: 22px;
 }
 .tphoto img {
   position: absolute;
@@ -685,20 +706,6 @@
   object-position: center;
   display: block;
   z-index: 0;
-}
-/* Bottom scrim so the overlaid name stays legible over the photo. */
-.tphoto::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: linear-gradient(
-    to top,
-    rgba(7, 14, 28, 0.78) 0%,
-    rgba(7, 14, 28, 0.15) 38%,
-    transparent 65%
-  );
 }
 .tphoto .ph {
   position: absolute;
@@ -1085,6 +1092,13 @@
   }
   .teamGrid {
     grid-template-columns: 1fr;
+  }
+  .tcard {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+  .tphoto {
+    max-width: 280px;
   }
   .scoreboard {
     flex-wrap: wrap;

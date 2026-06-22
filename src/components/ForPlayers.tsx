@@ -435,13 +435,8 @@ export function ForPlayers() {
         <div className={cx('stage')}>
           <div className={cx('bgword')}>Seen</div>
           <div className={cx('player-slot')}>
-            <div className={cx('player-ph')}>
-              Silueta de jugador
-              <br />
-              imagen real
-              <br />
-              (PNG con licencia)
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/silueta_atras.png" alt="" aria-hidden="true" />
           </div>
           <div className={cx('headline')}>
             <span className={cx('hl', 'hl1', 'reveal-line')}>
@@ -481,7 +476,8 @@ export function ForPlayers() {
               <span className={cx('c')}>CLEAR</span>WAY
             </div>
             <div className={cx('fifa-slot')}>
-              <div className={cx('ph')}>silueta</div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/silueta_dos.png" alt="" aria-hidden="true" />
             </div>
             <div className={cx('fifa-name')}>{u(card.name, 'YOUR NAME')}</div>
             <div className={cx('fifa-meta')}>
