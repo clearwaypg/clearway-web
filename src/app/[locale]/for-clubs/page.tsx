@@ -15,7 +15,6 @@ export default async function ForClubsPage({
       title={t('forClubs')}
       backLabel={t('backHome')}
       tone="navy"
-      viewName="hero-clubs"
     />
   );
 }

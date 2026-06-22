@@ -1,27 +1,16 @@
-import {ViewTransition} from 'react';
-
 import {Link} from '@/i18n/navigation';
 
 type Props = {
   title: string;
   backLabel: string;
-  /* 'navy' gives the placeholder a navy hero so the home → panel route morph
-     expands into a matching navy surface. Defaults to the light shell. */
+  /* 'navy' gives the placeholder a navy hero. Defaults to the light shell. */
   tone?: 'light' | 'navy';
-  /* When set, a full-screen surface carries this view-transition-name so it can
-     morph from the matching home panel. */
-  viewName?: string;
 };
 
 const NAVY = '#072c68';
 
 /* Minimal placeholder shell for routes still pending real content. */
-export function PlaceholderPage({
-  title,
-  backLabel,
-  tone = 'light',
-  viewName
-}: Props) {
+export function PlaceholderPage({title, backLabel, tone = 'light'}: Props) {
   const navy = tone === 'navy';
   const bg = navy ? NAVY : '#f3f3f3';
   const fg = navy ? '#fcfcfc' : '#191919';
@@ -44,14 +33,6 @@ export function PlaceholderPage({
         padding: '2rem'
       }}
     >
-      {viewName && (
-        <ViewTransition name={viewName} share="morph">
-          <div
-            aria-hidden
-            style={{position: 'absolute', inset: 0, background: bg, zIndex: -1}}
-          />
-        </ViewTransition>
-      )}
       <h1
         style={{
           fontSize: 'clamp(2rem, 5vw, 4rem)',

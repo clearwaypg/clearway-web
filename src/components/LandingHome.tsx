@@ -1,84 +1,237 @@
 'use client';
 
-import {useEffect, useRef, useState, useTransition, ViewTransition} from 'react';
-import {useLocale, useTranslations} from 'next-intl';
+import {useEffect, useRef, useState, useTransition} from 'react';
+import {useLocale} from 'next-intl';
 import {useParams} from 'next/navigation';
-import Image from 'next/image';
-import gsap from 'gsap';
 
 import {Link, usePathname, useRouter} from '@/i18n/navigation';
 import {routing, type Locale} from '@/i18n/routing';
-import {FooterHome} from './FooterHome';
+import styles from './LandingHome.module.css';
 
 /* =========================================================
    CLEARWAY PERFORMANCE GROUP — HOME
-   Brand tokens (approved by James Fox, June 2026)
-   navy  #072c68  · black #191919 · dew #d0d8e2 · white #f3f3f3
-   Display font: Archivo  → next/font Plus Jakarta Sans (--font-sans)
-   Accent font:  Optima italic → Cormorant Garamond italic (--font-serif)
+   Faithful port of the home-clearway design guide.
+   Brand tokens scoped to .page; fonts come from next/font
+   (Archivo display + EB Garamond italic) via the page wrapper.
 
-   Footer reveal: the footer is fixed behind the content. The split-screen
-   content layer slides up (GSAP) to expose the static footer — the footer
-   itself never moves.
+   The clips that used to back the split-screen panels now fade
+   in behind the hero content when the matching central button
+   is hovered.
    ========================================================= */
-const NAVY = '#072c68';
-const BLACK = '#191919';
-const DEW = '#d0d8e2';
-const WHITE = '#f3f3f3';
 
-/* 22 players on a percentage grid of the split-screen container:
-   x: 0 = left edge, 50 = halfway line, 100 = right edge · y: 0 = top, 100 = bottom.
-   Left (For Clubs) is a 4-3-3 attacking toward x=100; right (For Players) is a
-   4-2-3-1 attacking toward x=0. Debug numbers 1-22 map to array indices 0-21. */
-type Player = {team: 'left' | 'right'; x: number; y: number};
+/* Join scoped module classes by their guide names, dropping falsy values. */
+const cx = (...names: Array<string | false | null | undefined>) =>
+  names
+    .filter(Boolean)
+    .map((n) => styles[n as string] ?? (n as string))
+    .join(' ');
 
-const PLAYERS: Player[] = [
-  // ----- LEFT — 4-3-3 (debug 1-11) -----
-  {team: 'left', x: 5, y: 50}, // 1  GK
-  {team: 'left', x: 18, y: 22}, // 2
-  {team: 'left', x: 15, y: 40}, // 3
-  {team: 'left', x: 15, y: 60}, // 4
-  {team: 'left', x: 18, y: 78}, // 5
-  {team: 'left', x: 32, y: 30}, // 6
-  {team: 'left', x: 30, y: 50}, // 7
-  {team: 'left', x: 32, y: 70}, // 8
-  {team: 'left', x: 44, y: 28}, // 9
-  {team: 'left', x: 46, y: 50}, // 10
-  {team: 'left', x: 44, y: 72}, // 11
-  // ----- RIGHT — 4-2-3-1 (debug 12-22) -----
-  {team: 'right', x: 95, y: 50}, // 12 GK
-  {team: 'right', x: 82, y: 22}, // 13
-  {team: 'right', x: 85, y: 40}, // 14
-  {team: 'right', x: 85, y: 60}, // 15
-  {team: 'right', x: 82, y: 78}, // 16
-  {team: 'right', x: 70, y: 42}, // 17
-  {team: 'right', x: 70, y: 58}, // 18
-  {team: 'right', x: 60, y: 28}, // 19
-  {team: 'right', x: 58, y: 50}, // 20
-  {team: 'right', x: 60, y: 72}, // 21
-  {team: 'right', x: 54, y: 50} // 22
-];
+/* Turn **bold** markers into <strong> so the rich credit lines stay readable
+   in the copy table below without dangerouslySetInnerHTML. */
+function rich(s: string) {
+  return s.split(/\*\*(.+?)\*\*/g).map((part, i) =>
+    i % 2 === 1 ? <strong key={i}>{part}</strong> : part
+  );
+}
+
+type Copy = (typeof COPY)['en'];
+
+const COPY = {
+  en: {
+    nav: {clubs: 'For Clubs', players: 'For Players', about: 'About'},
+    hero: {
+      tagline: 'International talent identification · Est. 2023',
+      pg: 'Performance Group',
+      sub: 'We identify talent and open the door to clubs across England and Europe. Quietly, honestly, and only for the few who are ready.',
+      clubK: 'I am a club',
+      clubT: 'For Clubs',
+      playerK: 'I am a player',
+      playerT: 'For Players',
+      cue: 'Who we are'
+    },
+    what: {
+      eyebrow: 'Who we are',
+      pre: 'The honest ',
+      it: 'bridge',
+      mid: ' between a player who is ready and a club that is looking. ',
+      bold: 'We reveal just enough to be credible, and we never promise what we cannot deliver.'
+    },
+    doors: {
+      clubs: {
+        dlabel: 'If you are a club',
+        thin: 'We bring you',
+        bold: 'the right player.',
+        p: 'Identified, checked and ready. With the work permit and GBE paperwork for England already handled.',
+        enter: 'Enter'
+      },
+      players: {
+        dlabel: 'If you are a player',
+        thin: 'We open the',
+        bold: 'door for you.',
+        p: 'We measure you against a real professional standard and put you in front of the clubs that fit. We guarantee the trial, not the signing. Men and women.',
+        enter: 'Enter'
+      }
+    },
+    team: {
+      eyebrow: 'The names that open doors',
+      thin: 'They have seen it before.',
+      bold: 'They know what it takes.',
+      it: 'And they believe in the ones who do.',
+      jamesRole: 'Founder and CEO',
+      jamesCreds: [
+        'Over **30 years in professional sport**, as athlete, coach and manager. Alongside Olympic gold medallists, Wimbledon champions, world number ones and EFL footballers.',
+        '**Registered with The Football Association in Talent Identification.**',
+        'More than **100 clubs** across England and Europe. FIFA licensed agents available.',
+        'The **work permit and GBE for England**, handled.'
+      ],
+      cyrilRole: 'Director of European Football',
+      cyrilCreds: [
+        'Over **15 years in Ligue 1** with RC Lens, Bordeaux, OGC Nice and Olympique de Marseille.',
+        '**France Under 21 international.**',
+        'Has represented and placed several players in **Europe and Mexico**.'
+      ]
+    },
+    proof: {
+      eyebrow: 'The record',
+      thin: 'The numbers',
+      it: 'that hold up.',
+      cells: [
+        {count: 30, suffix: '', b: 'Years', l: 'in elite sport'},
+        {count: 100, suffix: '+', b: 'Clubs', l: 'England and Europe'},
+        {count: 66, suffix: '', b: 'Countries', l: 'in the database'},
+        {count: 7, suffix: '%', b: 'Make it', l: 'through the filter'}
+      ]
+    },
+    end: {
+      clubsTag: 'If you are a club',
+      playersTag: 'If you are a player',
+      forWord: 'For',
+      clubs: 'Clubs',
+      players: 'Players',
+      enter: 'Enter →',
+      q: ['Which side', 'are you on?']
+    },
+    foot: {
+      serif: 'we form champions',
+      navigate: 'Navigate',
+      clubs: 'For Clubs',
+      players: 'For Players',
+      about: 'About James Fox',
+      legal: 'Legal',
+      privacy: 'Privacy Policy',
+      terms: 'Terms & Conditions',
+      copyright: '© 2026 Clearway Performance Group · Created by SCNDAL'
+    }
+  },
+  es: {
+    nav: {clubs: 'Para Clubes', players: 'Para Jugadores', about: 'Sobre'},
+    hero: {
+      tagline: 'Identificación internacional de talento · Est. 2023',
+      pg: 'Performance Group',
+      sub: 'Identificamos talento y abrimos la puerta a clubes en Inglaterra y Europa. En silencio, con honestidad, y solo para los pocos que están listos.',
+      clubK: 'Soy un club',
+      clubT: 'Para Clubes',
+      playerK: 'Soy jugador',
+      playerT: 'Para Jugadores',
+      cue: 'Quiénes somos'
+    },
+    what: {
+      eyebrow: 'Quiénes somos',
+      pre: 'El ',
+      it: 'puente',
+      mid: ' honesto entre un jugador que está listo y un club que está buscando. ',
+      bold: 'Revelamos lo justo para ser creíbles, y nunca prometemos lo que no podemos cumplir.'
+    },
+    doors: {
+      clubs: {
+        dlabel: 'Si eres un club',
+        thin: 'Te traemos',
+        bold: 'al jugador correcto.',
+        p: 'Identificado, verificado y listo. Con el permiso de trabajo y el papeleo GBE para Inglaterra ya resueltos.',
+        enter: 'Entrar'
+      },
+      players: {
+        dlabel: 'Si eres jugador',
+        thin: 'Te abrimos',
+        bold: 'la puerta.',
+        p: 'Te medimos contra un estándar profesional real y te ponemos frente a los clubes que encajan. Garantizamos la prueba, no la firma. Hombres y mujeres.',
+        enter: 'Entrar'
+      }
+    },
+    team: {
+      eyebrow: 'Los nombres que abren puertas',
+      thin: 'Ya lo han vivido.',
+      bold: 'Saben lo que hace falta.',
+      it: 'Y creen en quienes lo tienen.',
+      jamesRole: 'Fundador y CEO',
+      jamesCreds: [
+        'Más de **30 años en el deporte profesional**, como atleta, entrenador y mánager. Junto a medallistas de oro olímpicos, campeones de Wimbledon, números uno del mundo y futbolistas de la EFL.',
+        '**Registrado en The Football Association en Identificación de Talento.**',
+        'Más de **100 clubes** en Inglaterra y Europa. Agentes con licencia FIFA disponibles.',
+        'El **permiso de trabajo y la GBE para Inglaterra**, resueltos.'
+      ],
+      cyrilRole: 'Director de Fútbol Europeo',
+      cyrilCreds: [
+        'Más de **15 años en la Ligue 1** con RC Lens, Burdeos, OGC Nice y Olympique de Marsella.',
+        '**Internacional con la Francia Sub-21.**',
+        'Ha representado y colocado a varios jugadores en **Europa y México**.'
+      ]
+    },
+    proof: {
+      eyebrow: 'El historial',
+      thin: 'Los números',
+      it: 'que se sostienen.',
+      cells: [
+        {count: 30, suffix: '', b: 'Años', l: 'en deporte de élite'},
+        {count: 100, suffix: '+', b: 'Clubes', l: 'Inglaterra y Europa'},
+        {count: 66, suffix: '', b: 'Países', l: 'en la base de datos'},
+        {count: 7, suffix: '%', b: 'Pasan', l: 'el filtro'}
+      ]
+    },
+    end: {
+      clubsTag: 'Si eres un club',
+      playersTag: 'Si eres jugador',
+      forWord: 'Para',
+      clubs: 'Clubes',
+      players: 'Jugadores',
+      enter: 'Entrar →',
+      q: ['¿De qué lado', 'estás?']
+    },
+    foot: {
+      serif: 'formamos campeones',
+      navigate: 'Navegar',
+      clubs: 'Para Clubes',
+      players: 'Para Jugadores',
+      about: 'Sobre James Fox',
+      legal: 'Legal',
+      privacy: 'Política de Privacidad',
+      terms: 'Términos y Condiciones',
+      copyright: '© 2026 Clearway Performance Group · Creado por SCNDAL'
+    }
+  }
+};
 
 export function LandingHome() {
-  const t = useTranslations('Landing');
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [, setFooterRevealed] = useState(false);
+  const locale = useLocale();
+  const c: Copy = COPY[locale === 'es' ? 'es' : 'en'];
+
   const [hovered, setHovered] = useState<'clubs' | 'players' | null>(null);
 
+  const rootRef = useRef<HTMLDivElement>(null);
+  const pitchRef = useRef<HTMLCanvasElement>(null);
+  const whatRef = useRef<HTMLElement>(null);
+  const whatCanvasRef = useRef<HTMLCanvasElement>(null);
+  const teamBallRef = useRef<HTMLCanvasElement>(null);
+  const endRef = useRef<HTMLElement>(null);
+  const vsBallRef = useRef<HTMLDivElement>(null);
+  const vsMidRef = useRef<HTMLDivElement>(null);
   const clubsVideoRef = useRef<HTMLVideoElement>(null);
   const playersVideoRef = useRef<HTMLVideoElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const footerRef = useRef<HTMLElement>(null);
-  const revealedRef = useRef(false);
-  const menuOpenRef = useRef(false);
-  const playerRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const ballRef = useRef<HTMLDivElement>(null);
 
   function playVideo(ref: React.RefObject<HTMLVideoElement | null>) {
     const v = ref.current;
     if (v) void v.play().catch(() => {});
   }
-
   function resetVideo(ref: React.RefObject<HTMLVideoElement | null>) {
     const v = ref.current;
     if (v) {
@@ -87,601 +240,930 @@ export function LandingHome() {
     }
   }
 
-  // Lock page scroll: the landing owns the full viewport (everything fixed).
+  /* ===== HERO: football play behind the logo, reacts to the cursor ===== */
   useEffect(() => {
-    const {documentElement, body} = document;
-    const prevHtml = documentElement.style.overflow;
-    const prevBody = body.style.overflow;
-    documentElement.style.overflow = 'hidden';
-    body.style.overflow = 'hidden';
-    return () => {
-      documentElement.style.overflow = prevHtml;
-      body.style.overflow = prevBody;
-    };
-  }, []);
+    const canvas = pitchRef.current;
+    const hero = canvas?.parentElement;
+    if (!canvas || !hero) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-  // Keep menu state available to the (window-level) scroll handlers.
-  useEffect(() => {
-    menuOpenRef.current = menuOpen;
-  }, [menuOpen]);
-
-  // Reveal / cover the static footer by sliding the content layer.
-  useEffect(() => {
-    function reveal(show: boolean) {
-      if (menuOpenRef.current) return;
-      if (show === revealedRef.current) return;
-      revealedRef.current = show;
-      setFooterRevealed(show);
-      const offset = footerRef.current?.offsetHeight ?? 0;
-      gsap.to(contentRef.current, {
-        y: show ? -offset : 0,
-        duration: 0.8,
-        ease: 'power3.inOut'
-      });
-    }
-
-    function onWheel(e: WheelEvent) {
-      if (e.deltaY > 30) reveal(true);
-      else if (e.deltaY < -30) reveal(false);
-    }
-
-    let touchStartY = 0;
-    function onTouchStart(e: TouchEvent) {
-      touchStartY = e.touches[0].clientY;
-    }
-    function onTouchMove(e: TouchEvent) {
-      const dy = touchStartY - e.touches[0].clientY; // >0 when swiping up
-      if (dy > 40) reveal(true);
-      else if (dy < -40) reveal(false);
-    }
-
-    window.addEventListener('wheel', onWheel, {passive: true});
-    window.addEventListener('touchstart', onTouchStart, {passive: true});
-    window.addEventListener('touchmove', onTouchMove, {passive: true});
-    return () => {
-      window.removeEventListener('wheel', onWheel);
-      window.removeEventListener('touchstart', onTouchStart);
-      window.removeEventListener('touchmove', onTouchMove);
-    };
-  }, []);
-
-  // Esc closes the menu overlay.
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setMenuOpen(false);
-    }
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
-
-  // Scripted, seamless team animation — no cursor input. Possession `p` eases
-  // between +1 (left attacking, right defending) and -1 (right attacking, left
-  // defending) on a slow plateaued sine, so the two phases flow into one another
-  // continuously: the players never snap, they transition out of one attack
-  // straight into the opposite one, and the loop has no visible cut. All maths
-  // in viewport px.
-  useEffect(() => {
-    const ball = ballRef.current;
-    const els = playerRefs.current;
-    const field = contentRef.current;
-    if (!ball || !field) return;
-
-    let W = window.innerWidth;
-    let H = window.innerHeight;
-    const baseOf = (i: number) => ({
-      x: (PLAYERS[i].x / 100) * W,
-      y: (PLAYERS[i].y / 100) * H
-    });
-
-    // How far forward each player drives when their team attacks: forwards push
-    // hard, the back line holds, the keeper barely moves. 0 (GK) … 1 (striker).
-    const roleF = PLAYERS.map((p) =>
-      p.team === 'left' ? (p.x - 5) / 41 : (95 - p.x) / 41
-    );
-
-    const cur = PLAYERS.map((_, i) => baseOf(i)); // live player positions (px)
-    const ballCur = {x: W / 2, y: H / 2};
-    let time = 0;
+    let W = 0;
+    let H = 0;
     let raf = 0;
-
-    // Plateaued wave: dwells near ±1 so each attack/defend shape is held a beat
-    // before the possession swings to the other side.
-    const wave = (ph: number) => {
-      const s = Math.sin(ph);
-      return Math.sign(s) * Math.pow(Math.abs(s), 0.6);
+    const mouse = {x: -9999, y: -9999, active: false};
+    type P = {
+      team: 'A' | 'B';
+      hx: number;
+      hy: number;
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      phase: number;
+      roam: number;
+    };
+    const players: P[] = [];
+    const ball = {
+      x: 0,
+      y: 0,
+      vx: 0,
+      vy: 0,
+      holder: null as P | null,
+      target: null as P | null,
+      traveling: false,
+      cool: 0
     };
 
-    function frame() {
-      time += 0.016;
-      W = window.innerWidth;
-      H = window.innerHeight;
-      const cx = W / 2;
-      const cy = H / 2;
-
-      const p = wave(time * 0.42); // -1 … +1 possession (full swing ≈ 15s)
-      const leftPoss = Math.max(0, p); // left has the ball, attacking →
-      const rightPoss = Math.max(0, -p); // right has the ball, attacking ←
-
-      const PUSH = 0.18 * W; // forward drive of the attacking team
-      const DROP = 0.07 * W; // retreat of the defending team toward its goal
-      const COMPRESS = 0.32; // vertical squeeze of the defending block
-
-      PLAYERS.forEach((pl, i) => {
-        const base = baseOf(i);
-        const dir = pl.team === 'left' ? 1 : -1; // attack direction in +x
-        const att = pl.team === 'left' ? leftPoss : rightPoss;
-        const def = pl.team === 'left' ? rightPoss : leftPoss;
-
-        // Attack: drive toward the far goal, scaled by attacking role.
-        let dx = dir * att * PUSH * roleF[i];
-        let dy = 0;
-
-        // Defend: drop back toward own goal and compress to the centre line;
-        // forwards track back further than the holding defenders.
-        dx += -dir * def * DROP * (0.45 + 0.55 * roleF[i]);
-        dy += (cy - base.y) * def * COMPRESS;
-
-        // Organic off-ball drift so the shape always breathes.
-        dx += Math.sin(time * 0.6 + i * 1.7) * 9;
-        dy += Math.cos(time * 0.5 + i * 2.3) * 7;
-
-        const tx = base.x + dx;
-        const ty = base.y + dy;
-        cur[i].x += (tx - cur[i].x) * 0.07;
-        cur[i].y += (ty - cur[i].y) * 0.07;
-
-        const el = els[i];
-        if (el)
-          el.style.transform = `translate(-50%, -50%) translate(${cur[i].x - base.x}px, ${cur[i].y - base.y}px)`;
-      });
-
-      // Ball is passed between the attacking team's players — never sitting on
-      // top of one, but in the space just in front of the carrier, toward the
-      // rival goal. As the attack builds (att 0→1) the chosen carrier advances
-      // from midfield to the strikers, so the ball hops forward pass by pass.
-      const attackTeam = p >= 0 ? 'left' : 'right';
-      const att = Math.abs(p);
-      const adir = attackTeam === 'left' ? 1 : -1; // toward the rival goal in +x
-      const targetAdv = 0.45 + 0.55 * att; // midfield → striker as it progresses
-      let carrier = -1;
-      let bestD = Infinity;
-      PLAYERS.forEach((pl, i) => {
-        if (pl.team !== attackTeam) return;
-        const d = Math.abs(roleF[i] - targetAdv);
-        if (d < bestD) {
-          bestD = d;
-          carrier = i;
+    function resize() {
+      W = canvas!.width = canvas!.offsetWidth;
+      H = canvas!.height = canvas!.offsetHeight;
+    }
+    function seed() {
+      players.length = 0;
+      const teamA = [
+        [0.1, 0.3],
+        [0.1, 0.7],
+        [0.22, 0.5],
+        [0.3, 0.2],
+        [0.3, 0.8],
+        [0.38, 0.5]
+      ];
+      const teamB = [
+        [0.9, 0.3],
+        [0.9, 0.7],
+        [0.78, 0.5],
+        [0.7, 0.2],
+        [0.7, 0.8]
+      ];
+      teamA.forEach(([fx, fy]) =>
+        players.push({
+          team: 'A',
+          hx: fx,
+          hy: fy,
+          x: fx * W,
+          y: fy * H,
+          vx: 0,
+          vy: 0,
+          phase: (fx + fy) * 6.28,
+          roam: 16 + fy * 12
+        })
+      );
+      teamB.forEach(([fx, fy]) =>
+        players.push({
+          team: 'B',
+          hx: fx,
+          hy: fy,
+          x: fx * W,
+          y: fy * H,
+          vx: 0,
+          vy: 0,
+          phase: (fx + fy) * 6.28,
+          roam: 16 + fy * 12
+        })
+      );
+      const s = players[2];
+      ball.x = s.x;
+      ball.y = s.y;
+      ball.holder = s;
+      ball.traveling = false;
+      ball.cool = 20;
+    }
+    function passBall() {
+      const from = ball.holder || players[0];
+      let best: P | null = null;
+      let score = -1;
+      let tick = 0;
+      for (const p of players) {
+        if (p === from || p.team !== from.team) continue;
+        const d = Math.hypot(p.x - from.x, p.y - from.y);
+        if (d < 40) continue;
+        const fwd =
+          from.team === 'A' ? (p.x - from.x) / W : (from.x - p.x) / W;
+        tick += 0.37;
+        const s = fwd * 1.2 + (tick % 1) * 1.2 - Math.abs(d - W * 0.3) / W;
+        if (s > score) {
+          score = s;
+          best = p;
         }
-      });
-      const BALL_AHEAD = 26; // px the ball leads in front of its carrier
-      const bx =
-        carrier >= 0 ? cur[carrier].x + adir * BALL_AHEAD : cx;
-      const by =
-        carrier >= 0 ? cur[carrier].y + Math.sin(time * 1.3) * 8 : cy;
-      ballCur.x += (bx - ballCur.x) * 0.08;
-      ballCur.y += (by - ballCur.y) * 0.08;
-      ball!.style.transform = `translate(-50%, -50%) translate(${ballCur.x - cx}px, ${ballCur.y - cy}px)`;
+      }
+      if (!best) best = players[0];
+      ball.holder = null;
+      ball.traveling = true;
+      ball.target = best;
+      const dx = best.x - ball.x;
+      const dy = best.y - ball.y;
+      const d = Math.hypot(dx, dy) || 1;
+      const sp = Math.min(17, 9 + d * 0.02);
+      ball.vx = (dx / d) * sp;
+      ball.vy = (dy / d) * sp;
+    }
+    function draw() {
+      ctx!.clearRect(0, 0, W, H);
+      // cancha HORIZONTAL con porterías izquierda y derecha
+      ctx!.save();
+      ctx!.strokeStyle = 'rgba(208,216,226,0.055)';
+      ctx!.lineWidth = 1;
+      const mx = W * 0.06;
+      const my = H * 0.1;
+      const mw = W * 0.88;
+      const mh = H * 0.8;
+      ctx!.strokeRect(mx, my, mw, mh);
+      ctx!.beginPath();
+      ctx!.moveTo(W * 0.5, my);
+      ctx!.lineTo(W * 0.5, my + mh);
+      ctx!.stroke();
+      const cr = Math.min(mw, mh) * 0.16;
+      ctx!.beginPath();
+      ctx!.arc(W * 0.5, my + mh * 0.5, cr, 0, 6.28);
+      ctx!.stroke();
+      ctx!.beginPath();
+      ctx!.arc(W * 0.5, my + mh * 0.5, 2.5, 0, 6.28);
+      ctx!.fillStyle = 'rgba(208,216,226,0.12)';
+      ctx!.fill();
+      const ah = mh * 0.4;
+      const aw = mw * 0.1;
+      const ash = mh * 0.2;
+      const asw = mw * 0.045;
+      ctx!.strokeStyle = 'rgba(208,216,226,0.055)';
+      ctx!.strokeRect(mx, my + (mh - ah) / 2, aw, ah);
+      ctx!.strokeRect(mx, my + (mh - ash) / 2, asw, ash);
+      ctx!.strokeRect(mx + mw - aw, my + (mh - ah) / 2, aw, ah);
+      ctx!.strokeRect(mx + mw - asw, my + (mh - ash) / 2, asw, ash);
+      const gh = mh * 0.2;
+      const gw = W * 0.022;
+      const gy = my + mh * 0.5 - gh / 2;
+      ctx!.strokeStyle = 'rgba(208,216,226,0.22)';
+      ctx!.lineWidth = 1.5;
+      ctx!.strokeRect(mx - gw, gy, gw, gh);
+      ctx!.strokeRect(mx + mw, gy, gw, gh);
+      ctx!.restore();
 
-      raf = requestAnimationFrame(frame);
+      for (const p of players) {
+        p.phase += 0.012;
+        let tx = p.hx * W + Math.cos(p.phase) * p.roam;
+        let ty = p.hy * H + Math.sin(p.phase * 0.8) * p.roam;
+        const db = Math.hypot(ball.x - p.x, ball.y - p.y);
+        if (p === ball.target || p === ball.holder) {
+          tx = tx * 0.5 + ball.x * 0.5;
+          ty = ty * 0.5 + ball.y * 0.5;
+        } else if (db < 160) {
+          const pull =
+            ball.holder && ball.holder.team === p.team ? 0.2 : 0.34;
+          tx = tx * (1 - pull) + ball.x * pull;
+          ty = ty * (1 - pull) + ball.y * pull;
+        }
+        if (mouse.active) {
+          const dmx = p.x - mouse.x;
+          const dmy = p.y - mouse.y;
+          const dm = Math.hypot(dmx, dmy);
+          if (dm < 260) {
+            tx += (dmx / dm) * (260 - dm) * 0.8;
+            ty += (dmy / dm) * (260 - dm) * 0.8;
+          }
+        }
+        p.vx += (tx - p.x) * 0.01;
+        p.vy += (ty - p.y) * 0.01;
+        p.vx *= 0.88;
+        p.vy *= 0.88;
+        p.x += p.vx;
+        p.y += p.vy;
+      }
+      if (ball.traveling) {
+        ball.x += ball.vx;
+        ball.y += ball.vy;
+        const tg = ball.target;
+        if (tg && Math.hypot(tg.x - ball.x, tg.y - ball.y) < 15) {
+          ball.traveling = false;
+          ball.holder = tg;
+          ball.cool = 12 + ((tg.phase * 7) % 18);
+        }
+      } else if (ball.holder) {
+        ball.x = ball.holder.x;
+        ball.y = ball.holder.y;
+        ball.cool--;
+        if (ball.cool <= 0) passBall();
+      }
+
+      if (ball.traveling) {
+        ctx!.globalAlpha = 0.3;
+        ctx!.strokeStyle = 'rgba(252,252,252,0.8)';
+        ctx!.lineWidth = 2;
+        ctx!.beginPath();
+        ctx!.moveTo(ball.x, ball.y);
+        ctx!.lineTo(ball.x - ball.vx * 2.5, ball.y - ball.vy * 2.5);
+        ctx!.stroke();
+        ctx!.globalAlpha = 1;
+      }
+
+      for (const p of players) {
+        const hasBall = ball.holder === p;
+        if (p.team === 'A') {
+          ctx!.beginPath();
+          ctx!.arc(p.x, p.y, hasBall ? 6 : 5, 0, 6.28);
+          ctx!.fillStyle = 'rgba(208,216,226,0.85)';
+          ctx!.fill();
+        } else {
+          ctx!.beginPath();
+          ctx!.arc(p.x, p.y, hasBall ? 6 : 5, 0, 6.28);
+          ctx!.fillStyle = 'rgba(120,140,170,0.5)';
+          ctx!.fill();
+          ctx!.beginPath();
+          ctx!.arc(p.x, p.y, 5, 0, 6.28);
+          ctx!.strokeStyle = 'rgba(208,216,226,0.3)';
+          ctx!.lineWidth = 1;
+          ctx!.stroke();
+        }
+        if (hasBall) {
+          ctx!.beginPath();
+          ctx!.arc(p.x, p.y, 11, 0, 6.28);
+          ctx!.strokeStyle = 'rgba(252,252,252,0.4)';
+          ctx!.lineWidth = 1.5;
+          ctx!.stroke();
+        }
+      }
+      ctx!.beginPath();
+      ctx!.arc(ball.x, ball.y, 4.5, 0, 6.28);
+      ctx!.fillStyle = '#fcfcfc';
+      ctx!.fill();
+      raf = requestAnimationFrame(draw);
     }
 
-    raf = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(raf);
+    function onMove(e: MouseEvent) {
+      const r = canvas!.getBoundingClientRect();
+      mouse.x = e.clientX - r.left;
+      mouse.y = e.clientY - r.top;
+      mouse.active = true;
+    }
+    function onLeave() {
+      mouse.active = false;
+    }
+    function onResize() {
+      resize();
+      seed();
+    }
+
+    hero.addEventListener('mousemove', onMove);
+    hero.addEventListener('mouseleave', onLeave);
+    window.addEventListener('resize', onResize);
+    resize();
+    seed();
+    draw();
+    return () => {
+      cancelAnimationFrame(raf);
+      hero.removeEventListener('mousemove', onMove);
+      hero.removeEventListener('mouseleave', onLeave);
+      window.removeEventListener('resize', onResize);
+    };
   }, []);
 
-  // Split the label into a light lead word ("For" / "Para") and a bold
-  // display word ("Clubs" / "Players") for the two-line typographic hierarchy.
-  const [clubsLead, ...clubsRest] = t('forClubs').split(' ');
-  const clubsMain = clubsRest.join(' ');
-  const [playersLead, ...playersRest] = t('forPlayers').split(' ');
-  const playersMain = playersRest.join(' ');
+  /* ===== WHO WE ARE: small ball that drops with the scroll, by the 2023 ===== */
+  useEffect(() => {
+    const canvas = whatCanvasRef.current;
+    const section = whatRef.current;
+    if (!canvas || !section) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    let W = 0;
+    let H = 0;
+    function resize() {
+      W = canvas!.width = canvas!.offsetWidth;
+      H = canvas!.height = canvas!.offsetHeight;
+    }
+    function render() {
+      if (
+        canvas!.width !== canvas!.offsetWidth ||
+        canvas!.height !== canvas!.offsetHeight
+      )
+        resize();
+      ctx!.clearRect(0, 0, W, H);
+      const r = section!.getBoundingClientRect();
+      const vh = window.innerHeight;
+      let p = (vh - r.top) / (vh + r.height);
+      p = Math.max(0, Math.min(1, p));
+      const bx = W * 0.82;
+      const by = H * 0.12 + p * (H * 0.76);
+      ctx!.strokeStyle = 'rgba(208,216,226,0.08)';
+      ctx!.lineWidth = 1;
+      ctx!.setLineDash([4, 8]);
+      ctx!.beginPath();
+      ctx!.moveTo(bx, H * 0.1);
+      ctx!.lineTo(bx, H * 0.9);
+      ctx!.stroke();
+      ctx!.setLineDash([]);
+      const grad = ctx!.createLinearGradient(bx, by - 50, bx, by);
+      grad.addColorStop(0, 'rgba(208,216,226,0)');
+      grad.addColorStop(1, 'rgba(208,216,226,0.4)');
+      ctx!.strokeStyle = grad;
+      ctx!.lineWidth = 2;
+      ctx!.beginPath();
+      ctx!.moveTo(bx, by - 50);
+      ctx!.lineTo(bx, by);
+      ctx!.stroke();
+      ctx!.beginPath();
+      ctx!.arc(bx, by, 14, 0, 6.28);
+      ctx!.fillStyle = 'rgba(208,216,226,0.06)';
+      ctx!.fill();
+      ctx!.save();
+      ctx!.translate(bx, by);
+      ctx!.rotate(p * 12);
+      ctx!.beginPath();
+      ctx!.arc(0, 0, 6, 0, 6.28);
+      ctx!.fillStyle = '#fcfcfc';
+      ctx!.fill();
+      ctx!.beginPath();
+      ctx!.arc(0, 0, 6, 0, 6.28);
+      ctx!.strokeStyle = 'rgba(208,216,226,0.6)';
+      ctx!.lineWidth = 1;
+      ctx!.stroke();
+      ctx!.fillStyle = 'rgba(120,140,170,0.55)';
+      ctx!.beginPath();
+      for (let i = 0; i < 5; i++) {
+        const a = -Math.PI / 2 + (i * 6.28) / 5;
+        const pr = 2.4;
+        if (i === 0) ctx!.moveTo(Math.cos(a) * pr, Math.sin(a) * pr);
+        else ctx!.lineTo(Math.cos(a) * pr, Math.sin(a) * pr);
+      }
+      ctx!.closePath();
+      ctx!.fill();
+      ctx!.restore();
+    }
+    let visible = false;
+    const io = new IntersectionObserver(
+      (es) =>
+        es.forEach((e) => {
+          visible = e.isIntersecting;
+          if (visible) {
+            resize();
+            render();
+          }
+        }),
+      {threshold: 0}
+    );
+    io.observe(section);
+    function onScroll() {
+      if (visible) render();
+    }
+    function onResize() {
+      resize();
+      if (visible) render();
+    }
+    window.addEventListener('scroll', onScroll, {passive: true});
+    window.addEventListener('resize', onResize);
+    return () => {
+      io.disconnect();
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
+
+  /* ===== TEAM: elite ball crossing behind James & Cyril ===== */
+  useEffect(() => {
+    const canvas = teamBallRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    let W = 0;
+    let H = 0;
+    let raf = 0;
+    let t = 0;
+    function resize() {
+      W = canvas!.width = canvas!.offsetWidth;
+      H = canvas!.height = canvas!.offsetHeight;
+    }
+    function draw() {
+      ctx!.clearRect(0, 0, W, H);
+      t += 0.005;
+      const y = H * 0.5;
+      ctx!.strokeStyle = 'rgba(208,216,226,0.06)';
+      ctx!.lineWidth = 1;
+      ctx!.setLineDash([6, 10]);
+      ctx!.beginPath();
+      ctx!.moveTo(W * 0.06, y);
+      ctx!.lineTo(W * 0.94, y);
+      ctx!.stroke();
+      ctx!.setLineDash([]);
+      const p = Math.sin(t) * 0.5 + 0.5;
+      const x = W * 0.08 + p * W * 0.84;
+      const by = y + Math.sin(t * 2.2) * 22;
+      const fadeAlpha = Math.min(1, Math.min(p, 1 - p) * 8);
+      const dir = Math.cos(t) >= 0 ? 1 : -1;
+      const grad = ctx!.createLinearGradient(x - dir * 110, by, x, by);
+      grad.addColorStop(0, 'rgba(208,216,226,0)');
+      grad.addColorStop(1, `rgba(208,216,226,${0.6 * fadeAlpha})`);
+      ctx!.strokeStyle = grad;
+      ctx!.lineWidth = 2.5;
+      ctx!.beginPath();
+      ctx!.moveTo(x - dir * 110, by);
+      ctx!.lineTo(x, by);
+      ctx!.stroke();
+      ctx!.globalAlpha = fadeAlpha * 0.15;
+      ctx!.beginPath();
+      ctx!.arc(x, by, 28, 0, 6.28);
+      ctx!.fillStyle = 'rgba(208,216,226,1)';
+      ctx!.fill();
+      ctx!.globalAlpha = fadeAlpha;
+      ctx!.beginPath();
+      ctx!.arc(x, by, 12, 0, 6.28);
+      ctx!.fillStyle = '#fcfcfc';
+      ctx!.fill();
+      ctx!.beginPath();
+      ctx!.arc(x, by, 12, 0, 6.28);
+      ctx!.strokeStyle = 'rgba(208,216,226,0.7)';
+      ctx!.lineWidth = 1.5;
+      ctx!.stroke();
+      ctx!.fillStyle = 'rgba(208,216,226,0.6)';
+      const pr = 4;
+      const pa = Math.PI / 2 + t * 2;
+      ctx!.beginPath();
+      for (let i = 0; i < 5; i++) {
+        const a = pa + (i * 6.28) / 5;
+        if (i === 0)
+          ctx!.moveTo(x + Math.cos(a) * pr, by + Math.sin(a) * pr);
+        else ctx!.lineTo(x + Math.cos(a) * pr, by + Math.sin(a) * pr);
+      }
+      ctx!.closePath();
+      ctx!.fill();
+      ctx!.globalAlpha = 1;
+      raf = requestAnimationFrame(draw);
+    }
+    const io = new IntersectionObserver(
+      (es) =>
+        es.forEach((e) => {
+          if (e.isIntersecting) {
+            resize();
+            if (!raf) draw();
+          } else if (raf) {
+            cancelAnimationFrame(raf);
+            raf = 0;
+          }
+        }),
+      {threshold: 0.05}
+    );
+    io.observe(canvas);
+    function onResize() {
+      if (raf) resize();
+    }
+    window.addEventListener('resize', onResize);
+    return () => {
+      io.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
+
+  /* ===== Scroll reveals ===== */
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const els = root.querySelectorAll<HTMLElement>(`.${styles.reveal}`);
+    const io = new IntersectionObserver(
+      (es) =>
+        es.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add(styles.in);
+            io.unobserve(e.target);
+          }
+        }),
+      {threshold: 0.12, rootMargin: '0px 0px -50px 0px'}
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
+  /* ===== VS closing: reveal text + ball that drops down the centre ===== */
+  useEffect(() => {
+    const end = endRef.current;
+    const ball = vsBallRef.current;
+    const mid = vsMidRef.current;
+    if (!end) return;
+    const eio = new IntersectionObserver(
+      (es) =>
+        es.forEach((e) => {
+          if (e.isIntersecting) end.classList.add(styles.in);
+        }),
+      {threshold: 0.3}
+    );
+    eio.observe(end);
+    function onScroll() {
+      if (!ball || !mid) return;
+      const r = mid.getBoundingClientRect();
+      const vh = window.innerHeight;
+      let p = (vh - r.top) / (vh + r.height);
+      p = Math.max(0, Math.min(1, p));
+      const travel = r.height - 30;
+      ball.style.top = p * travel + 'px';
+      ball.style.transform = 'translateX(-50%) rotate(' + p * 720 + 'deg)';
+    }
+    window.addEventListener('scroll', onScroll, {passive: true});
+    onScroll();
+    return () => {
+      eio.disconnect();
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, []);
+
+  /* ===== Scoreboard: dramatic count-up that eases as it lands ===== */
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const nums = root.querySelectorAll<HTMLElement>(
+      `.${styles.sbN}[data-count]`
+    );
+    if (!nums.length) return;
+    const animate = (el: HTMLElement) => {
+      const target = parseInt(el.dataset.count || '0', 10);
+      const suffix = el.dataset.suffix || '';
+      const dur = 1800;
+      let start = 0;
+      const step = (now: number) => {
+        if (!start) start = now;
+        const t = Math.min((now - start) / dur, 1);
+        const eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+        el.textContent = Math.round(eased * target) + suffix;
+        if (t < 1) requestAnimationFrame(step);
+        else {
+          el.textContent = target + suffix;
+          el.style.textShadow =
+            '0 0 40px rgba(208,216,226,.9),0 0 80px rgba(120,150,210,.6)';
+          setTimeout(() => {
+            el.style.textShadow = '';
+          }, 600);
+        }
+      };
+      requestAnimationFrame(step);
+    };
+    const cio = new IntersectionObserver(
+      (es) =>
+        es.forEach((e) => {
+          if (e.isIntersecting) {
+            animate(e.target as HTMLElement);
+            cio.unobserve(e.target);
+          }
+        }),
+      {threshold: 0.5}
+    );
+    nums.forEach((n) => cio.observe(n));
+    return () => cio.disconnect();
+  }, []);
 
   return (
-    <main
-      className="fixed inset-0 overflow-hidden font-sans"
-      style={{background: WHITE, color: BLACK}}
-    >
-      <MenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} t={t} />
-
-      {/* STATIC FOOTER — fixed behind everything, never moves */}
-      <FooterHome ref={footerRef} />
-
-      {/* CONTENT LAYER — slides up to reveal the footer */}
-      <div
-        ref={contentRef}
-        className="fixed inset-0 z-[10]"
-        style={{background: WHITE, willChange: 'transform'}}
-      >
-        {/* Football pitch — side-to-side SVG */}
-        <svg
-          aria-hidden
-          className="pointer-events-none fixed inset-0 z-0 h-full w-full"
-          viewBox="0 0 1440 900"
-          preserveAspectRatio="xMidYMid slice"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <g stroke={NAVY} strokeWidth="0.8" fill="none" opacity="0.2">
-            <rect x="0" y="0" width="1440" height="900" />
-            <line x1="720" y1="0" x2="720" y2="900" />
-            <circle cx="720" cy="450" r="130" />
-            <circle cx="720" cy="450" r="3" fill={NAVY} stroke="none" />
-            <rect x="0" y="275" width="200" height="350" />
-            <rect x="1240" y="275" width="200" height="350" />
-            <rect x="0" y="360" width="70" height="180" />
-            <rect x="1370" y="360" width="70" height="180" />
-            <circle cx="180" cy="450" r="3" fill={NAVY} stroke="none" />
-            <circle cx="1260" cy="450" r="3" fill={NAVY} stroke="none" />
-            <path d="M 200 360 A 80 80 0 0 1 200 540" />
-            <path d="M 1240 360 A 80 80 0 0 0 1240 540" />
-            <path d="M 0 20 A 20 20 0 0 1 20 0" />
-            <path d="M 1420 0 A 20 20 0 0 1 1440 20" />
-            <path d="M 1440 880 A 20 20 0 0 1 1420 900" />
-            <path d="M 20 900 A 20 20 0 0 1 0 880" />
-          </g>
-        </svg>
-
-        {/* Aerial player shadows — above the pitch, below the labels */}
-        <div aria-hidden className="pointer-events-none fixed inset-0 z-0">
-          {PLAYERS.map((p, i) => (
-            <div
-              key={i}
-              ref={(el) => {
-                playerRefs.current[i] = el;
-              }}
-              style={{
-                position: 'absolute',
-                left: `${p.x}%`,
-                top: `${p.y}%`,
-                width: 12,
-                height: 12,
-                borderRadius: '50%',
-                background: 'rgba(7, 44, 104, 0.15)',
-                transform: 'translate(-50%, -50%)'
-              }}
+    <div ref={rootRef} className={cx('page')}>
+      {/* film grain */}
+      <div className={cx('grain')} aria-hidden>
+        <svg xmlns="http://www.w3.org/2000/svg">
+          <filter id="grain-noise">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.8"
+              numOctaves={3}
             />
-          ))}
+          </filter>
+          <rect width="100%" height="100%" filter="url(#grain-noise)" />
+        </svg>
+      </div>
 
-          {/* Ball — darker so it reads against the players */}
-          <div
-            ref={ballRef}
-            style={{
-              position: 'absolute',
-              left: '50%',
-              top: '50%',
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              background: NAVY,
-              opacity: 0.35,
-              transform: 'translate(-50%, -50%)'
-            }}
+      {/* NAV */}
+      <nav className={cx('nav')}>
+        <Link href="/" className={cx('logo')}>
+          <span className={cx('c')}>CLEAR</span>
+          <span className={cx('w')}>WAY</span>
+        </Link>
+        <div className={cx('links')}>
+          <Link href="/for-clubs">{c.nav.clubs}</Link>
+          <Link href="/for-players">{c.nav.players}</Link>
+          <Link href="/about">{c.nav.about}</Link>
+          <LangToggle />
+        </div>
+      </nav>
+
+      {/* HERO */}
+      <section className={cx('hero')}>
+        <canvas ref={pitchRef} className={cx('pitch')} aria-hidden />
+
+        {/* Hover videos — fade in behind the hero when a button is hovered */}
+        <div className={cx('heroVideos')} aria-hidden>
+          <video
+            ref={clubsVideoRef}
+            src="/teams-1.mp4"
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            className={cx('heroVideo', hovered === 'clubs' && 'heroVideoOn')}
+          />
+          <video
+            ref={playersVideoRef}
+            src="/players-1.mp4"
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            className={cx('heroVideo', hovered === 'players' && 'heroVideoOn')}
           />
         </div>
-
-        {/* Center dividing line */}
         <div
-          className="pointer-events-none fixed top-0 left-1/2 z-[5] h-full w-px -translate-x-1/2"
-          style={{background: DEW}}
+          className={cx('heroVideoVeil', hovered && 'heroVideoVeilOn')}
+          aria-hidden
         />
 
-        {/* Split background panels (hover only). Each panel shares a
-            view-transition-name with its destination hero so the navy morphs
-            (expands) from the clicked panel into the full-screen hero. */}
-        <div className="fixed inset-0 z-[1] flex">
-          <ViewTransition name="hero-clubs" share="morph">
-          <Link
-            href="/for-clubs"
-            aria-label={t('forClubs')}
-            onMouseEnter={() => {
-              setHovered('clubs');
-              playVideo(clubsVideoRef);
-            }}
-            onMouseLeave={() => {
-              setHovered(null);
-              resetVideo(clubsVideoRef);
-            }}
-            className="group relative h-full flex-1 cursor-pointer overflow-hidden"
-          >
-            <video
-              ref={clubsVideoRef}
-              src="/teams-1.mp4"
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              aria-hidden
-              className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-700 group-hover:opacity-30"
-            />
-            {/* Vignette — keeps the label legible over the video */}
-            <span
-              aria-hidden
-              className="absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100"
-              style={{
-                background:
-                  'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.5) 100%)'
+        <div className={cx('heroInner')}>
+          <div className={cx('tagline')}>{c.hero.tagline}</div>
+          <div className={cx('logoBig')}>
+            <span>CLEAR</span>
+            <b>WAY</b>
+          </div>
+          <div className={cx('pg')}>{c.hero.pg}</div>
+          <p className={cx('sub')}>{c.hero.sub}</p>
+          <div className={cx('heroCta')}>
+            <Link
+              href="/for-clubs"
+              className={cx('hb', 'hbGhost')}
+              onMouseEnter={() => {
+                setHovered('clubs');
+                playVideo(clubsVideoRef);
               }}
-            />
-            <span
-              aria-hidden
-              className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-[0.04]"
-              style={{background: NAVY}}
-            />
-          </Link>
-          </ViewTransition>
-          <ViewTransition name="hero-players" share="morph">
-          <Link
-            href="/for-players"
-            aria-label={t('forPlayers')}
-            onMouseEnter={() => {
-              setHovered('players');
-              playVideo(playersVideoRef);
-            }}
-            onMouseLeave={() => {
-              setHovered(null);
-              resetVideo(playersVideoRef);
-            }}
-            className="group relative h-full flex-1 cursor-pointer overflow-hidden"
-          >
-            <video
-              ref={playersVideoRef}
-              src="/players-1.mp4"
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              aria-hidden
-              className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-700 group-hover:opacity-30"
-            />
-            {/* Vignette — keeps the label legible over the video */}
-            <span
-              aria-hidden
-              className="absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100"
-              style={{
-                background:
-                  'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.5) 100%)'
+              onMouseLeave={() => {
+                setHovered(null);
+                resetVideo(clubsVideoRef);
               }}
-            />
-            <span
-              aria-hidden
-              className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-[0.04]"
-              style={{background: BLACK}}
-            />
-          </Link>
-          </ViewTransition>
+            >
+              <span className={cx('hbK')}>{c.hero.clubK}</span>
+              <span className={cx('hbT')}>
+                {c.hero.clubT} <span className={cx('arr')}>→</span>
+              </span>
+            </Link>
+            <Link
+              href="/for-players"
+              className={cx('hb', 'hbSolid')}
+              onMouseEnter={() => {
+                setHovered('players');
+                playVideo(playersVideoRef);
+              }}
+              onMouseLeave={() => {
+                setHovered(null);
+                resetVideo(playersVideoRef);
+              }}
+            >
+              <span className={cx('hbK')}>{c.hero.playerK}</span>
+              <span className={cx('hbT')}>
+                {c.hero.playerT} <span className={cx('arr')}>→</span>
+              </span>
+            </Link>
+          </div>
         </div>
+        <div className={cx('scrollCue')}>
+          <span>{c.hero.cue}</span>
+          <span className={cx('bar')} />
+        </div>
+      </section>
 
-        {/* NAV */}
-        <nav
-          className="fixed top-0 right-0 left-0 z-[100] grid items-center"
-          style={{
-            gridTemplateColumns: '1fr auto 1fr',
-            padding: '1.5rem 2.5rem'
-          }}
-        >
-          <div className="flex items-center">
-            <LangToggle />
-          </div>
+      {/* WHO WE ARE */}
+      <section ref={whatRef} className={cx('what', 'reveal')}>
+        <canvas ref={whatCanvasRef} className={cx('whatcanvas')} aria-hidden />
+        <div className={cx('bgmark')} aria-hidden>
+          2023
+        </div>
+        <div className={cx('wrap')}>
+          <span className={cx('whatLine')} />
+          <div className={cx('eyebrow', 'reveal')}>{c.what.eyebrow}</div>
+          <h2 className={cx('reveal')} data-d="1">
+            {c.what.pre}
+            <span className={cx('it')}>{c.what.it}</span>
+            {c.what.mid}
+            <b>{c.what.bold}</b>
+          </h2>
+        </div>
+      </section>
 
-          <Link
-            href="/"
-            className="flex justify-center no-underline"
-            aria-label="Clearway Performance Group"
+      {/* THE TWO DOORS */}
+      <section className={cx('doors')}>
+        <Link href="/for-clubs" className={cx('door', 'doorClubs', 'reveal')}>
+          <svg
+            className={cx('doorSil')}
+            viewBox="0 0 200 240"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/Logotipos/clearway-black.svg"
-              alt="Clearway Performance Group"
-              height={34}
-              style={{height: 34, width: 'auto', display: 'block'}}
+            <path
+              d="M100 10 L180 40 L180 120 Q180 200 100 230 Q20 200 20 120 L20 40 Z"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
             />
-          </Link>
-
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={() => setMenuOpen(true)}
-              aria-label={t('menu.clubs')}
-              aria-expanded={menuOpen}
-              className="flex cursor-pointer flex-col gap-[5px] border-0 bg-transparent p-1"
-            >
-              <span className="block h-px w-[22px]" style={{background: BLACK}} />
-              <span className="block h-px w-[22px]" style={{background: BLACK}} />
-              <span className="block h-px w-[22px]" style={{background: BLACK}} />
-            </button>
-          </div>
-        </nav>
-
-        {/* ENTRY LABELS */}
-        <Link
-          href="/for-clubs"
-          className="pointer-events-none fixed z-20 text-left no-underline"
-          style={{left: '2.5rem', bottom: '2.5rem'}}
-        >
-          <div
-            className="transition-all duration-700"
-            style={{
-              letterSpacing: hovered === 'clubs' ? '0.07em' : '0.04em',
-              color: hovered === 'clubs' ? WHITE : BLACK
-            }}
-          >
-            <span
-              className="block font-light"
-              style={{
-                fontSize: '1rem',
-                lineHeight: 1.1,
-                letterSpacing: '0.12em'
-              }}
-            >
-              {clubsLead}
-            </span>
-            <span
-              className="block font-bold leading-none"
-              style={{fontSize: 'clamp(3.5rem, 7vw, 7rem)'}}
-            >
-              {clubsMain}
-            </span>
-          </div>
+            <path
+              d="M100 50 L100 190 M55 75 L145 75 M55 110 L145 110 M70 145 L130 145"
+              stroke="currentColor"
+              strokeWidth="2"
+              opacity="0.5"
+            />
+          </svg>
+          <div className={cx('dlabel')}>{c.doors.clubs.dlabel}</div>
+          <h3>
+            <span className={cx('thin')}>{c.doors.clubs.thin}</span>
+            <br />
+            <b>{c.doors.clubs.bold}</b>
+          </h3>
+          <p>{c.doors.clubs.p}</p>
+          <span className={cx('go')}>
+            <span>{c.doors.clubs.enter}</span> <span className={cx('arr')}>→</span>
+          </span>
         </Link>
-
         <Link
           href="/for-players"
-          className="pointer-events-none fixed z-20 text-right no-underline"
-          style={{right: '2.5rem', bottom: '2.5rem'}}
+          className={cx('door', 'doorPlayers', 'reveal')}
+          data-d="1"
         >
-          <div
-            className="transition-all duration-700"
-            style={{
-              letterSpacing: hovered === 'players' ? '0.07em' : '0.04em',
-              color: hovered === 'players' ? WHITE : BLACK
-            }}
+          <svg
+            className={cx('doorSil')}
+            viewBox="0 0 160 260"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden
           >
-            <span
-              className="block font-light"
-              style={{
-                fontSize: '1rem',
-                lineHeight: 1.1,
-                letterSpacing: '0.12em'
-              }}
-            >
-              {playersLead}
-            </span>
-            <span
-              className="block font-bold leading-none"
-              style={{fontSize: 'clamp(3.5rem, 7vw, 7rem)'}}
-            >
-              {playersMain}
-            </span>
-          </div>
+            <circle
+              cx="80"
+              cy="40"
+              r="26"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+            />
+            <path
+              d="M80 70 L80 160 M80 90 L40 130 M80 90 L120 130 M80 160 L52 240 M80 160 L108 240"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+            />
+          </svg>
+          <div className={cx('dlabel')}>{c.doors.players.dlabel}</div>
+          <h3>
+            <span className={cx('thin')}>{c.doors.players.thin}</span>
+            <br />
+            <b>{c.doors.players.bold}</b>
+          </h3>
+          <p>{c.doors.players.p}</p>
+          <span className={cx('go')}>
+            <span>{c.doors.players.enter}</span>{' '}
+            <span className={cx('arr')}>→</span>
+          </span>
         </Link>
+      </section>
 
-        {/* Center dot */}
-        <div
-          className="pointer-events-none fixed left-1/2 z-20 h-1 w-1 -translate-x-1/2 rounded-full"
-          style={{bottom: '28%', background: DEW}}
-        />
-
-      </div>
-    </main>
-  );
-}
-
-/* ----- Menu overlay ----- */
-function MenuOverlay({
-  open,
-  onClose,
-  t
-}: {
-  open: boolean;
-  onClose: () => void;
-  t: ReturnType<typeof useTranslations<'Landing'>>;
-}) {
-  return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-hidden={!open}
-      className="fixed inset-0 z-[200] flex transition-opacity duration-300"
-      style={{
-        background: '#0a1628',
-        opacity: open ? 1 : 0,
-        pointerEvents: open ? 'all' : 'none'
-      }}
-    >
-      {/* LEFT — language top-left, menu options bottom-left */}
-      <div className="relative flex-1">
-        {/* Language selector — top-left corner */}
-        <div style={{position: 'absolute', top: '1.75rem', left: '2.5rem'}}>
-          <LangToggle variant="menu" />
+      {/* JAMES & CYRIL */}
+      <section className={cx('team')}>
+        <canvas ref={teamBallRef} className={cx('teamball')} aria-hidden />
+        <div className={cx('wrap')}>
+          <div className={cx('eyebrow', 'reveal')}>{c.team.eyebrow}</div>
+          <h2 className={cx('reveal')} data-d="1">
+            <span className={cx('thin')}>{c.team.thin}</span>
+            <br />
+            <b>{c.team.bold}</b> <span className={cx('it')}>{c.team.it}</span>
+          </h2>
+          <div className={cx('teamGrid')}>
+            <div className={cx('tcard', 'reveal')} data-d="1">
+              <div className={cx('tphoto')}>
+                <div className={cx('nm')}>
+                  <span>James</span>
+                  <br />
+                  Fox.
+                </div>
+              </div>
+              <div className={cx('trole')}>{c.team.jamesRole}</div>
+              <ul className={cx('tcreds')}>
+                {c.team.jamesCreds.map((line, i) => (
+                  <li key={i}>{rich(line)}</li>
+                ))}
+              </ul>
+            </div>
+            <div className={cx('tcard', 'reveal')} data-d="2">
+              <div className={cx('tphoto')}>
+                <div className={cx('nm')}>
+                  <span>Cyril</span>
+                  <br />
+                  Rool.
+                </div>
+              </div>
+              <div className={cx('trole')}>{c.team.cyrilRole}</div>
+              <ul className={cx('tcreds')}>
+                {c.team.cyrilCreds.map((line, i) => (
+                  <li key={i}>{rich(line)}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
+      </section>
 
-        {/* Close — top-right of the content area, off the image */}
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute cursor-pointer border-0 bg-transparent transition-colors duration-200 hover:text-[#d0d8e2]"
-          style={{
-            top: '1.75rem',
-            right: '2.5rem',
-            fontSize: '1.3rem',
-            color: WHITE,
-            zIndex: 10
-          }}
-        >
-          {t('menu.close')} ×
-        </button>
-
-        {/* Menu options — bottom-left, large and tight */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '2.5rem',
-            left: '2.5rem',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.4rem'
-          }}
-        >
-          <MenuLink href="/for-clubs" onClick={onClose}>
-            {t('menu.clubs')}
-          </MenuLink>
-          <MenuLink href="/for-players" onClick={onClose}>
-            {t('menu.players')}
-          </MenuLink>
-          <MenuLink href="/about" onClick={onClose}>
-            {t('menu.about')}
-          </MenuLink>
+      {/* THE RECORD — scoreboard */}
+      <section className={cx('proof')}>
+        <div className={cx('wrap')}>
+          <div className={cx('recHead', 'reveal')}>
+            <div className={cx('eyebrow')}>{c.proof.eyebrow}</div>
+            <h2>
+              <span className={cx('thin')}>{c.proof.thin}</span>{' '}
+              <span className={cx('it')}>{c.proof.it}</span>
+            </h2>
+          </div>
+          <div className={cx('scoreboard', 'reveal')} data-d="1">
+            {c.proof.cells.map((cell, i) => (
+              <div key={i} style={{display: 'contents'}}>
+                {i > 0 && <div className={cx('sbSep')} />}
+                <div className={cx('sbCell')}>
+                  <div
+                    className={cx('sbN')}
+                    data-count={cell.count}
+                    data-suffix={cell.suffix || undefined}
+                  >
+                    0
+                  </div>
+                  <div className={cx('sbL')}>
+                    <b>{cell.b}</b>
+                    {cell.l}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* RIGHT — image, one third of the page */}
-      <div className="relative" style={{width: '33.3333%'}}>
-        <Image
-          src="/navmenu.jpg"
-          alt=""
-          fill
-          sizes="33vw"
-          aria-hidden
-          style={{objectFit: 'cover', objectPosition: 'center center'}}
-        />
-      </div>
+      {/* CLOSING — VS */}
+      <section ref={endRef} className={cx('end')}>
+        <div className={cx('vsWrap')}>
+          <Link href="/for-clubs" className={cx('vsSide', 'vsClubs', 'reveal')}>
+            <div className={cx('vsTag')}>{c.end.clubsTag}</div>
+            <div className={cx('vsName')}>
+              <span className={cx('thin')}>{c.end.forWord}</span>
+              <br />
+              <b>{c.end.clubs}</b>
+            </div>
+            <span className={cx('vsGo')}>{c.end.enter}</span>
+          </Link>
+          <div ref={vsMidRef} className={cx('vsMid', 'reveal')} data-d="1">
+            <div ref={vsBallRef} className={cx('vsBall')}>
+              <svg viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+                <circle
+                  cx="15"
+                  cy="15"
+                  r="13"
+                  fill="#fcfcfc"
+                  stroke="#d0d8e2"
+                  strokeWidth="1"
+                />
+                <polygon points="15,8 21,12 19,19 11,19 9,12" fill="#d0d8e2" />
+              </svg>
+            </div>
+            <div className={cx('vsQ')}>
+              {c.end.q[0]}
+              <br />
+              {c.end.q[1]}
+            </div>
+          </div>
+          <Link
+            href="/for-players"
+            className={cx('vsSide', 'vsPlayers', 'reveal')}
+            data-d="2"
+          >
+            <div className={cx('vsTag')}>{c.end.playersTag}</div>
+            <div className={cx('vsName')}>
+              <span className={cx('thin')}>{c.end.forWord}</span>
+              <br />
+              <b>{c.end.players}</b>
+            </div>
+          </Link>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className={cx('foot')}>
+        <div className={cx('wrap')}>
+          <div>
+            <span className={cx('mark')}>
+              <span className={cx('c')}>CLEAR</span>
+              <span className={cx('w')}>WAY</span>
+            </span>
+            <div className={cx('serif')}>{c.foot.serif}</div>
+          </div>
+          <div className={cx('footCol')}>
+            <h4>{c.foot.navigate}</h4>
+            <Link href="/for-clubs">{c.foot.clubs}</Link>
+            <Link href="/for-players">{c.foot.players}</Link>
+            <Link href="/about">{c.foot.about}</Link>
+          </div>
+          <div className={cx('footCol')}>
+            <h4>{c.foot.legal}</h4>
+            <Link href="/privacy">{c.foot.privacy}</Link>
+            <Link href="/terms">{c.foot.terms}</Link>
+          </div>
+        </div>
+        <div className={cx('footBot')}>{c.foot.copyright}</div>
+      </footer>
     </div>
   );
 }
 
-function MenuLink({
-  href,
-  onClick,
-  children
-}: {
-  href: string;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  const [hover, setHover] = useState(false);
-  return (
-    <Link
-      href={href}
-      onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      className="font-light no-underline hover:animate-bounce"
-      style={{
-        fontSize: 'clamp(2.4rem, 5vw, 4rem)',
-        lineHeight: 1.05,
-        letterSpacing: '0.05em',
-        color: hover ? DEW : WHITE,
-        transition: 'color 200ms ease'
-      }}
-    >
-      {children}
-    </Link>
-  );
-}
-
 /* ----- Language toggle (EN / ES) ----- */
-const LOCALE_NAMES: Record<string, string> = {en: 'English', es: 'Español'};
-
-function LangToggle({variant = 'nav'}: {variant?: 'nav' | 'menu'}) {
+function LangToggle() {
   const activeLocale = useLocale() as Locale;
   const router = useRouter();
   const pathname = usePathname();
@@ -699,36 +1181,19 @@ function LangToggle({variant = 'nav'}: {variant?: 'nav' | 'menu'}) {
     });
   }
 
-  const isMenu = variant === 'menu';
-
   return (
-    <div className={isMenu ? 'flex gap-4' : 'flex gap-[0.15rem]'}>
-      {routing.locales.map((locale) => {
-        const active = locale === activeLocale;
-        return (
-          <button
-            key={locale}
-            type="button"
-            onClick={() => switchTo(locale)}
-            aria-pressed={active}
-            className="cursor-pointer border-0 border-b bg-transparent transition-colors duration-200"
-            style={{
-              fontSize: isMenu ? '0.65rem' : '0.62rem',
-              fontWeight: isMenu ? 600 : 500,
-              letterSpacing: isMenu ? '0.02em' : '0.15em',
-              padding: isMenu ? '0.4rem 0.8rem' : '0.3rem 0.5rem',
-              color: isMenu ? (active ? WHITE : '#555') : BLACK,
-              borderBottomColor: active
-                ? isMenu
-                  ? WHITE
-                  : BLACK
-                : 'transparent'
-            }}
-          >
-            {isMenu ? LOCALE_NAMES[locale] : locale.toUpperCase()}
-          </button>
-        );
-      })}
+    <div className={cx('lang')}>
+      {routing.locales.map((locale) => (
+        <button
+          key={locale}
+          type="button"
+          onClick={() => switchTo(locale)}
+          aria-pressed={locale === activeLocale}
+          className={cx(locale === activeLocale && 'langActive')}
+        >
+          {locale.toUpperCase()}
+        </button>
+      ))}
     </div>
   );
 }

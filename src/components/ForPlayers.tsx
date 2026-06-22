@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useRef, useState, ViewTransition} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 import {Link} from '@/i18n/navigation';
 import {Ball3D} from './Ball3D';
@@ -428,10 +428,7 @@ export function ForPlayers() {
 
       {/* ===== CAP 01 · HERO ===== */}
       <section className={cx('hero')} id="hero">
-        {/* Shared navy surface — morphs (expands) from the home panel. */}
-        <ViewTransition name="hero-players" share="morph">
-          <div className={cx('hero-bg')} aria-hidden="true" />
-        </ViewTransition>
+        <div className={cx('hero-bg')} aria-hidden="true" />
         <div className={cx('chapter')}>
           <b>01</b> &nbsp;The invisible player
         </div>
