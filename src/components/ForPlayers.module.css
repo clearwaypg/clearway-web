@@ -50,12 +50,13 @@
   align-items: center;
   justify-content: space-between;
   padding: 22px clamp(20px, 5vw, 60px);
-  mix-blend-mode: difference;
+  /* No mix-blend-mode here: difference inverted the white logo to a yellow/cream
+     tone over the colored sections. Keep the logo pure white (#fcfcfc) and
+     consistent with the rest of the site. */
 }
 .nav .logo {
   display: flex;
   align-items: center;
-  mix-blend-mode: normal; /* keep the white logo pure white over the dark nav */
 }
 .nav .logo img {
   height: 26px;
