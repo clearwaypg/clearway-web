@@ -5,6 +5,7 @@ import {useLocale} from 'next-intl';
 
 import {Link} from '@/i18n/navigation';
 import {SiteHeader} from './SiteHeader';
+import {Ball3D} from './Ball3D';
 import styles from './LandingHome.module.css';
 
 /* =========================================================
@@ -25,13 +26,6 @@ const cx = (...names: Array<string | false | null | undefined>) =>
     .map((n) => styles[n as string] ?? (n as string))
     .join(' ');
 
-/* Turn **bold** markers into <strong> so the rich credit lines stay readable
-   in the copy table below without dangerouslySetInnerHTML. */
-function rich(s: string) {
-  return s.split(/\*\*(.+?)\*\*/g).map((part, i) =>
-    i % 2 === 1 ? <strong key={i}>{part}</strong> : part
-  );
-}
 
 type Copy = (typeof COPY)['en'];
 
@@ -61,14 +55,14 @@ const COPY = {
         thin: 'We bring you',
         bold: 'the right player.',
         p: 'Identified, checked and ready. With the work permit and GBE paperwork for England already handled.',
-        enter: 'Enter'
+        enter: "Let's go"
       },
       players: {
         dlabel: 'If you are a player',
         thin: 'We open the',
         bold: 'door for you.',
         p: 'We measure you against a real professional standard and put you in front of the clubs that fit. We guarantee the trial, not the signing. Men and women.',
-        enter: 'Enter'
+        enter: "Let's go"
       }
     },
     team: {
@@ -77,6 +71,8 @@ const COPY = {
       bold: 'They know what it takes.',
       it: 'And they believe in the ones who do.',
       jamesRole: 'Founder and CEO',
+      jamesDesc:
+        'FA-registered in Talent Identification, with access to 100+ clubs across England and Europe.',
       jamesCreds: [
         'Over **30 years in professional sport**, as athlete, coach and manager. Alongside Olympic gold medallists, Wimbledon champions, world number ones and EFL footballers.',
         '**Registered with The Football Association in Talent Identification.**',
@@ -84,6 +80,8 @@ const COPY = {
         'The **work permit and GBE for England**, handled.'
       ],
       cyrilRole: 'Director of European Football',
+      cyrilDesc:
+        '15+ years in Ligue 1 — Lens, Bordeaux, Nice and Marseille. France U21 international.',
       cyrilCreds: [
         'Over **15 years in Ligue 1** with RC Lens, Bordeaux, OGC Nice and Olympique de Marseille.',
         '**France Under 21 international.**',
@@ -147,14 +145,14 @@ const COPY = {
         thin: 'Te traemos',
         bold: 'al jugador correcto.',
         p: 'Identificado, verificado y listo. Con el permiso de trabajo y el papeleo GBE para Inglaterra ya resueltos.',
-        enter: 'Entrar'
+        enter: 'Vamos allá'
       },
       players: {
         dlabel: 'Si eres jugador',
         thin: 'Te abrimos',
         bold: 'la puerta.',
         p: 'Te medimos contra un estándar profesional real y te ponemos frente a los clubes que encajan. Garantizamos la prueba, no la firma. Hombres y mujeres.',
-        enter: 'Entrar'
+        enter: 'Vamos allá'
       }
     },
     team: {
@@ -163,6 +161,8 @@ const COPY = {
       bold: 'Saben lo que hace falta.',
       it: 'Y creen en quienes lo tienen.',
       jamesRole: 'Fundador y CEO',
+      jamesDesc:
+        'Registrado en la FA en Identificación de Talento, con acceso a más de 100 clubes en Inglaterra y Europa.',
       jamesCreds: [
         'Más de **30 años en el deporte profesional**, como atleta, entrenador y mánager. Junto a medallistas de oro olímpicos, campeones de Wimbledon, números uno del mundo y futbolistas de la EFL.',
         '**Registrado en The Football Association en Identificación de Talento.**',
@@ -170,6 +170,8 @@ const COPY = {
         'El **permiso de trabajo y la GBE para Inglaterra**, resueltos.'
       ],
       cyrilRole: 'Director de Fútbol Europeo',
+      cyrilDesc:
+        'Más de 15 años en la Ligue 1 — Lens, Burdeos, Niza y Marsella. Internacional sub-21 con Francia.',
       cyrilCreds: [
         'Más de **15 años en la Ligue 1** con RC Lens, Burdeos, OGC Nice y Olympique de Marsella.',
         '**Internacional con la Francia Sub-21.**',
@@ -220,10 +222,13 @@ export function LandingHome() {
   const pitchRef = useRef<HTMLCanvasElement>(null);
   const whatRef = useRef<HTMLElement>(null);
   const whatCanvasRef = useRef<HTMLCanvasElement>(null);
+  const whatBallRef = useRef<HTMLDivElement>(null);
   const teamBallRef = useRef<HTMLCanvasElement>(null);
   const endRef = useRef<HTMLElement>(null);
   const vsBallRef = useRef<HTMLDivElement>(null);
   const vsMidRef = useRef<HTMLDivElement>(null);
+  const doorsMidRef = useRef<HTMLDivElement>(null);
+  const doorsBallRef = useRef<HTMLDivElement>(null);
   const clubsVideoRef = useRef<HTMLVideoElement>(null);
   const playersVideoRef = useRef<HTMLVideoElement>(null);
 
@@ -305,7 +310,7 @@ export function LandingHome() {
           vx: 0,
           vy: 0,
           phase: (fx + fy) * 6.28,
-          roam: 16 + fy * 12
+          roam: 20 + fy * 16
         })
       );
       teamB.forEach(([fx, fy]) =>
@@ -318,7 +323,7 @@ export function LandingHome() {
           vx: 0,
           vy: 0,
           phase: (fx + fy) * 6.28,
-          roam: 16 + fy * 12
+          roam: 20 + fy * 16
         })
       );
       const s = players[2];
@@ -326,7 +331,7 @@ export function LandingHome() {
       ball.y = s.y;
       ball.holder = s;
       ball.traveling = false;
-      ball.cool = 20;
+      ball.cool = 42;
     }
     function passBall() {
       const from = ball.holder || players[0];
@@ -399,7 +404,7 @@ export function LandingHome() {
       ctx!.restore();
 
       for (const p of players) {
-        p.phase += 0.012;
+        p.phase += 0.014;
         let tx = p.hx * W + Math.cos(p.phase) * p.roam;
         let ty = p.hy * H + Math.sin(p.phase * 0.8) * p.roam;
         const db = Math.hypot(ball.x - p.x, ball.y - p.y);
@@ -429,13 +434,23 @@ export function LandingHome() {
         p.y += p.vy;
       }
       if (ball.traveling) {
-        ball.x += ball.vx;
-        ball.y += ball.vy;
         const tg = ball.target;
-        if (tg && Math.hypot(tg.x - ball.x, tg.y - ball.y) < 15) {
-          ball.traveling = false;
-          ball.holder = tg;
-          ball.cool = 12 + ((tg.phase * 7) % 18);
+        if (tg) {
+          const dx = tg.x - ball.x;
+          const dy = tg.y - ball.y;
+          const d = Math.hypot(dx, dy) || 1;
+          // Speed scales with distance so the ball eases in as it arrives, and
+          // it re-aims at the (drifting) receiver each frame for an organic curve.
+          const sp = Math.max(4.5, Math.min(15, d * 0.16));
+          ball.vx += ((dx / d) * sp - ball.vx) * 0.22;
+          ball.vy += ((dy / d) * sp - ball.vy) * 0.22;
+          ball.x += ball.vx;
+          ball.y += ball.vy;
+          if (d < 12) {
+            ball.traveling = false;
+            ball.holder = tg;
+            ball.cool = 48 + ((tg.phase * 13) % 54);
+          }
         }
       } else if (ball.holder) {
         ball.x = ball.holder.x;
@@ -459,30 +474,30 @@ export function LandingHome() {
         const hasBall = ball.holder === p;
         if (p.team === 'A') {
           ctx!.beginPath();
-          ctx!.arc(p.x, p.y, hasBall ? 6 : 5, 0, 6.28);
+          ctx!.arc(p.x, p.y, hasBall ? 2.8 : 2.4, 0, 6.28);
           ctx!.fillStyle = 'rgba(208,216,226,0.85)';
           ctx!.fill();
         } else {
           ctx!.beginPath();
-          ctx!.arc(p.x, p.y, hasBall ? 6 : 5, 0, 6.28);
+          ctx!.arc(p.x, p.y, hasBall ? 2.8 : 2.4, 0, 6.28);
           ctx!.fillStyle = 'rgba(120,140,170,0.5)';
           ctx!.fill();
           ctx!.beginPath();
-          ctx!.arc(p.x, p.y, 5, 0, 6.28);
+          ctx!.arc(p.x, p.y, 2.4, 0, 6.28);
           ctx!.strokeStyle = 'rgba(208,216,226,0.3)';
           ctx!.lineWidth = 1;
           ctx!.stroke();
         }
         if (hasBall) {
           ctx!.beginPath();
-          ctx!.arc(p.x, p.y, 11, 0, 6.28);
+          ctx!.arc(p.x, p.y, 6, 0, 6.28);
           ctx!.strokeStyle = 'rgba(252,252,252,0.4)';
           ctx!.lineWidth = 1.5;
           ctx!.stroke();
         }
       }
       ctx!.beginPath();
-      ctx!.arc(ball.x, ball.y, 4.5, 0, 6.28);
+      ctx!.arc(ball.x, ball.y, 2.4, 0, 6.28);
       ctx!.fillStyle = '#fcfcfc';
       ctx!.fill();
       raf = requestAnimationFrame(draw);
@@ -559,33 +574,12 @@ export function LandingHome() {
       ctx!.moveTo(bx, by - 50);
       ctx!.lineTo(bx, by);
       ctx!.stroke();
-      ctx!.beginPath();
-      ctx!.arc(bx, by, 14, 0, 6.28);
-      ctx!.fillStyle = 'rgba(208,216,226,0.06)';
-      ctx!.fill();
-      ctx!.save();
-      ctx!.translate(bx, by);
-      ctx!.rotate(p * 12);
-      ctx!.beginPath();
-      ctx!.arc(0, 0, 6, 0, 6.28);
-      ctx!.fillStyle = '#fcfcfc';
-      ctx!.fill();
-      ctx!.beginPath();
-      ctx!.arc(0, 0, 6, 0, 6.28);
-      ctx!.strokeStyle = 'rgba(208,216,226,0.6)';
-      ctx!.lineWidth = 1;
-      ctx!.stroke();
-      ctx!.fillStyle = 'rgba(120,140,170,0.55)';
-      ctx!.beginPath();
-      for (let i = 0; i < 5; i++) {
-        const a = -Math.PI / 2 + (i * 6.28) / 5;
-        const pr = 2.4;
-        if (i === 0) ctx!.moveTo(Math.cos(a) * pr, Math.sin(a) * pr);
-        else ctx!.lineTo(Math.cos(a) * pr, Math.sin(a) * pr);
+      // The football itself is the 3D model (balon-futbol.glb); slide it down
+      // the trail with the scroll.
+      if (whatBallRef.current) {
+        const bw = whatBallRef.current.offsetWidth;
+        whatBallRef.current.style.transform = `translate(-50%, ${by - bw / 2}px)`;
       }
-      ctx!.closePath();
-      ctx!.fill();
-      ctx!.restore();
     }
     let visible = false;
     const io = new IntersectionObserver(
@@ -634,14 +628,6 @@ export function LandingHome() {
       ctx!.clearRect(0, 0, W, H);
       t += 0.005;
       const y = H * 0.5;
-      ctx!.strokeStyle = 'rgba(208,216,226,0.06)';
-      ctx!.lineWidth = 1;
-      ctx!.setLineDash([6, 10]);
-      ctx!.beginPath();
-      ctx!.moveTo(W * 0.06, y);
-      ctx!.lineTo(W * 0.94, y);
-      ctx!.stroke();
-      ctx!.setLineDash([]);
       const p = Math.sin(t) * 0.5 + 0.5;
       const x = W * 0.08 + p * W * 0.84;
       const by = y + Math.sin(t * 2.2) * 22;
@@ -762,6 +748,27 @@ export function LandingHome() {
     };
   }, []);
 
+  /* ===== Pathways: a ball that drops down the centre divider with scroll ===== */
+  useEffect(() => {
+    const mid = doorsMidRef.current;
+    const ball = doorsBallRef.current;
+    if (!mid || !ball) return;
+    function onScroll() {
+      const r = mid!.getBoundingClientRect();
+      const vh = window.innerHeight;
+      let p = (vh - r.top) / (vh + r.height);
+      p = Math.max(0, Math.min(1, p));
+      // Keep the ball within the boxes' height (inset by the section padding).
+      const doors = mid!.parentElement;
+      const pad = doors ? parseFloat(getComputedStyle(doors).paddingTop) || 0 : 0;
+      const travel = Math.max(0, r.height - 2 * pad - ball!.offsetHeight);
+      ball!.style.top = pad + p * travel + 'px';
+    }
+    window.addEventListener('scroll', onScroll, {passive: true});
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   /* ===== Scoreboard: dramatic count-up that eases as it lands ===== */
   useEffect(() => {
     const root = rootRef.current;
@@ -842,7 +849,7 @@ export function LandingHome() {
           />
           <video
             ref={playersVideoRef}
-            src="/players-1.mp4"
+            src="/players-1.mov?v=1782320102"
             muted
             loop
             playsInline
@@ -912,6 +919,9 @@ export function LandingHome() {
       {/* WHO WE ARE */}
       <section ref={whatRef} className={cx('what', 'reveal')}>
         <canvas ref={whatCanvasRef} className={cx('whatcanvas')} aria-hidden />
+        <div ref={whatBallRef} className={cx('whatBall')} aria-hidden>
+          <Ball3D />
+        </div>
         <div className={cx('bgmark')} aria-hidden>
           2023
         </div>
@@ -929,25 +939,13 @@ export function LandingHome() {
       {/* THE TWO DOORS */}
       <section className={cx('doors')}>
         <Link href="/for-clubs" className={cx('door', 'doorClubs', 'reveal')}>
-          <svg
-            className={cx('doorSil')}
-            viewBox="0 0 200 240"
-            xmlns="http://www.w3.org/2000/svg"
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className={cx('doorImg')}
+            src="/logo_bordado.png"
+            alt=""
             aria-hidden
-          >
-            <path
-              d="M100 10 L180 40 L180 120 Q180 200 100 230 Q20 200 20 120 L20 40 Z"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-            />
-            <path
-              d="M100 50 L100 190 M55 75 L145 75 M55 110 L145 110 M70 145 L130 145"
-              stroke="currentColor"
-              strokeWidth="2"
-              opacity="0.5"
-            />
-          </svg>
+          />
           <div className={cx('dlabel')}>{c.doors.clubs.dlabel}</div>
           <h3>
             <span className={cx('thin')}>{c.doors.clubs.thin}</span>
@@ -959,32 +957,23 @@ export function LandingHome() {
             <span>{c.doors.clubs.enter}</span> <span className={cx('arr')}>→</span>
           </span>
         </Link>
+        <div ref={doorsMidRef} className={cx('doorsMid')} aria-hidden>
+          <div ref={doorsBallRef} className={cx('doorsBall')}>
+            <Ball3D />
+          </div>
+        </div>
         <Link
           href="/for-players"
           className={cx('door', 'doorPlayers', 'reveal')}
           data-d="1"
         >
-          <svg
-            className={cx('doorSil')}
-            viewBox="0 0 160 260"
-            xmlns="http://www.w3.org/2000/svg"
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className={cx('doorImg')}
+            src="/silueta_atras.png"
+            alt=""
             aria-hidden
-          >
-            <circle
-              cx="80"
-              cy="40"
-              r="26"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-            />
-            <path
-              d="M80 70 L80 160 M80 90 L40 130 M80 90 L120 130 M80 160 L52 240 M80 160 L108 240"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-            />
-          </svg>
+          />
           <div className={cx('dlabel')}>{c.doors.players.dlabel}</div>
           <h3>
             <span className={cx('thin')}>{c.doors.players.thin}</span>
@@ -1003,45 +992,55 @@ export function LandingHome() {
       <section className={cx('team')}>
         <canvas ref={teamBallRef} className={cx('teamball')} aria-hidden />
         <div className={cx('wrap')}>
-          <div className={cx('eyebrow', 'reveal')}>{c.team.eyebrow}</div>
           <h2 className={cx('reveal')} data-d="1">
-            <span className={cx('thin')}>{c.team.thin}</span>
+            <b>{c.team.bold}</b>
             <br />
-            <b>{c.team.bold}</b> <span className={cx('it')}>{c.team.it}</span>
+            <span className={cx('it')}>{c.team.it}</span>
           </h2>
           <div className={cx('teamGrid')}>
             <div className={cx('tcard', 'reveal')} data-d="1">
               <div className={cx('tphoto')}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/james.png" alt="James Fox" />
+                <img src="/james.png" alt="" />
               </div>
               <div className={cx('tinfo')}>
                 <div className={cx('tname')}>
                   <span>James</span> Fox.
                 </div>
                 <div className={cx('trole')}>{c.team.jamesRole}</div>
-                <ul className={cx('tcreds')}>
-                  {c.team.jamesCreds.map((line, i) => (
-                    <li key={i}>{rich(line)}</li>
-                  ))}
-                </ul>
+                <p className={cx('tdesc')}>{c.team.jamesDesc}</p>
               </div>
             </div>
             <div className={cx('tcard', 'reveal')} data-d="2">
               <div className={cx('tphoto')}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/Cyril.png" alt="Cyril Rool" />
+                <img src="/Cyril.png" alt="" />
               </div>
               <div className={cx('tinfo')}>
                 <div className={cx('tname')}>
                   <span>Cyril</span> Rool.
                 </div>
                 <div className={cx('trole')}>{c.team.cyrilRole}</div>
-                <ul className={cx('tcreds')}>
-                  {c.team.cyrilCreds.map((line, i) => (
-                    <li key={i}>{rich(line)}</li>
-                  ))}
-                </ul>
+                <p className={cx('tdesc')}>{c.team.cyrilDesc}</p>
+              </div>
+            </div>
+            <div className={cx('tcard', 'reveal')} data-d="3">
+              <div className={cx('tphoto')}>
+                <span className={cx('tph')} aria-hidden="true">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.3"
+                    strokeLinecap="round"
+                  >
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 21c0-4.2 3.6-7 8-7s8 2.8 8 7" />
+                  </svg>
+                </span>
+              </div>
+              <div className={cx('tinfo')}>
+                <div className={cx('tname')}>Tom.</div>
               </div>
             </div>
           </div>
@@ -1078,53 +1077,6 @@ export function LandingHome() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* CLOSING — VS */}
-      <section ref={endRef} className={cx('end')}>
-        <div className={cx('vsWrap')}>
-          <Link href="/for-clubs" className={cx('vsSide', 'vsClubs', 'reveal')}>
-            <div className={cx('vsTag')}>{c.end.clubsTag}</div>
-            <div className={cx('vsName')}>
-              <span className={cx('thin')}>{c.end.forWord}</span>
-              <br />
-              <b>{c.end.clubs}</b>
-            </div>
-            <span className={cx('vsGo')}>{c.end.enter}</span>
-          </Link>
-          <div ref={vsMidRef} className={cx('vsMid', 'reveal')} data-d="1">
-            <div ref={vsBallRef} className={cx('vsBall')}>
-              <svg viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
-                <circle
-                  cx="15"
-                  cy="15"
-                  r="13"
-                  fill="#fcfcfc"
-                  stroke="#d0d8e2"
-                  strokeWidth="1"
-                />
-                <polygon points="15,8 21,12 19,19 11,19 9,12" fill="#d0d8e2" />
-              </svg>
-            </div>
-            <div className={cx('vsQ')}>
-              {c.end.q[0]}
-              <br />
-              {c.end.q[1]}
-            </div>
-          </div>
-          <Link
-            href="/for-players"
-            className={cx('vsSide', 'vsPlayers', 'reveal')}
-            data-d="2"
-          >
-            <div className={cx('vsTag')}>{c.end.playersTag}</div>
-            <div className={cx('vsName')}>
-              <span className={cx('thin')}>{c.end.forWord}</span>
-              <br />
-              <b>{c.end.players}</b>
-            </div>
-          </Link>
         </div>
       </section>
 

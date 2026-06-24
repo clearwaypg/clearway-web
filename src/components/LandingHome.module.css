@@ -366,7 +366,7 @@
   margin-top: 34px;
   font-size: clamp(1rem, 1.5vw, 1.18rem);
   color: #c4ccd8;
-  max-width: 42ch;
+  max-width: min(640px, 90vw);
   margin-left: auto;
   margin-right: auto;
   line-height: 1.5;
@@ -599,6 +599,19 @@
   pointer-events: none;
   opacity: 0.55;
 }
+/* The 3D football (balon-futbol.glb) that drops down the trail with the scroll;
+   its vertical position is set in JS, x stays on the trail at 82%. */
+.whatBall {
+  position: absolute;
+  top: 0;
+  left: 82%;
+  width: clamp(38px, 4vw, 56px);
+  aspect-ratio: 1 / 1;
+  z-index: 1;
+  pointer-events: none;
+  transform: translate(-50%, 0);
+  will-change: transform;
+}
 .what .wrap {
   position: relative;
   z-index: 2;
@@ -642,7 +655,31 @@
   position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  gap: clamp(96px, 9vw, 150px);
+  padding: clamp(12px, 1.8vw, 24px);
   min-height: 90vh;
+  overflow: hidden;
+  background: var(--black);
+}
+/* Intermediate element centred between the two doors: a slightly-rounded
+   container with a ball that drops down it on scroll (set in JS). */
+.doorsMid {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(84px, 9.5vw, 140px);
+  z-index: 3;
+  pointer-events: none;
+}
+.doorsBall {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: clamp(84px, 9.5vw, 140px);
+  aspect-ratio: 1 / 1;
+  transform: translateX(-50%);
 }
 .door {
   position: relative;
@@ -651,6 +688,7 @@
   justify-content: flex-end;
   padding: clamp(40px, 6vw, 80px);
   overflow: hidden;
+  border-radius: clamp(18px, 2.2vw, 30px);
   text-decoration: none;
   transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
@@ -669,6 +707,36 @@
 .door:hover .doorSil {
   opacity: 0.2;
   transform: translateY(-50%) scale(1.06);
+}
+/* Decorative per-column image (Clubs: embroidered crest; Players: silhouette),
+   sitting behind the text like the silhouette did. */
+.doorImg {
+  position: absolute;
+  top: 50%;
+  right: 8%;
+  transform: translateY(-50%);
+  height: 76%;
+  width: auto;
+  opacity: 0.24;
+  pointer-events: none;
+  user-select: none;
+  transition:
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.5s ease;
+}
+.doorClubs .doorImg {
+  opacity: 0.32;
+  height: 42%;
+  top: 30%;
+}
+.doorPlayers .doorImg {
+  right: -2%;
+  height: 60%;
+  top: 48%;
+}
+/* Smooth zoom + slight drift when hovering the column. */
+.door:hover .doorImg {
+  transform: translateY(-50%) translateX(-8px) scale(1.1);
 }
 .dlabel {
   position: relative;
@@ -732,10 +800,28 @@
   flex-grow: 1.15;
 }
 .doorClubs:hover {
-  background: var(--navy2);
+  background: #041a3d;
 }
 .doorPlayers:hover {
-  background: #c3cdda;
+  background: #97a5b8;
+}
+/* Soft, diffuse light pooling on the right of the Players column on hover. */
+.doorPlayers::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    55% 80% at 100% 50%,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0) 62%
+  );
+  opacity: 0;
+  transition: opacity 0.55s ease;
+}
+.doorPlayers:hover::after {
+  opacity: 1;
 }
 
 /* ===== JAMES Y CYRIL ===== */
@@ -764,6 +850,7 @@
   letter-spacing: -0.025em;
   margin-bottom: 54px;
   text-transform: uppercase;
+  text-align: center;
 }
 .team h2 .thin {
   font-weight: 300;
@@ -772,6 +859,8 @@
   font-weight: 900;
 }
 .team h2 .it {
+  display: block;
+  font-size: 1.2em;
   font-family: var(--serif);
   font-style: italic;
   font-weight: 400;
@@ -781,144 +870,109 @@
 }
 .teamGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(32px, 5vw, 64px);
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(20px, 2.4vw, 32px);
 }
+/* Vertical portrait card (same as for-players): photo on top, name/role/desc
+   below; on hover the photo zooms and expands to fill the whole card. */
 .tcard {
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 0.92fr) 1fr;
-  gap: clamp(18px, 2.2vw, 28px);
-  align-items: center;
-  background: rgba(252, 252, 252, 0.03);
-  border: 1px solid rgba(208, 216, 226, 0.14);
+  aspect-ratio: 3 / 4;
   border-radius: 14px;
-  padding: clamp(20px, 2.4vw, 28px);
-  transition: 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  background: linear-gradient(160deg, #0a2a5e 0%, #061c40 52%, #04122c 100%);
+  border: 1px solid rgba(208, 216, 226, 0.14);
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
   cursor: pointer;
 }
-.tinfo {
-  min-width: 0;
-}
-.tname {
-  font-size: clamp(1.4rem, 2.1vw, 1.9rem);
-  font-weight: 900;
-  color: #fff;
-  line-height: 0.95;
-  margin-bottom: 8px;
-  transition: 0.45s;
-}
-.tname span {
-  font-weight: 300;
-}
-.tcard:last-child:hover .tname {
-  color: var(--navy);
-}
-.teamGrid:hover .tcard:not(:hover) {
-  opacity: 0.5;
-}
-.tcard:first-child:hover {
-  background: var(--navy);
-  border-color: var(--navy2);
-  transform: translateY(-6px);
-  box-shadow: 0 30px 70px rgba(7, 44, 104, 0.45);
-}
-.tcard:last-child:hover {
-  background: var(--dew);
-  border-color: var(--dew);
-  transform: translateY(-6px);
-  box-shadow: 0 30px 70px rgba(208, 216, 226, 0.25);
-}
-.tcard:last-child:hover .trole {
-  color: var(--navy);
-}
-.tcard:last-child:hover .tcreds li {
-  color: #3a4658;
-}
-.tcard:last-child:hover .tcreds strong {
-  color: var(--navy);
-}
-.tcard:last-child:hover .tcreds li::before {
-  background: var(--navy);
+.tcard:hover {
+  border-color: rgba(140, 185, 255, 0.75);
+  box-shadow: 0 0 16px rgba(90, 150, 255, 0.28);
 }
 .tphoto {
-  /* Square box + square source photo → the founder is shown in full, no crop. */
-  aspect-ratio: 1 / 1;
-  border-radius: 10px;
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64%;
+  z-index: 2;
   overflow: hidden;
   background: linear-gradient(150deg, #0a3a86, #04193f);
+  transition: height 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .tphoto img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  /* Fill the defined box, centered, without distorting the photo. */
   object-fit: cover;
-  object-position: center;
+  object-position: center top;
   display: block;
-  z-index: 0;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.tphoto .ph {
+.tphoto::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(4, 18, 46, 0.5) 0%, transparent 32%);
+}
+.tcard:hover .tphoto {
+  height: 100%;
+}
+.tcard:hover .tphoto img {
+  transform: scale(1.08);
+}
+/* Placeholder (Tom): no photo. */
+.tph {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(208, 216, 226, 0.4);
-  font-size: 0.64rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  color: rgba(208, 216, 226, 0.28);
 }
-.tphoto .nm {
-  position: relative;
-  z-index: 2;
-  font-size: 1.7rem;
+.tph svg {
+  width: 32%;
+  height: auto;
+}
+.tinfo {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 36%;
+  z-index: 1;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+.tname {
+  font-size: clamp(1.15rem, 1.7vw, 1.5rem);
   font-weight: 900;
   color: #fff;
-  line-height: 0.92;
+  line-height: 1;
 }
-.tphoto .nm span {
+.tname span {
   font-weight: 300;
 }
 .trole {
-  font-size: 0.72rem;
+  font-size: 0.64rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--dew);
-  margin-bottom: 18px;
-  transition: 0.45s;
+  margin-top: 9px;
 }
-.tcreds {
-  list-style: none;
-  display: grid;
-  gap: 13px;
-}
-.tcreds li {
-  padding-left: 20px;
-  position: relative;
-  color: #c4ccd8;
-  font-size: 0.94rem;
-  line-height: 1.45;
-  transition: 0.45s;
-}
-.tcreds li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 8px;
-  width: 6px;
-  height: 6px;
-  background: var(--dew);
-  border-radius: 50%;
-  transition: 0.45s;
-}
-.tcreds strong {
-  color: #fff;
-  font-weight: 700;
-  transition: 0.45s;
+.tdesc {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: #aebac9;
+  margin-top: 9px;
 }
 
 /* ===== MARCADOR DE PARTIDO ===== */
