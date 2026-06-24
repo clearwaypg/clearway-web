@@ -849,7 +849,7 @@ export function LandingHome() {
           />
           <video
             ref={playersVideoRef}
-            src="/players-1.mov?v=1782320102"
+            src="/players-1.mp4?v=1782322525"
             muted
             loop
             playsInline
@@ -1001,19 +1001,6 @@ export function LandingHome() {
             <div className={cx('tcard', 'reveal')} data-d="1">
               <div className={cx('tphoto')}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/james.png" alt="" />
-              </div>
-              <div className={cx('tinfo')}>
-                <div className={cx('tname')}>
-                  <span>James</span> Fox.
-                </div>
-                <div className={cx('trole')}>{c.team.jamesRole}</div>
-                <p className={cx('tdesc')}>{c.team.jamesDesc}</p>
-              </div>
-            </div>
-            <div className={cx('tcard', 'reveal')} data-d="2">
-              <div className={cx('tphoto')}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/Cyril.png" alt="" />
               </div>
               <div className={cx('tinfo')}>
@@ -1022,6 +1009,19 @@ export function LandingHome() {
                 </div>
                 <div className={cx('trole')}>{c.team.cyrilRole}</div>
                 <p className={cx('tdesc')}>{c.team.cyrilDesc}</p>
+              </div>
+            </div>
+            <div className={cx('tcard', 'reveal')} data-d="2">
+              <div className={cx('tphoto')}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/james.png" alt="" />
+              </div>
+              <div className={cx('tinfo')}>
+                <div className={cx('tname')}>
+                  <span>James</span> Fox.
+                </div>
+                <div className={cx('trole')}>{c.team.jamesRole}</div>
+                <p className={cx('tdesc')}>{c.team.jamesDesc}</p>
               </div>
             </div>
             <div className={cx('tcard', 'reveal')} data-d="3">
