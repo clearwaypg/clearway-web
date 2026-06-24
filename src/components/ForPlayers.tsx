@@ -756,16 +756,19 @@ export function ForPlayers() {
         </div>
         <div className={cx('wrap')}>
           <div className={cx('foot-top')}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              className={cx('foot-logo')}
-              src="/Logotipos/clearway-white.svg"
-              alt="Clearway"
-            />
+            <Link href="/" aria-label="Clearway — home">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                className={cx('foot-logo')}
+                src="/Logotipos/clearway-white.svg"
+                alt="Clearway"
+              />
+            </Link>
             <nav className={cx('foot-nav')}>
               <div className={cx('foot-col')}>
                 <Link href="/for-clubs">For Clubs</Link>
                 <Link href="/for-players">For Players</Link>
+                <Link href="/">About Clearway</Link>
               </div>
               <div className={cx('foot-col')}>
                 <Link href="/privacy">Privacy Policy</Link>

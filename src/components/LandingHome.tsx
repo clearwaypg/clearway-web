@@ -3,10 +3,43 @@
 import {useEffect, useRef, useState} from 'react';
 import {useLocale} from 'next-intl';
 
+import dynamic from 'next/dynamic';
+
 import {Link} from '@/i18n/navigation';
 import {SiteHeader} from './SiteHeader';
 import {Ball3D} from './Ball3D';
 import styles from './LandingHome.module.css';
+
+/* Lazy, client-only (WebGL canvas). The same 3D ball is reused for the WHO WE
+   ARE, doors and numbers sections. */
+const FootballBall3D = dynamic(() => import('@/components/FootballBall3D'), {
+  ssr: false
+});
+
+/* Mounts the 3D ball only while its slot is near the viewport (and unmounts it
+   when far away). Several always-on r3f canvases exhaust the browser's WebGL
+   context limit, which silently blanks the oldest ones — keeping at most one or
+   two live at a time fixes that. The wrapper keeps its px size so layout/parallax
+   never shift when the canvas mounts/unmounts. */
+function LazyFootball({width, height}: {width: number; height: number}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => setShow(e.isIntersecting)),
+      {rootMargin: '300px'}
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div ref={ref} style={{width, height}}>
+      {show && <FootballBall3D width={width} height={height} />}
+    </div>
+  );
+}
 
 /* =========================================================
    CLEARWAY PERFORMANCE GROUP — HOME
@@ -227,8 +260,10 @@ export function LandingHome() {
   const endRef = useRef<HTMLElement>(null);
   const vsBallRef = useRef<HTMLDivElement>(null);
   const vsMidRef = useRef<HTMLDivElement>(null);
-  const doorsMidRef = useRef<HTMLDivElement>(null);
   const doorsBallRef = useRef<HTMLDivElement>(null);
+  const numbersRef = useRef<HTMLElement>(null);
+  const bgmarkRef = useRef<HTMLDivElement>(null);
+  const numLeftRef = useRef<HTMLDivElement>(null);
   const clubsVideoRef = useRef<HTMLVideoElement>(null);
   const playersVideoRef = useRef<HTMLVideoElement>(null);
 
@@ -551,12 +586,9 @@ export function LandingHome() {
       )
         resize();
       ctx!.clearRect(0, 0, W, H);
-      const r = section!.getBoundingClientRect();
-      const vh = window.innerHeight;
-      let p = (vh - r.top) / (vh + r.height);
-      p = Math.max(0, Math.min(1, p));
+      // Faint dashed guide line; the football itself floats over it with its own
+      // scroll parallax (see the WHO WE ARE parallax effect below).
       const bx = W * 0.82;
-      const by = H * 0.12 + p * (H * 0.76);
       ctx!.strokeStyle = 'rgba(208,216,226,0.08)';
       ctx!.lineWidth = 1;
       ctx!.setLineDash([4, 8]);
@@ -565,21 +597,6 @@ export function LandingHome() {
       ctx!.lineTo(bx, H * 0.9);
       ctx!.stroke();
       ctx!.setLineDash([]);
-      const grad = ctx!.createLinearGradient(bx, by - 50, bx, by);
-      grad.addColorStop(0, 'rgba(208,216,226,0)');
-      grad.addColorStop(1, 'rgba(208,216,226,0.4)');
-      ctx!.strokeStyle = grad;
-      ctx!.lineWidth = 2;
-      ctx!.beginPath();
-      ctx!.moveTo(bx, by - 50);
-      ctx!.lineTo(bx, by);
-      ctx!.stroke();
-      // The football itself is the 3D model (balon-futbol.glb); slide it down
-      // the trail with the scroll.
-      if (whatBallRef.current) {
-        const bw = whatBallRef.current.offsetWidth;
-        whatBallRef.current.style.transform = `translate(-50%, ${by - bw / 2}px)`;
-      }
     }
     let visible = false;
     const io = new IntersectionObserver(
@@ -608,6 +625,39 @@ export function LandingHome() {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
     };
+  }, []);
+
+  /* ===== WHO WE ARE: the 3D football floats downward with scroll (0.3x). Uses
+     the section position so it stays in view — raw window.scrollY*0.3 would push
+     it hundreds of px past this (overflow-clipped) section. ===== */
+  useEffect(() => {
+    const ball = whatBallRef.current;
+    const section = whatRef.current;
+    if (!ball || !section) return;
+    function onScroll() {
+      const r = section!.getBoundingClientRect();
+      const offset = (window.innerHeight / 2 - (r.top + r.height / 2)) * 0.3;
+      ball!.style.transform = `translate(-50%, ${offset}px)`;
+    }
+    window.addEventListener('scroll', onScroll, {passive: true});
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  /* ===== "2023" watermark: breathes while in view, fades in/out on scroll. ===== */
+  useEffect(() => {
+    const el = bgmarkRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          el.classList.toggle(styles.bgmarkIn, e.isIntersecting);
+        });
+      },
+      {threshold: 0}
+    );
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
 
   /* ===== TEAM: elite ball crossing behind James & Cyril ===== */
@@ -748,25 +798,64 @@ export function LandingHome() {
     };
   }, []);
 
-  /* ===== Pathways: a ball that drops down the centre divider with scroll ===== */
+  /* ===== Pathways: football parallax — the centre ball drifts down at ~0.3x
+     the scroll speed (slower than the page) for a floating effect. ===== */
   useEffect(() => {
-    const mid = doorsMidRef.current;
     const ball = doorsBallRef.current;
-    if (!mid || !ball) return;
+    if (!ball) return;
     function onScroll() {
-      const r = mid!.getBoundingClientRect();
-      const vh = window.innerHeight;
-      let p = (vh - r.top) / (vh + r.height);
-      p = Math.max(0, Math.min(1, p));
-      // Keep the ball within the boxes' height (inset by the section padding).
-      const doors = mid!.parentElement;
-      const pad = doors ? parseFloat(getComputedStyle(doors).paddingTop) || 0 : 0;
-      const travel = Math.max(0, r.height - 2 * pad - ball!.offsetHeight);
-      ball!.style.top = pad + p * travel + 'px';
+      // offsetParent is the (position: relative) doors section; null when the
+      // ball is display:none (mobile), so the parallax simply no-ops there.
+      const sec = ball!.offsetParent;
+      if (!sec) return;
+      const r = sec.getBoundingClientRect();
+      // Section-relative 0.25× parallax. Raw window.scrollY*0.25 would push the
+      // ball hundreds of px below this overflow-hidden section (clipped = "not
+      // rendering"); offsetting by the section keeps it floating in view.
+      const offset =
+        (window.innerHeight / 2 - (r.top + r.height / 2)) * 0.25;
+      ball!.style.transform = `translate(-50%, -50%) translateY(${offset}px)`;
     }
     window.addEventListener('scroll', onScroll, {passive: true});
     onScroll();
     return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  /* ===== THE NUMBERS: when the section scrolls into view, the stat rows
+     stagger up and the heading slides in from the right (fires once). ===== */
+  useEffect(() => {
+    const el = numbersRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            el.classList.add(styles.numIn);
+            io.disconnect();
+          }
+        });
+      },
+      {threshold: 0.2}
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  /* ===== THE NUMBERS ball: slides in from the left each time the left column
+     enters view, and slides back out when it leaves (toggles, not once). ===== */
+  useEffect(() => {
+    const el = numLeftRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          el.classList.toggle(styles.ballIn, e.isIntersecting);
+        });
+      },
+      {threshold: 0.2}
+    );
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
 
   /* ===== Scoreboard: dramatic count-up that eases as it lands ===== */
@@ -913,6 +1002,20 @@ export function LandingHome() {
         <div className={cx('scrollCue')}>
           <span>{c.hero.cue}</span>
           <span className={cx('bar')} />
+          <svg
+            className={cx('chev')}
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M5 9l7 7 7-7"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </div>
       </section>
 
@@ -920,9 +1023,9 @@ export function LandingHome() {
       <section ref={whatRef} className={cx('what', 'reveal')}>
         <canvas ref={whatCanvasRef} className={cx('whatcanvas')} aria-hidden />
         <div ref={whatBallRef} className={cx('whatBall')} aria-hidden>
-          <Ball3D />
+          <LazyFootball width={72} height={72} />
         </div>
-        <div className={cx('bgmark')} aria-hidden>
+        <div ref={bgmarkRef} className={cx('bgmark')} aria-hidden>
           2023
         </div>
         <div className={cx('wrap')}>
@@ -957,10 +1060,8 @@ export function LandingHome() {
             <span>{c.doors.clubs.enter}</span> <span className={cx('arr')}>→</span>
           </span>
         </Link>
-        <div ref={doorsMidRef} className={cx('doorsMid')} aria-hidden>
-          <div ref={doorsBallRef} className={cx('doorsBall')}>
-            <Ball3D />
-          </div>
+        <div ref={doorsBallRef} className={cx('doorsBall')} aria-hidden="true">
+          <LazyFootball width={80} height={80} />
         </div>
         <Link
           href="/for-players"
@@ -1047,33 +1148,69 @@ export function LandingHome() {
         </div>
       </section>
 
-      {/* THE RECORD — scoreboard */}
-      <section className={cx('proof')}>
+      {/* THE NUMBERS — editorial split: stat strips (left) + heading (right) */}
+      <section ref={numbersRef} className={cx('proof')}>
         <div className={cx('wrap')}>
-          <div className={cx('recHead', 'reveal')}>
-            <div className={cx('eyebrow')}>{c.proof.eyebrow}</div>
+          <div className={cx('numLayout')}>
+            <div ref={numLeftRef} className={cx('numLeft')}>
+              <div className={cx('numBallWrap')} aria-hidden="true">
+                <LazyFootball width={320} height={320} />
+              </div>
+              <div className={cx('numGlow')} aria-hidden="true" />
+              <div className={cx('numHead')}>
+                <h2>
+                  <span className={cx('thin')}>{c.proof.thin}</span>{' '}
+                  <span className={cx('it')}>{c.proof.it}</span>
+                </h2>
+              </div>
+            </div>
+            <div className={cx('numList')}>
+              <div className={cx('numGrid')}>
+                {c.proof.cells.map((cell, i) => (
+                  <div className={cx('numStat')} key={i}>
+                    <div
+                      className={cx('sbN')}
+                      data-count={cell.count}
+                      data-suffix={cell.suffix || undefined}
+                    >
+                      0
+                    </div>
+                    <div className={cx('numLabel')}>
+                      <b>{cell.b}</b>
+                      <span>{cell.l}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* TESTIMONIALS — dark-blue glassmorphism carousel; row pauses and card
+          grows on hover */}
+      <section className={cx('voices')}>
+        <div className={cx('wrap')}>
+          <div className={cx('head', 'reveal')}>
             <h2>
-              <span className={cx('thin')}>{c.proof.thin}</span>{' '}
-              <span className={cx('it')}>{c.proof.it}</span>
+              Real voices. <span className={cx('it')}>Real pathways.</span>
             </h2>
           </div>
-          <div className={cx('scoreboard', 'reveal')} data-d="1">
-            {c.proof.cells.map((cell, i) => (
-              <div key={i} style={{display: 'contents'}}>
-                {i > 0 && <div className={cx('sbSep')} />}
-                <div className={cx('sbCell')}>
-                  <div
-                    className={cx('sbN')}
-                    data-count={cell.count}
-                    data-suffix={cell.suffix || undefined}
-                  >
-                    0
-                  </div>
-                  <div className={cx('sbL')}>
-                    <b>{cell.b}</b>
-                    {cell.l}
-                  </div>
-                </div>
+        </div>
+        <div className={cx('vmarquee')}>
+          <div className={cx('vrow', 'r1')}>
+            {VOICES_R1.concat(VOICES_R1).map((v, i) => (
+              <div className={cx('vcard')} key={`r1-${i}`}>
+                <p>{v.quote}</p>
+                <span className={cx('who')}>{v.who}</span>
+              </div>
+            ))}
+          </div>
+          <div className={cx('vrow', 'r2')}>
+            {VOICES_R2.concat(VOICES_R2).map((v, i) => (
+              <div className={cx('vcard')} key={`r2-${i}`}>
+                <p>{v.quote}</p>
+                <span className={cx('who')}>{v.who}</span>
               </div>
             ))}
           </div>
@@ -1082,28 +1219,91 @@ export function LandingHome() {
 
       {/* FOOTER */}
       <footer className={cx('foot')}>
+        <div className={cx('foot-ball')} aria-hidden="true">
+          <Ball3D />
+        </div>
         <div className={cx('wrap')}>
-          <div>
-            <span className={cx('mark')}>
-              <span className={cx('c')}>CLEAR</span>
-              <span className={cx('w')}>WAY</span>
-            </span>
-            <div className={cx('serif')}>{c.foot.serif}</div>
+          <div className={cx('foot-top')}>
+            <Link href="/" aria-label="Clearway — home">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                className={cx('foot-logo')}
+                src="/Logotipos/clearway-white.svg"
+                alt="Clearway"
+              />
+            </Link>
+            <nav className={cx('foot-nav')}>
+              <div className={cx('foot-col')}>
+                <Link href="/for-clubs">For Clubs</Link>
+                <Link href="/for-players">For Players</Link>
+                <Link href="/">About Clearway</Link>
+              </div>
+              <div className={cx('foot-col')}>
+                <Link href="/privacy">Privacy Policy</Link>
+                <Link href="/terms">Terms &amp; Conditions</Link>
+              </div>
+            </nav>
           </div>
-          <div className={cx('footCol')}>
-            <h4>{c.foot.navigate}</h4>
-            <Link href="/for-clubs">{c.foot.clubs}</Link>
-            <Link href="/for-players">{c.foot.players}</Link>
-            <Link href="/about">{c.foot.about}</Link>
-          </div>
-          <div className={cx('footCol')}>
-            <h4>{c.foot.legal}</h4>
-            <Link href="/privacy">{c.foot.privacy}</Link>
-            <Link href="/terms">{c.foot.terms}</Link>
+          <div className={cx('foot-bot')}>
+            <span>© 2026 Clearway Performance Group</span>
+            <span>Created by SCNDAL</span>
           </div>
         </div>
-        <div className={cx('footBot')}>{c.foot.copyright}</div>
       </footer>
     </div>
   );
 }
+
+const VOICES_R1 = [
+  {
+    quote:
+      '"Every player you sent was worth the trip. Not one wasted trial all season."',
+    who: 'Sporting Director'
+  },
+  {
+    quote:
+      '"Your professionalism at every stage has been incredible. We already feel Clearway."',
+    who: 'Parent of a player'
+  },
+  {
+    quote:
+      '"Having someone on the ground who has actually watched the player live changes everything."',
+    who: 'Head of Recruitment'
+  },
+  {
+    quote:
+      '"It is always very professional, clear and exciting getting news from you."',
+    who: 'Parent of a player'
+  },
+  {
+    quote:
+      '"The work permit and GBE were cleared before we even met him. That never happens."',
+    who: 'Technical Director'
+  }
+];
+
+const VOICES_R2 = [
+  {
+    quote: '"We signed two from your shortlist. Both are still in the side."',
+    who: 'Head of Academy'
+  },
+  {
+    quote:
+      '"I had not realised you would be there in person on the first day. That is truly priceless."',
+    who: 'Parent of a player'
+  },
+  {
+    quote:
+      '"The honesty up front saved us months chasing the wrong profiles."',
+    who: 'Director of Football'
+  },
+  {
+    quote:
+      '"Reading your messages is highly motivating. We will follow your recommendations."',
+    who: 'Parent of a player'
+  },
+  {
+    quote: '"Finally a partner who understands what our level actually needs."',
+    who: 'Sporting Director'
+  }
+];

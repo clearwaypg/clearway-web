@@ -1126,28 +1126,35 @@ export function ForClubs() {
 
       {/* FOOTER */}
       <footer className={cx('foot')}>
-        <div className={cx('wrap')}>
-          <div>
-            <span className={cx('mark')}>
-              <span className={cx('c')}>CLEAR</span>
-              <span className={cx('w')}>WAY</span>
-            </span>
-            <div className={cx('serif')}>we form champions</div>
-          </div>
-          <div className={cx('footCol')}>
-            <h4>Navigate</h4>
-            <Link href="/for-clubs">For Clubs</Link>
-            <Link href="/for-players">For Players</Link>
-            <Link href="/about">About James Fox</Link>
-          </div>
-          <div className={cx('footCol')}>
-            <h4>Legal</h4>
-            <Link href="/privacy">Privacy Policy</Link>
-            <Link href="/terms">Terms &amp; Conditions</Link>
-          </div>
+        <div className={cx('foot-ball')} aria-hidden="true">
+          <Ball3D />
         </div>
-        <div className={cx('footBot')}>
-          © 2026 Clearway Performance Group · Created by SCNDAL
+        <div className={cx('wrap')}>
+          <div className={cx('foot-top')}>
+            <Link href="/" aria-label="Clearway — home">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                className={cx('foot-logo')}
+                src="/Logotipos/clearway-white.svg"
+                alt="Clearway"
+              />
+            </Link>
+            <nav className={cx('foot-nav')}>
+              <div className={cx('foot-col')}>
+                <Link href="/for-clubs">For Clubs</Link>
+                <Link href="/for-players">For Players</Link>
+                <Link href="/">About Clearway</Link>
+              </div>
+              <div className={cx('foot-col')}>
+                <Link href="/privacy">Privacy Policy</Link>
+                <Link href="/terms">Terms &amp; Conditions</Link>
+              </div>
+            </nav>
+          </div>
+          <div className={cx('foot-bot')}>
+            <span>© 2026 Clearway Performance Group</span>
+            <span>Created by SCNDAL</span>
+          </div>
         </div>
       </footer>
     </div>

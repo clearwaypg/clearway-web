@@ -69,7 +69,7 @@ export function FooterHome({ref}: Props) {
         <FooterCol title={c.navigate}>
           <FooterLink href="/for-clubs">{c.clubs}</FooterLink>
           <FooterLink href="/for-players">{c.players}</FooterLink>
-          <FooterLink href="/about">{c.about}</FooterLink>
+          <FooterLink href="/">{c.about}</FooterLink>
         </FooterCol>
 
         <FooterCol title={c.legal}>

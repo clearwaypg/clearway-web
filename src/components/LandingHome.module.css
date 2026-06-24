@@ -294,6 +294,21 @@
   z-index: 1;
   pointer-events: none;
   overflow: hidden;
+  /* Soft top/bottom dissolve into the sections above and below. */
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 12%,
+    black 88%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 12%,
+    black 88%,
+    transparent 100%
+  );
 }
 .heroVideo {
   position: absolute;
@@ -476,9 +491,9 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 3;
-  font-size: 0.62rem;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
   color: #5f6b7d;
   display: flex;
@@ -491,6 +506,22 @@
   height: 30px;
   background: linear-gradient(var(--dew), transparent);
   animation: drop 1.8s ease-in-out infinite;
+}
+/* Small downward chevron below the cue, white at ~30%, gentle looping bounce. */
+.scrollCue .chev {
+  width: 16px;
+  height: 16px;
+  color: rgba(255, 255, 255, 0.3);
+  animation: cueBounce 1.6s ease-in-out infinite;
+}
+@keyframes cueBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
 }
 @keyframes drop {
   0% {
@@ -556,10 +587,25 @@
   font-family: var(--serif);
   font-style: italic;
   font-size: min(28vw, 360px);
-  color: rgba(208, 216, 226, 0.04);
+  color: var(--dew);
   pointer-events: none;
   line-height: 1;
-  animation: breathe 7s ease-in-out infinite;
+  /* Hidden by default; fades in/out as it enters/leaves the viewport (JS toggles
+     .bgmarkIn). While in view it breathes (opacity 0.04 → 0.12 → 0.04). */
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.bgmarkIn {
+  animation: bgBreathe 4s ease-in-out infinite;
+}
+@keyframes bgBreathe {
+  0%,
+  100% {
+    opacity: 0.04;
+  }
+  50% {
+    opacity: 0.12;
+  }
 }
 @keyframes breathe {
   0%,
@@ -571,11 +617,6 @@
     transform: translateY(-52%) scale(1.03);
     color: rgba(208, 216, 226, 0.07);
   }
-}
-.what.in .bgmark {
-  animation:
-    bgreveal 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards,
-    breathe 7s ease-in-out 1.4s infinite;
 }
 @keyframes bgreveal {
   from {
@@ -604,13 +645,18 @@
 .whatBall {
   position: absolute;
   top: 0;
-  left: 82%;
-  width: clamp(38px, 4vw, 56px);
-  aspect-ratio: 1 / 1;
-  z-index: 1;
+  left: 50%;
+  width: 72px;
+  height: 72px;
+  z-index: 5;
   pointer-events: none;
-  transform: translate(-50%, 0);
+  transform: translateX(-50%);
   will-change: transform;
+}
+@media (max-width: 767px) {
+  .whatBall {
+    display: none;
+  }
 }
 .what .wrap {
   position: relative;
@@ -663,23 +709,23 @@
 }
 /* Intermediate element centred between the two doors: a slightly-rounded
    container with a ball that drops down it on scroll (set in JS). */
-.doorsMid {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: clamp(84px, 9.5vw, 140px);
-  z-index: 3;
-  pointer-events: none;
-}
+/* Football centred between the two panels at the section's vertical midpoint.
+   Its translateY is driven by JS for a ~0.4x parallax (see LandingHome.tsx). */
 .doorsBall {
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 50%;
-  width: clamp(84px, 9.5vw, 140px);
-  aspect-ratio: 1 / 1;
-  transform: translateX(-50%);
+  width: 80px;
+  height: 80px;
+  z-index: 10;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+}
+@media (max-width: 767px) {
+  .doorsBall {
+    display: none;
+  }
 }
 .door {
   position: relative;
@@ -783,18 +829,61 @@
   text-transform: uppercase;
 }
 .go .arr {
-  transition: transform 0.3s;
+  display: inline-block;
+  transition: transform 0.35s ease;
 }
+/* On hover the arrow alone slides right and grows; "LET'S GO" stays fixed. */
 .door:hover .go .arr {
-  transform: translateX(7px);
+  transform: translateX(50px) scale(1.4);
 }
 .doorClubs {
   background: var(--navy);
   color: #fff;
+  will-change: transform;
+  animation: doorFloatA 7s ease-in-out infinite;
 }
 .doorPlayers {
   background: var(--dew);
   color: var(--navy);
+  will-change: transform;
+  animation: doorFloatB 9s ease-in-out -3s infinite;
+}
+/* Subtle, continuous "suspended" float. Two different shapes + durations (and a
+   phase offset) so the two boxes drift out of sync and read as organic, not
+   mechanical. The easing is gentle and the travel is only a few px. */
+@keyframes doorFloatA {
+  0% {
+    transform: translateY(-5px);
+  }
+  30% {
+    transform: translateY(1px);
+  }
+  55% {
+    transform: translateY(5px);
+  }
+  80% {
+    transform: translateY(-2px);
+  }
+  100% {
+    transform: translateY(-5px);
+  }
+}
+@keyframes doorFloatB {
+  0% {
+    transform: translateY(4px);
+  }
+  35% {
+    transform: translateY(-3px);
+  }
+  60% {
+    transform: translateY(-6px);
+  }
+  85% {
+    transform: translateY(2px);
+  }
+  100% {
+    transform: translateY(4px);
+  }
 }
 .door:hover {
   flex-grow: 1.15;
@@ -845,7 +934,7 @@
   z-index: 2;
 }
 .team h2 {
-  font-size: clamp(2rem, 5vw, 4rem);
+  font-size: clamp(2rem, 5vw, 3rem);
   line-height: 0.98;
   letter-spacing: -0.025em;
   margin-bottom: 54px;
@@ -979,102 +1068,209 @@
 .proof {
   background: var(--black);
   color: #fff;
-  padding: clamp(90px, 13vh, 160px) 0;
+  /* Vertical padding cut ~40% so the section is more compact. */
+  padding: clamp(54px, 8vh, 96px) 0;
 }
-.recHead {
-  text-align: center;
-  margin-bottom: 54px;
+/* Editorial split: stacked stat strips on the left (40%); the heading pinned
+   to the top of the right column (60%), floating against the data below. */
+/* Editorial dark split (matches for-players "The bit others skip."): a large
+   display heading with a high-contrast grayscale player silhouette behind it on
+   the left, and the four stats as glassmorphism cards on the right. */
+.numLayout {
+  position: relative;
+  display: grid;
+  grid-template-columns: 45% 55%;
+  gap: clamp(28px, 5vw, 80px);
+  align-items: stretch;
 }
-.recHead .eyebrow {
-  display: inline-flex;
+.numLeft {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  display: flex;
   align-items: center;
-  gap: 14px;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.24em;
+  min-height: 320px;
+  overflow: hidden;
+}
+/* Player photo as a high-contrast grayscale silhouette behind the heading; it
+   lights up (brighter + more opaque) when the left column is hovered, like a
+   spotlight hitting it. */
+/* Background video behind the left column: a ghost texture at low opacity that
+   lights up on section hover. */
+/* 3D football centred behind the heading as a background element. */
+.numBallWrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 0;
+  /* Slides in from the left when the left column enters view, back out when it
+     leaves (.ballIn toggled by IntersectionObserver). */
+  opacity: 0;
+  transform: translateX(-140px);
+  transition:
+    transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    opacity 0.9s ease;
+}
+.ballIn .numBallWrap {
+  opacity: 1;
+  transform: translateX(0);
+}
+/* Soft radial blue glow — a cool stadium light turning on behind the ball when
+   the left column is hovered. Sits above the ball, below the text. */
+.numGlow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(80, 140, 255, 0.18) 0%,
+    transparent 70%
+  );
+  transition: opacity 0.4s ease;
+}
+.numLeft:hover .numGlow {
+  opacity: 1;
+}
+/* Heading: mid-left, large display, stacked across two lines; slides in from the
+   left on scroll. */
+.numHead {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  text-align: right;
+  opacity: 0;
+  transform: translateX(-40px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
+}
+.numIn .numHead {
+  opacity: 1;
+  transform: translateX(0);
+}
+.numHead h2 {
+  font-size: clamp(2.4rem, 5.5vw, 4.6rem);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
   text-transform: uppercase;
-  color: var(--dew);
-  margin-bottom: 18px;
 }
-.recHead h2 {
-  font-size: clamp(2.4rem, 6vw, 5rem);
-  line-height: 0.9;
-  letter-spacing: -0.03em;
-  text-transform: uppercase;
+.numHead h2 .thin {
+  font-weight: 800;
+  font-size: clamp(48px, 6vw, 80px);
 }
-.recHead h2 .thin {
-  font-weight: 300;
-}
-.recHead h2 b {
-  font-weight: 900;
-}
-.recHead h2 .it {
+.numHead h2 .it {
+  display: block;
   font-family: var(--serif);
   font-style: italic;
-  font-weight: 400;
+  font-weight: 300;
+  font-size: clamp(36px, 4.5vw, 64px);
   text-transform: none;
   color: var(--dew);
 }
-.scoreboard {
+/* Right column: four identical glassmorphism cards stacked in a simple flex
+   column — no grid, no absolute positioning, no per-card offsets. */
+/* Right column: a centred flex wrapper holding the 2×2 grid, so the grid sits in
+   the middle of the column (not pushed to any edge). */
+.numList {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
   display: flex;
-  align-items: stretch;
   justify-content: center;
-  gap: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(7, 44, 104, 0.25),
-    rgba(0, 0, 0, 0.3)
-  );
-  border: 1px solid rgba(208, 216, 226, 0.16);
-  border-radius: 16px;
-  overflow: hidden;
+  align-items: center;
 }
-.sbCell {
-  flex: 1;
+.numGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  width: 380px;
+  max-width: 100%;
+}
+.numStat {
+  width: 100%;
+  min-height: 140px;
+  padding: 24px 28px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  padding: clamp(30px, 4vw, 52px) clamp(10px, 2vw, 24px);
+  background: rgba(15, 30, 60, 0.65);
+  border: 1px solid rgba(80, 130, 220, 0.18);
+  border-radius: 14px;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+  animation: floatCard 4s ease-in-out infinite;
+}
+/* Right-column cards sit lower (stagger); each card floats at its own phase so
+   they feel independent. */
+.numStat:nth-child(2) {
+  margin-top: 24px;
+  animation-delay: 0.5s;
+}
+.numStat:nth-child(3) {
+  animation-delay: 1s;
+}
+.numStat:nth-child(4) {
+  margin-top: 24px;
+  animation-delay: 1.5s;
+}
+@keyframes floatCard {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.numStat:hover {
+  transform: translateY(-3px);
+  border-color: rgba(100, 160, 255, 0.35);
+  box-shadow: 0 0 20px rgba(60, 120, 255, 0.15);
 }
 .sbN {
-  font-family: var(--serif);
+  font-size: 52px;
   font-style: italic;
-  font-size: clamp(3rem, 6.5vw, 5.8rem);
-  line-height: 0.9;
+  font-family: var(--serif);
   color: #fff;
+  margin-bottom: 4px;
   font-variant-numeric: tabular-nums;
-  text-shadow:
-    0 0 24px rgba(208, 216, 226, 0.5),
-    0 0 50px rgba(120, 150, 210, 0.3);
 }
-.sbN span {
-  font-size: 0.5em;
-  vertical-align: super;
-  color: var(--dew);
-  text-shadow: none;
-}
-.sbL {
-  font-size: 0.7rem;
+.numLabel b {
+  display: block;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--dew);
-  margin-top: 16px;
-  line-height: 1.5;
-}
-.sbL b {
-  display: block;
   color: #fff;
-  font-weight: 800;
-  font-size: 1.15em;
-  letter-spacing: 0.04em;
-  margin-bottom: 2px;
 }
-.sbSep {
-  width: 1px;
-  background: linear-gradient(
-    transparent,
-    rgba(208, 216, 226, 0.3),
-    transparent
-  );
+.numLabel span {
+  display: block;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 2px;
+}
+/* Mobile: 3D ball hidden, cards become a static 2×2 grid. */
+@media (max-width: 767px) {
+  .numLayout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .numLeft {
+    min-height: 0;
+    overflow: visible;
+  }
+  .numBallWrap {
+    display: none;
+  }
 }
 
 /* ===== CIERRE TIPO VS ===== */
@@ -1238,59 +1434,317 @@
   height: 30%;
 }
 
-/* FOOTER */
+/* FOOTER — same rich footer as for-players/for-clubs: dark card with rounded
+   top, drifting navy glows, a 3D ball rolling + hopping along the bottom, and
+   floating glassmorphism nav cards in two tidy columns. */
 .foot {
-  background: var(--black);
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  background: #191919;
   color: #cfd6e0;
-  padding: 54px 0 30px;
+  padding: clamp(80px, 11vh, 134px) 0 42px;
+  border-radius: 32px 32px 0 0;
+  margin-top: -32px;
+  overflow: hidden;
+}
+.foot::before {
+  content: '';
+  position: absolute;
+  inset: -15%;
+  z-index: -1;
+  background:
+    radial-gradient(
+      58% 70% at 15% 5%,
+      rgba(15, 62, 138, 0.55) 0%,
+      rgba(15, 62, 138, 0) 58%
+    ),
+    radial-gradient(
+      52% 65% at 92% 100%,
+      rgba(9, 44, 104, 0.45) 0%,
+      rgba(9, 44, 104, 0) 55%
+    );
+  animation: footGlowDrift 19s ease-in-out infinite;
+}
+@keyframes footGlowDrift {
+  0%,
+  100% {
+    transform: translate(-2%, -1.5%) scale(1);
+  }
+  50% {
+    transform: translate(3%, 2%) scale(1.08);
+  }
 }
 .foot .wrap {
+  position: relative;
+  z-index: 1;
+  width: min(1280px, 92vw);
+  margin: 0 auto;
+}
+@property --ballx {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+@property --bally {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+.foot-ball {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  width: clamp(54px, 6vw, 84px);
+  aspect-ratio: 1 / 1;
+  z-index: 0;
+  pointer-events: none;
+  transform: translate(calc(-50% + var(--ballx)), var(--bally));
+  animation:
+    footBallX 12s ease-in-out infinite alternate,
+    footBallY 7s ease-in-out infinite;
+}
+@keyframes footBallX {
+  from {
+    --ballx: -165px;
+  }
+  to {
+    --ballx: 165px;
+  }
+}
+@keyframes footBallY {
+  0%,
+  13%,
+  21%,
+  44%,
+  50%,
+  70%,
+  78%,
+  100% {
+    --bally: 0px;
+  }
+  17% {
+    --bally: -22px;
+  }
+  47% {
+    --bally: -13px;
+  }
+  74% {
+    --bally: -25px;
+  }
+}
+.foot-top {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  gap: 50px;
   flex-wrap: wrap;
-  gap: 30px;
+  padding-bottom: clamp(50px, 8vh, 92px);
 }
-.foot .mark {
-  font-size: 1.4rem;
+.foot-logo {
+  height: clamp(42px, 5vw, 60px);
+  width: auto;
+  display: block;
+}
+.foot-nav {
+  display: flex;
+  gap: clamp(20px, 4vw, 48px);
+  flex-wrap: wrap;
+}
+@property --fy {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+@property --hx {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+@property --hy {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+@property --sc {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 1;
+}
+@keyframes footFloat {
+  0%,
+  100% {
+    --fy: 0px;
+  }
+  50% {
+    --fy: -10px;
+  }
+}
+.foot-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.foot-col a {
+  display: block;
+  min-width: 172px;
+  padding: 0.66em 1.1em;
+  border-radius: 13px;
+  background: rgba(20, 70, 146, 0.16);
+  -webkit-backdrop-filter: blur(11px) saturate(150%);
+  backdrop-filter: blur(11px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #eaeff6;
+  text-decoration: none;
+  text-align: center;
+  font-size: clamp(0.96rem, 1.15vw, 1.14rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  transform: translate(var(--hx, 0px), calc(var(--hy, 0px) + var(--fy, 0px)))
+    scale(var(--sc, 1));
+  transition:
+    --hx 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    --hy 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    --sc 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s ease,
+    filter 0.3s ease,
+    box-shadow 0.3s ease;
+  animation: footFloat 4.6s ease-in-out infinite;
+}
+.foot-col:nth-child(1) a:nth-of-type(1) {
+  background: rgba(15, 58, 132, 0.18);
+  animation-duration: 4.3s;
+  animation-delay: -0.7s;
+}
+.foot-col:nth-child(1) a:nth-of-type(2) {
+  background: rgba(28, 82, 162, 0.15);
+  animation-duration: 5.4s;
+  animation-delay: -2.1s;
+}
+.foot-col:nth-child(1) a:nth-of-type(3) {
+  background: rgba(21, 72, 150, 0.16);
+  animation-duration: 4.9s;
+  animation-delay: -1.3s;
+}
+.foot-col:nth-child(2) a:nth-of-type(1) {
+  background: rgba(33, 90, 172, 0.14);
+  animation-duration: 5.1s;
+  animation-delay: -0.4s;
+}
+.foot-col:nth-child(2) a:nth-of-type(2) {
+  background: rgba(18, 66, 142, 0.17);
+  animation-duration: 5.7s;
+  animation-delay: -1.8s;
+}
+.foot-col a:hover {
+  --hx: 7px;
+  --hy: -6px;
+  --sc: 1.07;
+  border-color: rgba(150, 188, 255, 0.6);
+  filter: brightness(1.18);
+  box-shadow: 0 12px 32px rgba(18, 66, 142, 0.44);
+}
+.foot-bot {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding-top: 26px;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: #8fa0b5;
+}
+
+/* TESTIMONIALS — same carousel as for-players: two marquee rows of dark-blue
+   glassmorphism cards scrolling opposite ways; hovering a card pauses its row
+   and grows the card. */
+.voices {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #191919 0%, #0a2249 50%, #191919 100%);
+  padding: clamp(60px, 9vh, 110px) 0 clamp(70px, 11vh, 140px);
+}
+.voices .head {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.voices .head h2 {
+  font-size: clamp(2rem, 5vw, 2.7rem);
+  font-weight: 700;
   color: #fff;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
 }
-.foot .c {
-  font-weight: 300;
-}
-.foot .w {
-  font-weight: 900;
-}
-.foot .serif {
+.voices .head h2 .it {
   font-family: var(--serif);
   font-style: italic;
+  font-weight: 400;
+  text-transform: none;
   color: var(--dew);
-  margin-top: 8px;
 }
-.footCol h4 {
+.voices .head p {
+  color: rgba(252, 252, 252, 0.78);
+  margin-top: 14px;
+  font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+}
+.vmarquee {
+  position: relative;
+  margin-top: clamp(40px, 6vh, 72px);
+}
+.vrow {
+  display: flex;
+  gap: 20px;
+  width: max-content;
+  animation: vscroll 46s linear infinite;
+}
+.vrow.r2 {
+  animation-duration: 58s;
+  animation-direction: reverse;
+  margin-top: 20px;
+}
+.vrow:has(.vcard:hover) {
+  animation-play-state: paused;
+}
+@keyframes vscroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.vcard {
+  position: relative;
+  width: 330px;
+  flex-shrink: 0;
+  background: rgba(8, 24, 56, 0.5);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+  padding: 26px;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.vcard:hover {
+  transform: scale(1.06);
+  z-index: 2;
+}
+.vcard p {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: #eaf0fb;
+  line-height: 1.45;
+}
+.vcard .who {
+  display: block;
+  margin-top: 14px;
+  font-style: normal;
   font-size: 0.72rem;
-  letter-spacing: 0.1em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--dew);
-  margin-bottom: 13px;
-}
-.footCol a {
-  display: block;
-  color: #9aa6b6;
-  text-decoration: none;
-  font-size: 0.9rem;
-  margin-bottom: 8px;
-  transition: 0.2s;
-}
-.footCol a:hover {
-  color: #fff;
-}
-.footBot {
-  width: min(1180px, 92vw);
-  margin: 36px auto 0;
-  border-top: 1px solid #2a2a2a;
-  padding-top: 20px;
-  font-size: 0.8rem;
-  color: #6b7585;
 }
 
 @media (max-width: 900px) {

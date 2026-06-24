@@ -1660,7 +1660,7 @@
   position: absolute;
   bottom: 16px;
   left: 50%;
-  width: clamp(38px, 4.2vw, 58px);
+  width: clamp(54px, 6vw, 84px);
   aspect-ratio: 1 / 1;
   z-index: 0;
   pointer-events: none;

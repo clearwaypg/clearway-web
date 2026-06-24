@@ -229,13 +229,6 @@
   opacity: 0;
   animation: rise 1s ease 0.15s forwards;
 }
-.heroEyebrow::before,
-.heroEyebrow::after {
-  content: '';
-  width: 40px;
-  height: 1px;
-  background: var(--dew);
-}
 .heroBallZone {
   position: relative;
   z-index: 3;
@@ -322,20 +315,20 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   padding: 0 4vw;
   will-change: opacity;
 }
 .hstat {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 7px;
   background: rgba(208, 216, 226, 0.06);
   border: 1px solid rgba(208, 216, 226, 0.2);
   backdrop-filter: blur(8px);
   border-radius: 50px;
-  padding: 0.7em 1.3em;
-  font-size: 0.82rem;
+  padding: 0.5em 1.05em;
+  font-size: 0.72rem;
   font-weight: 600;
   color: #cfd6e0;
   letter-spacing: 0.01em;
@@ -358,7 +351,7 @@
 .hstat b {
   font-family: var(--serif);
   font-style: italic;
-  font-size: 1.5em;
+  font-size: 1.3em;
   color: #fff;
   font-weight: 400;
 }
@@ -1387,59 +1380,233 @@
   color: #7e8ba3;
 }
 
-/* FOOTER */
+/* FOOTER — ported from for-players: dark card with a rounded top edge, drifting
+   navy glows, a 3D ball that rolls + hops along the bottom, and floating
+   glassmorphism nav cards. Here the cards sit in two tidy columns (no big
+   scatter) — just a gentle, desynchronised float. */
 .foot {
-  background: var(--black);
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  background: #191919;
   color: #cfd6e0;
-  padding: 54px 0 30px;
+  padding: clamp(80px, 11vh, 134px) 0 42px;
+  /* Curved top edge so the footer reads as a card overlapping the section above. */
+  border-radius: 32px 32px 0 0;
+  margin-top: -32px;
+  overflow: hidden;
+}
+.foot::before {
+  content: '';
+  position: absolute;
+  inset: -15%;
+  z-index: -1;
+  background:
+    radial-gradient(
+      58% 70% at 15% 5%,
+      rgba(15, 62, 138, 0.55) 0%,
+      rgba(15, 62, 138, 0) 58%
+    ),
+    radial-gradient(
+      52% 65% at 92% 100%,
+      rgba(9, 44, 104, 0.45) 0%,
+      rgba(9, 44, 104, 0) 55%
+    );
+  animation: footGlowDrift 19s ease-in-out infinite;
+}
+@keyframes footGlowDrift {
+  0%,
+  100% {
+    transform: translate(-2%, -1.5%) scale(1);
+  }
+  50% {
+    transform: translate(3%, 2%) scale(1.08);
+  }
 }
 .foot .wrap {
+  position: relative;
+  z-index: 1;
+  width: min(1280px, 92vw);
+  margin: 0 auto;
+}
+/* The 3D football rolls back and forth along the bottom — below the cards — with
+   the occasional small hop. X and Y run on separate, differently-timed loops. */
+@property --ballx {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+@property --bally {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+.foot-ball {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  width: clamp(54px, 6vw, 84px);
+  aspect-ratio: 1 / 1;
+  z-index: 0;
+  pointer-events: none;
+  transform: translate(calc(-50% + var(--ballx)), var(--bally));
+  animation:
+    footBallX 12s ease-in-out infinite alternate,
+    footBallY 7s ease-in-out infinite;
+}
+@keyframes footBallX {
+  from {
+    --ballx: -165px;
+  }
+  to {
+    --ballx: 165px;
+  }
+}
+@keyframes footBallY {
+  0%,
+  13%,
+  21%,
+  44%,
+  50%,
+  70%,
+  78%,
+  100% {
+    --bally: 0px;
+  }
+  17% {
+    --bally: -22px;
+  }
+  47% {
+    --bally: -13px;
+  }
+  74% {
+    --bally: -25px;
+  }
+}
+.foot-top {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  gap: 50px;
   flex-wrap: wrap;
-  gap: 30px;
+  padding-bottom: clamp(50px, 8vh, 92px);
 }
-.foot .mark {
-  font-size: 1.4rem;
-  color: #fff;
-}
-.foot .c {
-  font-weight: 300;
-}
-.foot .w {
-  font-weight: 900;
-}
-.foot .serif {
-  font-family: var(--serif);
-  font-style: italic;
-  color: var(--dew);
-  margin-top: 8px;
-}
-.footCol h4 {
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--dew);
-  margin-bottom: 13px;
-}
-.footCol a {
+.foot-logo {
+  height: clamp(42px, 5vw, 60px);
+  width: auto;
   display: block;
-  color: #9aa6b6;
+}
+/* Two tidy columns, kept close together (not spread across the width). */
+.foot-nav {
+  display: flex;
+  gap: clamp(20px, 4vw, 48px);
+  flex-wrap: wrap;
+}
+@property --fy {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+@property --hx {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+@property --hy {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+@property --sc {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 1;
+}
+@keyframes footFloat {
+  0%,
+  100% {
+    --fy: 0px;
+  }
+  50% {
+    --fy: -10px;
+  }
+}
+.foot-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+/* Glassmorphism link cards. No resting offset (so the column stays aligned) —
+   only a hover nudge/scale (--hx/--hy/--sc) and a continuous float (--fy). */
+.foot-col a {
+  display: block;
+  min-width: 172px;
+  padding: 0.66em 1.1em;
+  border-radius: 13px;
+  background: rgba(20, 70, 146, 0.16);
+  -webkit-backdrop-filter: blur(11px) saturate(150%);
+  backdrop-filter: blur(11px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #eaeff6;
   text-decoration: none;
-  font-size: 0.9rem;
-  margin-bottom: 8px;
-  transition: 0.2s;
+  text-align: center;
+  font-size: clamp(0.96rem, 1.15vw, 1.14rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  transform: translate(var(--hx, 0px), calc(var(--hy, 0px) + var(--fy, 0px)))
+    scale(var(--sc, 1));
+  transition:
+    --hx 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    --hy 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    --sc 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s ease,
+    filter 0.3s ease,
+    box-shadow 0.3s ease;
+  animation: footFloat 4.6s ease-in-out infinite;
 }
-.footCol a:hover {
-  color: #fff;
+/* Slightly different blue tonality + desynchronised float per card. */
+.foot-col:nth-child(1) a:nth-of-type(1) {
+  background: rgba(15, 58, 132, 0.18);
+  animation-duration: 4.3s;
+  animation-delay: -0.7s;
 }
-.footBot {
-  width: min(1180px, 92vw);
-  margin: 36px auto 0;
-  border-top: 1px solid #2a2a2a;
-  padding-top: 20px;
-  font-size: 0.8rem;
-  color: #6b7585;
+.foot-col:nth-child(1) a:nth-of-type(2) {
+  background: rgba(28, 82, 162, 0.15);
+  animation-duration: 5.4s;
+  animation-delay: -2.1s;
+}
+.foot-col:nth-child(1) a:nth-of-type(3) {
+  background: rgba(21, 72, 150, 0.16);
+  animation-duration: 4.9s;
+  animation-delay: -1.3s;
+}
+.foot-col:nth-child(2) a:nth-of-type(1) {
+  background: rgba(33, 90, 172, 0.14);
+  animation-duration: 5.1s;
+  animation-delay: -0.4s;
+}
+.foot-col:nth-child(2) a:nth-of-type(2) {
+  background: rgba(18, 66, 142, 0.17);
+  animation-duration: 5.7s;
+  animation-delay: -1.8s;
+}
+.foot-col a:hover {
+  --hx: 7px;
+  --hy: -6px;
+  --sc: 1.07;
+  border-color: rgba(150, 188, 255, 0.6);
+  filter: brightness(1.18);
+  box-shadow: 0 12px 32px rgba(18, 66, 142, 0.44);
+}
+.foot-bot {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding-top: 26px;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: #8fa0b5;
 }
 
 @media (max-width: 900px) {
