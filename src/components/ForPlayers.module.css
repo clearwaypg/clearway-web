@@ -53,6 +53,33 @@
   /* No mix-blend-mode here: difference inverted the white logo to a yellow/cream
      tone over the colored sections. Keep the logo pure white (#fcfcfc) and
      consistent with the rest of the site. */
+  background: transparent;
+  transition:
+    top 0.35s ease,
+    left 0.35s ease,
+    right 0.35s ease,
+    padding 0.35s ease,
+    border-radius 0.35s ease,
+    background-color 0.35s ease,
+    backdrop-filter 0.35s ease,
+    box-shadow 0.35s ease;
+}
+/* On scroll the header becomes a floating glassmorphism pill — inset from the
+   edges with rounded corners, semitransparent with a blur (no solid color) — so
+   the white logo and navigation stay legible. */
+.nav.scrolled {
+  top: 12px;
+  left: clamp(12px, 3vw, 28px);
+  right: clamp(12px, 3vw, 28px);
+  padding: 12px clamp(16px, 3vw, 26px);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(7, 44, 104, 0.32);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 12px 40px rgba(0, 0, 0, 0.28);
 }
 .nav .logo {
   display: flex;
@@ -70,11 +97,14 @@
   text-transform: uppercase;
   opacity: 0.85;
 }
+/* Shares the exact same pill style as .card-cta — both lead to the same
+   "build my profile" destination, so they must read as visually identical:
+   full pill radius, white-on-navy, Archivo 700. */
 .nav-cta {
   background: var(--white);
   color: var(--navy);
   border: none;
-  border-radius: 5px;
+  border-radius: 999px;
   padding: 0.6em 1.2em;
   font-family: var(--font);
   font-weight: 700;
@@ -127,7 +157,10 @@
   display: grid;
   grid-template-columns: 1fr 0.82fr;
   gap: clamp(24px, 4vw, 56px);
-  align-items: center;
+  /* Top-align the two columns so the title and the card start at the same level.
+     With center alignment the taller (text + stats) column pushed the shorter
+     card down to the middle; top-aligning keeps them on the same visual line. */
+  align-items: start;
   padding: 120px clamp(20px, 5vw, 60px) 60px;
   overflow: hidden;
   background: #0c0c0c;
@@ -140,15 +173,14 @@
   background: radial-gradient(135% 110% at 20% 5%, #14294f 0%, #0c0c0c 58%);
 }
 .chapter {
-  position: absolute;
-  top: 108px;
-  left: clamp(20px, 5vw, 60px);
+  position: relative;
   z-index: 6;
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.24em;
+  font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+  font-weight: 800;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #5f6b7d;
+  color: var(--dew);
+  margin-bottom: 1.4rem;
 }
 .chapter b {
   color: var(--dew);
@@ -156,6 +188,9 @@
 
 .stage {
   position: relative;
+  /* Allow this grid column to shrink below the headline's intrinsic width so the
+     grid never overflows the viewport (which was pushing the card off-screen). */
+  min-width: 0;
 }
 .bgword {
   position: absolute;
@@ -219,35 +254,39 @@
   display: block;
 }
 .hl1 {
-  font-size: clamp(2.2rem, 5vw, 4.8rem);
+  font-size: clamp(1.9rem, 4.1vw, 4rem);
   font-weight: 300;
   color: #fff;
 }
 .hl1 b {
   font-weight: 900;
+  color: transparent;
+  -webkit-text-stroke: 1px #fcfcfc;
+  text-stroke: 1px #fcfcfc;
+  filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.45));
 }
 .hl2 {
-  font-size: clamp(3.4rem, 8.5vw, 8rem);
-  font-weight: 900;
+  font-size: clamp(2.8rem, 7vw, 6.5rem);
+  font-weight: 500;
   color: #fff;
-  margin-top: -0.04em;
+  margin-top: 0.5rem;
 }
 .hl3 {
   font-family: var(--serif);
   font-style: italic;
   font-weight: 400;
   text-transform: none;
-  font-size: clamp(2.4rem, 5.6vw, 5rem);
+  font-size: clamp(2rem, 4.6vw, 4.1rem);
   letter-spacing: -0.01em;
   color: var(--dew);
-  line-height: 0.9;
-  margin-top: 0.1em;
+  line-height: 0.86;
+  margin-top: 0.2rem;
 }
 
 .undertext {
   position: relative;
   z-index: 3;
-  margin-top: 36px;
+  margin-top: 56px;
   max-width: 38ch;
 }
 .undertext .lead {
@@ -261,23 +300,45 @@
 }
 .stats {
   display: flex;
-  gap: 34px;
-  margin-top: 22px;
+  gap: 28px;
+  margin-top: 14px;
+  align-items: flex-start;
+}
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+/* Number and label both sit in matching dark-blue (near-black) boxes; the label
+   box stretches to the same width as the number box above it. */
+.stat .n,
+.stat .l {
+  display: block;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  background: rgba(8, 13, 28, 0.92);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 .stat .n {
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 1.9rem;
+  padding: 0.4em 0.72em;
+  font-family: var(--font);
+  font-weight: 600;
+  font-size: clamp(2rem, 4vw, 2.9rem);
   line-height: 1;
+  letter-spacing: -0.02em;
   color: #fff;
 }
 .stat .l {
-  font-size: 0.66rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  color: #8a96a6;
-  margin-top: 5px;
-  max-width: 14ch;
+  padding: 0.72em 0.8em;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #a2adbf;
+  line-height: 1.15;
 }
 
 .cardcol {
@@ -285,160 +346,180 @@
   z-index: 5;
   display: flex;
   flex-direction: column;
+  /* Center the card in its column and nudge it left so it sits roughly centered
+     between the end of "GOOD" in the headline and the right edge of the screen.
+     The vw-based shift keeps that balance across screen widths. */
   align-items: center;
+  transform: translateX(-4vw);
+  min-width: 0;
   gap: 18px;
 }
-.fifa {
-  width: min(360px, 94%);
-  aspect-ratio: 3 / 4.2;
-  border-radius: 16px;
+/* ── CARD PREMIUM (referencia: tarjeta coleccionable Clearway) ── */
+.pcard-outer{width:min(320px,90%);background:linear-gradient(148deg,#c8d0e0 0%,#98a8c0 12%,#e8eef8 28%,#7888a8 46%,#d8e4f4 62%,#98a8c0 78%,#c0ccdc 100%);border-radius:20px;padding:2.5px;box-shadow:0 50px 110px rgba(0,0,60,.95),0 0 0 1px rgba(255,255,255,.14);transition:transform .45s cubic-bezier(.22,1,.36,1),box-shadow .45s ease}
+/* Subtle "about to be selected" hover: slight lift + scale and a blue edge glow. */
+.pcard-outer:hover{transform:translateY(-10px) scale(1.02);box-shadow:0 64px 140px rgba(0,0,60,.95),0 0 0 1px rgba(255,255,255,.42),0 0 48px rgba(60,140,255,.5)}
+.pcard{width:100%;aspect-ratio:3/4;border-radius:18px;position:relative;overflow:hidden;background:linear-gradient(170deg,#0c1e48 0%,#07102e 40%,#040917 100%);font-family:var(--font)}
+.pcard-glow{position:absolute;top:-8%;left:50%;transform:translateX(-50%);width:280px;height:80%;background:radial-gradient(ellipse 70% 65% at 50% 14%,rgba(35,90,240,.3) 0%,rgba(15,55,190,.1) 50%,transparent 75%);pointer-events:none;z-index:1}
+.pcard-rays{position:absolute;inset:0;overflow:hidden;z-index:1;pointer-events:none}
+.pcard-ray{position:absolute;top:0;left:50%;transform-origin:top center;border-radius:1px;background:linear-gradient(180deg,rgba(90,150,255,.16) 0%,transparent 100%)}
+.pcard-ray.r1{width:2px;height:72%;transform:translateX(-50%) rotate(-42deg) translateX(-80px)}
+.pcard-ray.r2{width:3px;height:76%;transform:translateX(-50%) rotate(-24deg) translateX(-40px);opacity:.85}
+.pcard-ray.r3{width:5px;height:80%;transform:translateX(-50%) rotate(-6deg);background:linear-gradient(180deg,rgba(110,170,255,.2) 0%,transparent 100%)}
+.pcard-ray.r4{width:3px;height:76%;transform:translateX(-50%) rotate(14deg) translateX(35px);opacity:.75}
+.pcard-ray.r5{width:2px;height:70%;transform:translateX(-50%) rotate(36deg) translateX(75px);opacity:.5}
+.pcard-sp{position:absolute;border-radius:50%;background:rgba(220,238,255,.95);box-shadow:0 0 7px 2px rgba(140,195,255,.75);z-index:2;pointer-events:none}
+.pcard-sp1{width:5px;height:5px;top:13%;left:48.5%}
+.pcard-sp2{width:3px;height:3px;top:15.5%;left:42%;opacity:.65}
+.pcard-sp3{width:3px;height:3px;top:11%;left:55%;opacity:.6}
+.pcard-stadium{position:absolute;bottom:0;left:0;right:0;height:36%;background:radial-gradient(ellipse 80% 50% at 50% 115%,rgba(8,45,180,.45) 0%,transparent 70%),radial-gradient(ellipse 35% 30% at 6% 115%,rgba(0,70,220,.18) 0%,transparent 55%),radial-gradient(ellipse 35% 30% at 94% 115%,rgba(0,70,220,.18) 0%,transparent 55%);pointer-events:none;z-index:1}
+.pcard-wm{position:absolute;right:-2%;top:24%;width:54%;opacity:.065;z-index:1;pointer-events:none}
+.pcard-wm-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;opacity:.16;pointer-events:none;filter:drop-shadow(0 0 20px rgba(30,80,220,.3))}
+.pcard-player{position:absolute;bottom:13%;left:50%;transform:translateX(-50%);width:82%;z-index:4;pointer-events:none;filter:drop-shadow(0 -6px 42px rgba(48,120,255,.65)) drop-shadow(0 0 95px rgba(25,85,235,.5))}
+.pcard-wm img,.pcard-wm-center img,.pcard-player img{width:100%;height:auto;display:block}
+.pcard-wm-center img{width:90%}
+.pcard-shield{position:absolute;top:10px;left:10px;z-index:6;width:86px}
+.pcard-shield img{width:100%;height:auto;display:block}
+.pcard-brand{position:absolute;top:15px;right:11px;z-index:6;font-size:1.1rem;font-weight:900;color:rgba(240,248,255,.88);letter-spacing:.1em;line-height:1;text-shadow:0 0 14px rgba(70,130,255,.5)}
+.pcard-brand span{font-weight:300}
+.pcard-left{position:absolute;left:20px;top:50%;transform:translateY(-50%);z-index:6;display:flex;flex-direction:column;align-items:flex-start;gap:0}
+.pcard-num{font-size:2.7rem;font-weight:900;color:#fff;line-height:.92;text-shadow:0 0 22px rgba(70,140,255,.65),0 2px 8px rgba(0,0,0,.9)}
+.pcard-posab{font-size:.56rem;font-weight:800;letter-spacing:.13em;color:rgba(185,215,255,.75);text-transform:uppercase;margin-top:-2px}
+.pcard-sep{width:26px;height:2px;background:rgba(120,175,255,.5);margin:6px 0;border-radius:1px}
+.pcard-field{width:32px;height:46px;border:1px solid rgba(120,175,255,.3);border-radius:3px;position:relative;background:rgba(6,14,44,.7);flex-shrink:0}
+.pcard-field::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(130,180,255,.3)}
+.pcard-field::after{content:'';position:absolute;top:0;left:25%;width:50%;height:20%;border:1px solid rgba(130,180,255,.25);border-top:none}
+.pcard-fld-bot{position:absolute;bottom:0;left:25%;width:50%;height:20%;border:1px solid rgba(130,180,255,.25);border-bottom:none}
+.pcard-fld-circle{position:absolute;top:50%;left:50%;width:10px;height:10px;border:1px solid rgba(130,180,255,.22);border-radius:50%;transform:translate(-50%,-50%)}
+.pcard-dot{position:absolute;width:5px;height:5px;border-radius:50%;background:rgba(60,140,255,.95);box-shadow:0 0 5px rgba(60,140,255,1)}
+.pcard-name-wrap{position:absolute;bottom:15.5%;left:0;right:0;z-index:6;text-align:center;padding:0 10px}
+.pcard-name{display:block;width:100%;background:transparent;border:none;outline:none;padding:0;font-family:var(--font-archivo-narrow),'Archivo Narrow',sans-serif;font-size:1.3rem;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.04em;text-align:center;caret-color:#5a96ff;text-shadow:0 2px 20px rgba(0,15,90,.98),0 0 28px rgba(30,90,240,.2)}
+.pcard-name::placeholder{color:rgba(190,215,255,.5);font-weight:700;text-transform:none;letter-spacing:.02em}
+.pcard-name-line{width:34px;height:2px;background:rgba(120,175,255,.45);border-radius:1px;margin:5px auto 0}
+.pcard-footer{position:absolute;bottom:0;left:0;right:0;height:14.5%;z-index:6;display:flex;background:rgba(3,10,38,.65)}
+.pcard-fc{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:5px 2px}
+.pcard-fc+.pcard-fc{border-left:1px solid rgba(70,120,255,.18)}
+.pcard-fc svg{width:17px;height:17px;flex-shrink:0;color:rgba(150,195,255,.7)}
+.pcard-fc-lbl{font-size:.45rem;font-weight:700;letter-spacing:.1em;color:rgba(170,205,255,.55);text-transform:uppercase}
+.pcard-fc-val{width:42px;height:1px;background:rgba(120,175,255,.3);margin-top:2px}
+
+/* ── CARD CTA — glassmorphism pill with a rotating light halo behind it and a
+   sliding word-swap on hover. Editorial, not a flat button. ── */
+@property --cta-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+.card-cta-wrap {
   position: relative;
-  overflow: hidden;
-  background: linear-gradient(160deg, #0a3a86, #072c68 55%, #04193f);
-  box-shadow:
-    0 50px 110px rgba(0, 0, 0, 0.6),
-    inset 0 0 0 1.5px rgba(208, 216, 226, 0.28);
+  /* Same width as the card and right-aligned (no auto-centering) so the button
+     lines up exactly under the card. */
+  width: min(320px, 90%);
+  isolation: isolate;
 }
-.fifa::before {
-  content: '';
+/* Halo: a soft conic light that sweeps around behind the pill. */
+.card-cta-halo {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    120deg,
-    transparent 40%,
-    rgba(208, 216, 226, 0.16) 50%,
-    transparent 60%
+  inset: -2px;
+  z-index: 0;
+  border-radius: 999px;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--cta-angle),
+    #1e48b0,
+    #5a96ff,
+    #cfe0ff,
+    #5a96ff,
+    #1e48b0
   );
-  animation: shine 4.5s ease-in-out infinite;
+  filter: blur(10px);
+  opacity: 0.7;
+  animation: ctaHalo 5s linear infinite;
+  transition:
+    opacity 0.35s ease,
+    filter 0.35s ease;
 }
-@keyframes shine {
-  0%,
-  100% {
-    transform: translateX(-60%);
+@keyframes ctaHalo {
+  to {
+    --cta-angle: 360deg;
   }
-  50% {
-    transform: translateX(60%);
-  }
-}
-.fifa-top {
-  position: absolute;
-  top: 18px;
-  left: 20px;
-  z-index: 2;
-}
-.fifa-rating {
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 2.4rem;
-  line-height: 0.9;
-  color: #fff;
-}
-.fifa-pos {
-  font-size: 0.74rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  color: var(--dew);
-  margin-top: 2px;
-}
-.fifa-logo {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 2;
-  font-size: 0.68rem;
-  font-weight: 900;
-  color: #fff;
-}
-.fifa-logo .c {
-  font-weight: 300;
-}
-.fifa-slot {
-  position: absolute;
-  bottom: 86px;
-  top: 64px;
-  left: 0;
-  right: 0;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.fifa-slot img {
-  height: 100%;
-  object-fit: contain;
-  opacity: 0.92;
-}
-.fifa-slot .ph {
-  height: 80%;
-  aspect-ratio: 1 / 2;
-  border: 1px dashed rgba(208, 216, 226, 0.3);
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(208, 216, 226, 0.45);
-  font-size: 0.58rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  text-align: center;
-  padding: 10px;
-}
-.fifa-name {
-  position: absolute;
-  bottom: 52px;
-  left: 20px;
-  right: 20px;
-  text-align: center;
-  z-index: 2;
-  font-weight: 800;
-  font-size: 1.05rem;
-  text-transform: uppercase;
-  color: #fff;
-  border-top: 1px solid rgba(208, 216, 226, 0.3);
-  padding-top: 11px;
-}
-.fifa-meta {
-  position: absolute;
-  bottom: 20px;
-  left: 0;
-  right: 0;
-  z-index: 2;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--dew);
-}
-.fifa-meta span b {
-  color: #fff;
-  display: block;
-  font-size: 0.8rem;
-  text-align: center;
 }
 .card-cta {
-  width: min(360px, 94%);
-  background: var(--white);
-  color: var(--navy);
-  border: none;
-  border-radius: 8px;
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
   padding: 1.1em 1.4em;
   font-family: var(--font);
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 700;
+  color: #fcfcfc;
   cursor: pointer;
-  transition: 0.25s;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
   text-align: center;
+  background: rgba(9, 12, 22, 0.86);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 18px 45px rgba(0, 0, 0, 0.35);
+  transition:
+    border-color 0.35s ease,
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
 }
-.card-cta b {
+/* Continuous right-to-left marquee — runs in an infinite loop, no hover needed.
+   The track holds 6 identical copies; translating it -50% lands copy 4 exactly
+   where copy 1 started, so the loop is seamless. */
+.card-cta-text {
+  display: block;
+  overflow: hidden;
+  width: 100%;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 9%,
+    #000 91%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 9%,
+    #000 91%,
+    transparent
+  );
+}
+.card-cta-track {
+  display: flex;
+  width: max-content;
+  animation: ctaMarquee 22s linear infinite;
+  animation-direction: reverse;
+}
+.card-cta-item {
+  flex: none;
+  white-space: nowrap;
+  padding-right: 2.6em;
+  font-weight: 500;
+}
+.card-cta-item b {
   font-weight: 800;
 }
-.card-cta:hover {
-  background: var(--dew);
+@keyframes ctaMarquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.card-cta-wrap:hover .card-cta {
+  border-color: rgba(255, 255, 255, 0.55);
   transform: translateY(-3px);
-  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 26px 60px rgba(0, 0, 0, 0.45);
+}
+.card-cta-wrap:hover .card-cta-halo {
+  opacity: 1;
+  filter: blur(14px);
 }
 .card-note {
   font-size: 0.72rem;
@@ -820,33 +901,121 @@
 /* =================== CAP 02 · truth =================== */
 .truth {
   position: relative;
-  background: #111418;
+  overflow: hidden;
+  /* Dark like the hero/page, fading at the bottom into the navy the next
+     (socios) section opens on, so that seam dissolves with no colour cut. */
+  background: linear-gradient(180deg, #0c0c0c 0%, #0c0c0c 76%, #04193f 100%);
   padding: clamp(80px, 11vh, 140px) 0;
 }
+/* Two-column layout: big editorial title (with the silhouette centered behind it)
+   on the left, the three rows stacked vertically on the right. */
+.truthLayout {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(40px, 6vw, 90px);
+  margin-top: 44px;
+}
+.truthLeft {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+}
+/* Diffuse light-blue halo behind the silhouette. No hard edge — a radial glow
+   that fades to transparent, heavily blurred, appearing softly on hover. */
+.truthGlow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* A contained ellipse focused on the silhouette only: smaller than the column
+     and shorter than the section, so it lights the figure without reaching the
+     section edges or the neighbouring sections. Soft, fading to transparent. */
+  width: 92%;
+  height: clamp(440px, 74vh, 760px);
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse closest-side,
+    rgba(105, 165, 255, 0.5) 0%,
+    rgba(70, 130, 245, 0.3) 45%,
+    rgba(55, 115, 235, 0.12) 72%,
+    transparent 90%
+  );
+  filter: blur(56px);
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.truthLeft:hover .truthGlow {
+  opacity: 1;
+}
+/* Decorative silhouette, perfectly centered behind the title and a bit larger.
+   A symmetric vertical fade softens the top and bottom edges (so its mass stays
+   centered, not bottom-heavy) without covering the title. */
+.truthSil {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: clamp(500px, 88vh, 840px);
+  width: auto;
+  opacity: 0.55;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 20%,
+    #000 80%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 20%,
+    #000 80%,
+    transparent 100%
+  );
+}
 .truth .head {
-  max-width: 20ch;
-  margin-bottom: 54px;
+  position: relative;
+  z-index: 1;
 }
 .truth .head h2 {
-  font-size: clamp(2rem, 5vw, 4rem);
+  font-size: clamp(2.6rem, 6.5vw, 6rem);
+  line-height: 0.96;
+  letter-spacing: -0.02em;
   color: #fff;
 }
 .truth .head h2 .it {
   color: var(--dew);
 }
 .tgrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: rgba(208, 216, 226, 0.12);
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
+/* Three independent rounded cards; each expands smoothly on hover. */
 .tcard {
   background: #111418;
-  padding: 38px 32px;
-  transition: background 0.4s;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 28px 30px;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
 }
 .tcard:hover {
-  background: #161b21;
+  transform: scale(1.03);
+  background: #161b22;
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.45);
 }
 .tcard .tn {
   font-family: var(--serif);
@@ -874,190 +1043,335 @@
 /* =================== CAP 03 · filter =================== */
 .filter {
   position: relative;
-  background: linear-gradient(180deg, #111418, var(--navy));
-  padding: clamp(90px, 14vh, 170px) 0;
+  /* Start at the previous section's colour (#0c0c0c) so there is no seam at the
+     top, then fade smoothly into this section's dark navy. */
+  background: linear-gradient(180deg, #0c0c0c 0%, var(--navy) 60%);
+  padding: clamp(90px, 14vh, 170px) 0 clamp(40px, 5.5vh, 64px);
   text-align: center;
   overflow: hidden;
 }
+/* The 7/100 numbers as SVG so their outline can be drawn/erased on a loop.
+   The container width also defines the title width below (change 1). */
 .filter .big {
-  font-weight: 900;
-  font-size: clamp(5rem, 22vw, 20rem);
-  line-height: 0.8;
-  letter-spacing: -0.05em;
-  color: transparent;
-  -webkit-text-stroke: 1.5px rgba(208, 216, 226, 0.22);
+  width: min(660px, 94vw);
+  margin: 0 auto;
 }
-.filter .big em {
+.bigSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.bigText {
+  font-family: var(--font);
+  font-weight: 900;
+  font-size: 230px;
+  letter-spacing: -8px;
+  fill: none;
+  stroke: rgba(208, 216, 226, 0.38);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-dasharray: 6000;
+  stroke-dashoffset: 6000;
+  animation: bigDraw 7s ease-in-out infinite;
+}
+.bigSlash {
   font-family: var(--serif);
   font-style: italic;
   font-weight: 400;
-  -webkit-text-stroke: 0;
-  color: var(--dew);
+  fill: var(--dew);
+  stroke: none;
 }
+/* Outline is drawn (offset → 0), held, then erased (→ -length), forever. */
+@keyframes bigDraw {
+  0% {
+    stroke-dashoffset: 6000;
+  }
+  42% {
+    stroke-dashoffset: 0;
+  }
+  58% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -6000;
+  }
+}
+/* Stretch the title to the same width as the numbers above (change 1). */
 .filter h2 {
-  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-size: clamp(1.4rem, 2.9vw, 2.4rem);
+  line-height: 1.1;
   color: #fff;
-  margin: 10px auto 18px;
-  max-width: 18ch;
+  width: max-content;
+  max-width: 94vw;
+  margin: 18px auto 22px;
+  text-align: center;
+  white-space: nowrap;
+}
+/* Notably larger italic so it carries visual weight similar to the bold words. */
+.filter h2 .it {
+  color: var(--dew);
+  font-size: 1.6em;
 }
 .filter p {
-  max-width: 46ch;
+  max-width: min(760px, 92vw);
   margin: 0 auto;
   color: var(--dew);
   font-size: 1.05rem;
   line-height: 1.55;
 }
+/* Glassmorphism, matching the other buttons on the page. Fixed width so the
+   looping marquee text inside has a window to scroll within. */
 .inline-cta {
-  margin-top: 34px;
-  background: transparent;
+  position: relative;
+  overflow: hidden;
+  width: min(440px, 92%);
+  margin: 34px auto 0;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
   color: #fff;
-  border: 1.5px solid rgba(208, 216, 226, 0.4);
-  border-radius: 7px;
-  padding: 1em 2em;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 1em 1.4em;
   font-family: var(--font);
   font-size: 0.98rem;
   font-weight: 500;
   cursor: pointer;
-  transition: 0.25s;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease;
+}
+/* Soft reflection that glides left-to-right across the button, on a loop. */
+.inline-cta::after {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: 0;
+  width: 45%;
+  height: 140%;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.25) 50%,
+    transparent 100%
+  );
+  transform: skewX(-18deg) translateX(-220%);
+  animation: ctaSheen 3.8s ease-in-out infinite;
+}
+@keyframes ctaSheen {
+  0% {
+    transform: skewX(-18deg) translateX(-220%);
+  }
+  55%,
+  100% {
+    transform: skewX(-18deg) translateX(480%);
+  }
 }
 .inline-cta b {
   font-weight: 800;
 }
 .inline-cta:hover {
-  background: #fff;
-  color: var(--navy);
-  border-color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 /* =================== CAP 04 · guides =================== */
 .guides {
-  background: var(--navy);
-  padding: clamp(80px, 11vh, 140px) 0;
+  /* Opens on the navy that the truth section fades into (so that seam is
+     invisible) and fades to #0c0c0c at the bottom to meet "THE STANDARD". */
+  background: linear-gradient(
+    180deg,
+    #04193f 0%,
+    #04193f 70%,
+    #0c0c0c 100%
+  );
+  padding: clamp(48px, 7vh, 90px) 0;
 }
 .guides .head {
   margin-bottom: 50px;
+  text-align: center;
 }
 .guides .head h2 {
   font-size: clamp(1.8rem, 4vw, 3.2rem);
   color: #fff;
-  max-width: 20ch;
+  max-width: 24ch;
+  margin: 0 auto;
 }
 .guides .head h2 .it {
   color: var(--dew);
 }
 .team {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
 }
+/* Vertical portrait card: photo fills most of the top, name/role/description
+   below. On hover the photo zooms and expands to cover the whole card. All
+   three cards share the same size and structure. */
 .gcard {
-  background: rgba(252, 252, 252, 0.04);
-  border: 1px solid rgba(208, 216, 226, 0.16);
-  border-radius: 10px;
-  padding: 30px;
-  transition: 0.35s;
+  position: relative;
+  /* Above the travelling ball (z-index 40) so it passes behind the cards. */
+  z-index: 45;
+  aspect-ratio: 3 / 4;
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(160deg, #0a2a5e 0%, #061c40 52%, #04122c 100%);
+  border: 1px solid rgba(208, 216, 226, 0.14);
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
 }
+/* On hover the border lights up subtly (no back shadow). */
 .gcard:hover {
-  background: rgba(252, 252, 252, 0.07);
-  transform: translateY(-4px);
+  border-color: rgba(140, 185, 255, 0.75);
+  box-shadow: 0 0 16px rgba(90, 150, 255, 0.28);
 }
 .gphoto {
-  aspect-ratio: 16 / 10;
-  border-radius: 8px;
-  margin-bottom: 22px;
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64%;
+  z-index: 2;
   overflow: hidden;
   background: linear-gradient(150deg, #0a3a86, #04193f);
-  display: flex;
-  align-items: flex-end;
-  padding: 20px;
+  transition: height 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .gphoto img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  /* Fill the defined box, centered, without distorting the photo. */
   object-fit: cover;
-  object-position: center;
+  object-position: center top;
   display: block;
-  z-index: 0;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
-/* Bottom scrim so the overlaid name stays legible over the photo. */
 .gphoto::after {
   content: '';
   position: absolute;
   inset: 0;
-  z-index: 1;
   pointer-events: none;
-  background: linear-gradient(
-    to top,
-    rgba(7, 14, 28, 0.78) 0%,
-    rgba(7, 14, 28, 0.15) 38%,
-    transparent 65%
-  );
+  background: linear-gradient(to top, rgba(4, 18, 46, 0.5) 0%, transparent 32%);
 }
-.gphoto .ph {
+.gcard:hover .gphoto {
+  height: 100%;
+}
+.gcard:hover .gphoto img {
+  transform: scale(1.08);
+}
+/* Placeholder (Tom): keeps the layout with no photo. */
+.gph {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(208, 216, 226, 0.4);
-  font-size: 0.62rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  color: rgba(208, 216, 226, 0.28);
 }
-.gphoto .nm {
-  position: relative;
-  z-index: 2;
-  font-size: 1.6rem;
+.gph svg {
+  width: 32%;
+  height: auto;
+}
+.gbody {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 36%;
+  z-index: 1;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.gname {
+  font-size: clamp(1.2rem, 1.8vw, 1.55rem);
   font-weight: 900;
   color: #fff;
-  line-height: 0.95;
+  line-height: 1;
 }
-.gphoto .nm span {
+.gname span {
   font-weight: 300;
 }
 .grole {
-  font-size: 0.72rem;
+  font-size: 0.64rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--dew);
-  margin-bottom: 16px;
+  margin-top: 9px;
 }
-.glist {
-  list-style: none;
-  display: grid;
-  gap: 13px;
+.gdesc {
+  font-size: 0.76rem;
+  line-height: 1.4;
+  color: #aebac9;
+  margin-top: 9px;
 }
-.glist li {
-  padding-left: 22px;
-  position: relative;
-  color: #c4ccd8;
-  font-size: 0.95rem;
-  line-height: 1.45;
+
+/* =================== RIBBON (clubs/countries marquee) ===================
+   A minimalist editorial band between "THE STANDARD" and the testimonials.
+   Same navy as both neighbours so the colour stays continuous; thin top/bottom
+   rules delineate the strip. Text scrolls in a seamless loop (six identical
+   copies, translateX(-50%) lands copy 4 where copy 1 was). */
+/* Navy band filling the gap between "THE STANDARD" and the testimonials. Both
+   sections meet at this same navy (#072c68), so the fill blends them with no
+   black gap or colour cut. Its padding gives the generous space and centres the
+   ribbon within it as a separator. */
+.ribbon-band {
+  background: var(--navy);
+  padding: clamp(54px, 8vh, 104px) 0;
 }
-.glist li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 8px;
-  width: 7px;
-  height: 7px;
-  background: var(--dew);
-  border-radius: 50%;
+.ribbon {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  overflow: hidden;
+  background: var(--navy);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
-.glist strong {
-  color: #fff;
-  font-weight: 600;
+.ribbon-track {
+  display: flex;
+  flex: none;
+  width: max-content;
+  animation: ribbonMarquee 42s linear infinite;
+}
+.ribbon-item {
+  flex: none;
+  white-space: nowrap;
+  font-family: var(--font);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dew);
+}
+/* Separator between repeated copies, a touch airier than the inline dots. */
+.ribbon-dot {
+  margin: 0 1.1em;
+  color: rgba(208, 216, 226, 0.5);
+}
+@keyframes ribbonMarquee {
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* =================== CAP 05 · voices =================== */
 .voices {
-  background: linear-gradient(180deg, var(--navy), var(--dew));
-  padding: clamp(90px, 13vh, 160px) 0;
+  /* Hold the navy (= the colour the guides section ends on) at the top so the
+     seam blends with no visible cut, then fade smoothly to dew. */
+  background: linear-gradient(
+    180deg,
+    var(--navy) 0%,
+    var(--navy) 12%,
+    var(--dew) 100%
+  );
+  padding: clamp(40px, 5.5vh, 68px) 0 clamp(90px, 13vh, 160px);
   position: relative;
   overflow: hidden;
 }
@@ -1066,24 +1380,32 @@
   position: relative;
   z-index: 2;
 }
+/* Testimonial cards sit above the travelling ball (z-index 40) so it passes
+   behind them. */
+.voices .vmarquee {
+  z-index: 45;
+}
 .voices .head {
   text-align: center;
+  margin-top: clamp(14px, 3vh, 40px);
   margin-bottom: 20px;
 }
 .voices .head h2 {
   font-size: clamp(2rem, 5vw, 3.6rem);
+  font-weight: 700;
   color: #fff;
 }
 .voices .head h2 .it {
   color: #fff;
 }
 .voices .head p {
-  color: rgba(252, 252, 252, 0.8);
-  margin-top: 12px;
+  color: rgba(252, 252, 252, 0.85);
+  margin-top: 14px;
+  font-size: clamp(1.05rem, 1.5vw, 1.25rem);
 }
 .vmarquee {
   position: relative;
-  margin-top: 30px;
+  margin-top: clamp(50px, 7vh, 84px);
 }
 .vrow {
   display: flex;
@@ -1096,7 +1418,8 @@
   animation-direction: reverse;
   margin-top: 20px;
 }
-.voices:hover .vrow {
+/* Hovering a card pauses its row so it can be read. */
+.vrow:has(.vcard:hover) {
   animation-play-state: paused;
 }
 @keyframes vscroll {
@@ -1107,19 +1430,29 @@
     transform: translateX(-50%);
   }
 }
+/* Dark-blue glassmorphism: semitransparent navy with blur and a subtle border. */
 .vcard {
+  position: relative;
   width: 330px;
   flex-shrink: 0;
-  background: rgba(252, 252, 252, 0.92);
-  border-radius: 12px;
+  background: rgba(8, 24, 56, 0.5);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
   padding: 26px;
-  box-shadow: 0 20px 50px rgba(7, 44, 104, 0.18);
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Grows smoothly on hover (the row pauses via .vrow:has(.vcard:hover)). */
+.vcard:hover {
+  transform: scale(1.06);
+  z-index: 2;
 }
 .vcard p {
   font-family: var(--serif);
   font-style: italic;
   font-size: 1.1rem;
-  color: var(--black);
+  color: #eaf0fb;
   line-height: 1.45;
 }
 .vcard .who {
@@ -1131,36 +1464,50 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--navy);
+  color: var(--dew);
 }
 
 /* =================== CAP 06 · close =================== */
 .close {
-  background: var(--bg);
+  /* The blue (dew) holds long, then fades smoothly to the light page colour at
+     the very bottom — no grey band in between. */
+  background: linear-gradient(
+    180deg,
+    var(--dew) 0%,
+    var(--dew) 38%,
+    var(--bg) 100%
+  );
   color: var(--black);
-  padding: clamp(90px, 14vh, 170px) 0 0;
+  /* A more compact section; the image is scaled to fit this height (contain) so
+     it is never cropped. */
+  min-height: clamp(460px, 60vh, 660px);
+  padding: clamp(76px, 11vh, 140px) 0 clamp(50px, 7vh, 84px);
   text-align: center;
   position: relative;
   overflow: hidden;
 }
+/* Crowd line-art (publico.png): the complete image fitted into the (shorter)
+   section without cropping, anchored to the top, faint at 40%, behind content. */
 .crowd-close {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  inset: 0;
   z-index: 0;
+  opacity: 0.05;
   pointer-events: none;
+  overflow: hidden;
   line-height: 0;
 }
-.crowd-close svg {
+/* Full width, shifted up so the crowd sits higher in the section; the empty top
+   of the artwork is clipped, and any excess is clipped at the bottom. */
+.crowd-close img {
   width: 100%;
   height: auto;
+  margin-top: -15vw;
   display: block;
 }
 .close .wrap {
   position: relative;
   z-index: 2;
-  padding-bottom: clamp(120px, 18vh, 200px);
 }
 .close .chapnum {
   color: #8a96a6;
@@ -1170,95 +1517,330 @@
 }
 .close h2 {
   font-size: clamp(2.4rem, 6vw, 5rem);
-  max-width: 16ch;
-  margin: 0 auto 20px;
+  line-height: 0.98;
+  max-width: 20ch;
+  margin: 0 auto 22px;
   color: var(--black);
 }
+/* "to seen." — prominent serif italic on its own line for clear hierarchy,
+   with a soft highlight that sweeps left-to-right across the letters. */
 .close h2 .it {
-  color: var(--navy);
+  display: block;
+  font-size: 1.18em;
+  /* Navy comes from the gradient base; text itself is transparent so the
+     clipped gradient (and its sweeping highlight) shows in every browser. */
+  color: transparent;
+  background: linear-gradient(
+    90deg,
+    var(--navy) 0%,
+    var(--navy) 42%,
+    #ffffff 50%,
+    var(--navy) 58%,
+    var(--navy) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: itShine 4s ease-in-out infinite;
+}
+@keyframes itShine {
+  0% {
+    background-position: 200% center;
+  }
+  60%,
+  100% {
+    background-position: -200% center;
+  }
 }
 .close p {
   color: #5b6b80;
-  max-width: 40ch;
+  max-width: min(680px, 90vw);
   margin: 0 auto 36px;
   font-size: 1.08rem;
   line-height: 1.5;
 }
+/* Glassmorphism CTA pill — single label, hugging its content so the button is
+   narrow; centred by the section's text-align. */
 .close .cta {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  background: var(--navy);
-  color: #fff;
-  font-weight: 800;
+  gap: 10px;
+  max-width: 92%;
+  /* Pure glassmorphism: no solid fill — just blur and a subtle visible border. */
+  background: transparent;
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(150%);
+  color: var(--navy);
+  font-family: var(--font);
+  font-weight: 700;
   font-size: 0.92rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  padding: 1.1em 2.4em;
-  border-radius: 4px;
-  text-decoration: none;
-  border: none;
+  padding: 1.05em 2em;
+  border-radius: 999px;
+  border: 1px solid rgba(7, 44, 104, 0.4);
   cursor: pointer;
-  transition: 0.3s;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease;
 }
 .close .cta:hover {
-  background: var(--navy2);
-  gap: 18px;
+  background: rgba(7, 44, 104, 0.06);
+  border-color: rgba(7, 44, 104, 0.62);
 }
 
 /* FOOTER */
+/* Editorial footer: a #191919 base lifted by two soft navy glows (a strong one
+   pooling behind the logo, a quieter one in the opposite corner) for diagonal
+   depth, finished with a thin gradient hairline along the top edge. */
 .foot {
-  background: var(--black);
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  background: #191919;
   color: #cfd6e0;
-  padding: 54px 0 30px;
+  padding: clamp(80px, 11vh, 134px) 0 42px;
+  /* Curved top edge: the footer reads as a card. It overlaps the section above
+     by the corner radius so the rounded notches reveal that lighter section. */
+  border-radius: 32px 32px 0 0;
+  margin-top: -32px;
+  overflow: hidden;
+}
+/* The two navy glows live on an oversized layer that drifts and breathes very
+   slowly, so the colour seems to move softly across the dark base. */
+.foot::before {
+  content: '';
+  position: absolute;
+  inset: -15%;
+  z-index: -1;
+  background:
+    radial-gradient(
+      58% 70% at 15% 5%,
+      rgba(15, 62, 138, 0.55) 0%,
+      rgba(15, 62, 138, 0) 58%
+    ),
+    radial-gradient(
+      52% 65% at 92% 100%,
+      rgba(9, 44, 104, 0.45) 0%,
+      rgba(9, 44, 104, 0) 55%
+    );
+  animation: footGlowDrift 19s ease-in-out infinite;
+}
+@keyframes footGlowDrift {
+  0%,
+  100% {
+    transform: translate(-2%, -1.5%) scale(1);
+  }
+  50% {
+    transform: translate(3%, 2%) scale(1.08);
+  }
 }
 .foot .wrap {
+  position: relative;
+  z-index: 1;
+  width: min(1280px, 92vw);
+  margin: 0 auto;
+}
+/* The 3D football (balon-futbol.glb) rolls back and forth along the bottom of
+   the footer — below the cards, so it never hits them — with the occasional
+   small hop. Horizontal and vertical run on separate, differently-timed loops
+   so the hops land at varying points (a pseudo-random feel). */
+@property --ballx {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+@property --bally {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+.foot-ball {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  width: clamp(38px, 4.2vw, 58px);
+  aspect-ratio: 1 / 1;
+  z-index: 0;
+  pointer-events: none;
+  transform: translate(calc(-50% + var(--ballx)), var(--bally));
+  animation:
+    footBallX 12s ease-in-out infinite alternate,
+    footBallY 7s ease-in-out infinite;
+}
+@keyframes footBallX {
+  from {
+    --ballx: -165px;
+  }
+  to {
+    --ballx: 165px;
+  }
+}
+@keyframes footBallY {
+  0%,
+  13%,
+  21%,
+  44%,
+  50%,
+  70%,
+  78%,
+  100% {
+    --bally: 0px;
+  }
+  17% {
+    --bally: -22px;
+  }
+  47% {
+    --bally: -13px;
+  }
+  74% {
+    --bally: -25px;
+  }
+}
+/* Top band: enlarged wordmark on the left, navigation columns on the right,
+   distributed across the full width with generous breathing room. */
+.foot-top {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  gap: 50px;
   flex-wrap: wrap;
-  gap: 30px;
+  padding-bottom: clamp(50px, 8vh, 92px);
 }
-.foot .mark {
-  font-size: 1.4rem;
-  color: #fff;
+.foot-logo {
+  height: clamp(42px, 5vw, 60px);
+  width: auto;
+  display: block;
 }
-.foot .c {
-  font-weight: 300;
+.foot-nav {
+  display: flex;
+  gap: clamp(50px, 8vw, 120px);
+  flex-wrap: wrap;
 }
-.foot .w {
-  font-weight: 900;
+/* Column labels — small, bold, wide-tracked uppercase eyebrows. */
+/* Glassmorphism link cards, stacked — no numbering. Each card carries a slightly
+   different blue tonality and its own subtle offset/tilt, for a dynamic but
+   intentional, editorial arrangement. */
+/* Registered so they interpolate: --fy drives the float, the hover vars are
+   transitioned directly (instead of transitioning `transform`, which would
+   fight the float animation). */
+@property --fy {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
 }
-.foot .serif {
-  font-family: var(--serif);
-  font-style: italic;
-  color: var(--dew);
-  margin-top: 8px;
+@property --hx {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
 }
-.foot-col h4 {
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--dew);
-  margin-bottom: 13px;
+@property --hy {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+@property --sc {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 1;
+}
+@keyframes footFloat {
+  0%,
+  100% {
+    --fy: 0px;
+  }
+  50% {
+    --fy: -10px;
+  }
 }
 .foot-col a {
   display: block;
-  color: #9aa6b6;
+  padding: 0.66em 1.1em;
+  border-radius: 13px;
+  background: rgba(20, 70, 146, 0.16);
+  -webkit-backdrop-filter: blur(11px) saturate(150%);
+  backdrop-filter: blur(11px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #eaeff6;
   text-decoration: none;
-  font-size: 0.9rem;
-  margin-bottom: 8px;
-  transition: 0.2s;
+  text-align: center;
+  font-size: clamp(0.96rem, 1.15vw, 1.14rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin-bottom: 42px;
+  /* Resting position (--tx/--ty) + hover nudge/scale (--hx/--hy/--sc) + a
+     continuous float (--fy). No rotation — the cards stay perfectly straight. */
+  transform: translate(
+      calc(var(--tx, 0px) + var(--hx, 0px)),
+      calc(var(--ty, 0px) + var(--hy, 0px) + var(--fy, 0px))
+    )
+    scale(var(--sc, 1));
+  transition:
+    --hx 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    --hy 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    --sc 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s ease,
+    filter 0.3s ease,
+    box-shadow 0.3s ease;
+  animation: footFloat 4.6s ease-in-out infinite;
 }
+.foot-col a:last-child {
+  margin-bottom: 0;
+}
+/* Each card: a slightly different blue + its own casual horizontal offset and
+   tilt — a loose stack, but intentional. */
+.foot-col:nth-child(1) a:nth-of-type(1) {
+  background: rgba(15, 58, 132, 0.18);
+  --tx: -32px;
+  --ty: -7px;
+  animation-duration: 4.3s;
+  animation-delay: -0.7s;
+}
+.foot-col:nth-child(1) a:nth-of-type(2) {
+  background: rgba(28, 82, 162, 0.15);
+  --tx: 24px;
+  --ty: 9px;
+  animation-duration: 5.4s;
+  animation-delay: -2.1s;
+}
+.foot-col:nth-child(2) a:nth-of-type(1) {
+  background: rgba(21, 72, 150, 0.16);
+  --tx: 36px;
+  --ty: -5px;
+  animation-duration: 4.9s;
+  animation-delay: -1.3s;
+}
+.foot-col:nth-child(2) a:nth-of-type(2) {
+  background: rgba(33, 90, 172, 0.14);
+  --tx: -20px;
+  --ty: 12px;
+  animation-duration: 5.8s;
+  animation-delay: -0.4s;
+}
+/* Hover: the card lifts, slides a touch and grows, smoothly. */
 .foot-col a:hover {
-  color: #fff;
+  --hx: 7px;
+  --hy: -6px;
+  --sc: 1.07;
+  border-color: rgba(150, 188, 255, 0.6);
+  filter: brightness(1.18);
+  box-shadow: 0 12px 32px rgba(18, 66, 142, 0.44);
 }
+/* Stagger the second stack so the two are not perfectly aligned. */
+.foot-nav .foot-col:nth-child(2) {
+  margin-top: 18px;
+}
+/* Bottom rule: copyright and credit pushed to opposite edges. */
 .foot-bot {
-  width: min(1200px, 92vw);
-  margin: 36px auto 0;
-  border-top: 1px solid #2a2a2a;
-  padding-top: 20px;
-  font-size: 0.8rem;
-  color: #6b7585;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding-top: 26px;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: #8fa0b5;
 }
 
 /* reveals */
@@ -1343,6 +1925,22 @@
     grid-template-columns: 1fr;
     gap: 30px;
   }
+  .cardcol {
+    transform: none;
+  }
+  .team {
+    grid-template-columns: 1fr;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+  .truthLayout {
+    grid-template-columns: 1fr;
+    gap: 34px;
+  }
+  .truthSil {
+    height: clamp(220px, 40vh, 340px);
+    opacity: 0.55;
+  }
   .stage {
     height: auto;
     min-height: 0;
@@ -1404,7 +2002,9 @@
 /* ===== BALL that follows the scroll ===== */
 .ball {
   position: fixed;
-  z-index: 90;
+  /* Below the partner cards (z-index 45) so it passes behind them, but still
+     above the section content so it stays visible elsewhere. */
+  z-index: 40;
   width: 62px;
   height: 62px;
   left: 0;

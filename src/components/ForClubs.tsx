@@ -4,6 +4,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {Link} from '@/i18n/navigation';
 import {Ball3D} from './Ball3D';
+import {SiteHeader} from './SiteHeader';
 import styles from './ForClubs.module.css';
 
 /* =========================================================
@@ -636,18 +637,10 @@ export function ForClubs() {
         </svg>
       </div>
 
-      {/* NAV */}
-      <nav className={cx('nav')}>
-        <Link href="/" className={cx('logo')} aria-label="Clearway Performance Group">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/Logotipos/clearway-white.svg" alt="Clearway Performance Group" />
-        </Link>
-        <div className={cx('links')}>
-          <Link href="/for-clubs">For Clubs</Link>
-          <Link href="/for-players">For Players</Link>
-          <Link href="/about">About</Link>
-        </div>
-      </nav>
+      {/* NAV — shared header. On for-clubs the logo and menu keep their normal
+          padding/position on scroll (no floating-card collapse, no logo
+          centering); only the glassmorphism background fades in. */}
+      <SiteHeader floatingOnScroll={false} />
 
       {/* HERO */}
       <section ref={heroRef} className={cx('hero')} id="hero">

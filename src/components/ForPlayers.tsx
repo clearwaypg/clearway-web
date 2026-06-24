@@ -1,9 +1,11 @@
 'use client';
 
 import {useEffect, useRef, useState} from 'react';
+import {useLocale} from 'next-intl';
 
 import {Link} from '@/i18n/navigation';
 import {Ball3D} from './Ball3D';
+import {SiteHeader} from './SiteHeader';
 import styles from './ForPlayers.module.css';
 
 /* Join scoped module classes by their guide names, dropping falsy values. */
@@ -21,7 +23,11 @@ const STEP_NAMES = [
   'Your footage'
 ];
 
+const RIBBON_TEXT =
+  'Acceso a más de 100 clubes · Inglaterra · España · Francia · Italia · Alemania · Austria · Bélgica · Hungría';
+
 export function ForPlayers() {
+  const locale = useLocale();
   const [playing, setPlaying] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [step, setStep] = useState(0);
@@ -415,29 +421,15 @@ export function ForPlayers() {
         <Ball3D />
       </div>
 
-      {/* NAV */}
-      <nav className={cx('nav')}>
-        <Link href="/" className={cx('logo')} aria-label="Clearway Performance Group">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/Logotipos/clearway-white.svg" alt="Clearway Performance Group" />
-        </Link>
-        <button type="button" className={cx('nav-cta')} onClick={openModal}>
-          Build my profile →
-        </button>
-      </nav>
+      {/* NAV — shared header with a glassmorphism "Build my profile" pill in
+          place of the menu (opens the profile modal). */}
+      <SiteHeader cta={{label: 'Build my profile →', onClick: openModal}} />
 
       {/* ===== CAP 01 · HERO ===== */}
       <section className={cx('hero')} id="hero">
         <div className={cx('hero-bg')} aria-hidden="true" />
-        <div className={cx('chapter')}>
-          <b>01</b> &nbsp;The invisible player
-        </div>
         <div className={cx('stage')}>
-          <div className={cx('bgword')}>Seen</div>
-          <div className={cx('player-slot')}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/silueta_atras.png" alt="" aria-hidden="true" />
-          </div>
+          <div className={cx('chapter')}>The invisible player</div>
           <div className={cx('headline')}>
             <span className={cx('hl', 'hl1', 'reveal-line')}>
               <span>
@@ -467,31 +459,71 @@ export function ForPlayers() {
           </div>
         </div>
         <div className={cx('cardcol', 'anim', 'd4')}>
-          <div className={cx('fifa')}>
-            <div className={cx('fifa-top')}>
-              <div className={cx('fifa-rating')}>CW</div>
-              <div className={cx('fifa-pos')}>{u(card.pos, 'POS')}</div>
-            </div>
-            <div className={cx('fifa-logo')}>
-              <span className={cx('c')}>CLEAR</span>WAY
-            </div>
-            <div className={cx('fifa-slot')}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/silueta_dos.png" alt="" aria-hidden="true" />
-            </div>
-            <div className={cx('fifa-name')}>{u(card.name, 'YOUR NAME')}</div>
-            <div className={cx('fifa-meta')}>
-              <span>
-                <b>{u(card.eu, '—')}</b>EU PASS
-              </span>
-              <span>
-                <b>{u(card.age, '—')}</b>AGE CAT
-              </span>
+          <div className={cx('pcard-outer')}>
+            <div className={cx('pcard')}>
+              <div className={cx('pcard-glow')}></div>
+              <div className={cx('pcard-stadium')}></div>
+              <div className={cx('pcard-wm')}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/silueta_dos.png" alt="" aria-hidden="true" />
+              </div>
+              <div className={cx('pcard-wm-center')}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo.png" alt="" aria-hidden="true" />
+              </div>
+              <div className={cx('pcard-player')}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/silueta_dos.png" alt="" aria-hidden="true" />
+              </div>
+              <div className={cx('pcard-shield')}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo_2.png" alt="Clearway" />
+              </div>
+              <div className={cx('pcard-brand')}><span>CLEAR</span>WAY</div>
+              <div className={cx('pcard-left')}>
+                <div id="cPos" style={{display: 'none'}}></div><div className={cx('pcard-field')}><div className={cx('pcard-fld-bot')}></div><div className={cx('pcard-fld-circle')}></div><div className={cx('pcard-dot')} style={{top: '42%', left: '38%'}}></div></div>
+              </div>
+              <div className={cx('pcard-name-wrap')}>
+                <input
+                  type="text"
+                  className={cx('pcard-name')}
+                  id="cName"
+                  value={card.name}
+                  onChange={(e) =>
+                    setCard((c) => ({...c, name: e.target.value}))
+                  }
+                  placeholder={
+                    locale === 'es' ? 'Escribe tu nombre' : 'Write your name'
+                  }
+                  aria-label={locale === 'es' ? 'Tu nombre' : 'Your name'}
+                />
+              </div>
+              <div className={cx('pcard-footer')}>
+                <div className={cx('pcard-fc')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z"/></svg><div className={cx('pcard-fc-lbl')}>EU PASS</div><div className={cx('pcard-fc-val')} id="cEu">{u(card.eu, '—')}</div></div>
+                <div className={cx('pcard-fc')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><div className={cx('pcard-fc-lbl')}>AGE CAT</div><div className={cx('pcard-fc-val')} id="cAge">{u(card.age, '—')}</div></div>
+                <div className={cx('pcard-fc')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg><div className={cx('pcard-fc-lbl')}>POSITION</div><div className={cx('pcard-fc-val')}></div></div>
+              </div>
             </div>
           </div>
-          <button type="button" className={cx('card-cta')} onClick={openModal}>
-            This could be your card. <b>Build it →</b>
-          </button>
+          <div className={cx('card-cta-wrap')}>
+            <span className={cx('card-cta-halo')} aria-hidden="true" />
+            <button
+              type="button"
+              className={cx('card-cta')}
+              onClick={openModal}
+              aria-label="This could be your card. Build it"
+            >
+              <span className={cx('card-cta-text')} aria-hidden="true">
+                <span className={cx('card-cta-track')}>
+                  {[0, 1, 2, 3, 4, 5].map((i) => (
+                    <span className={cx('card-cta-item')} key={i}>
+                      This could be your card. <b>Build it →</b>
+                    </span>
+                  ))}
+                </span>
+              </span>
+            </button>
+          </div>
           <div className={cx('card-note')}>
             Free to build · Players from Mexico and the world
           </div>
@@ -505,77 +537,62 @@ export function ForPlayers() {
       {/* ===== CAP 02 · TRUTH ===== */}
       <section className={cx('truth')} ref={truthRef}>
         <div className={cx('wrap')}>
-          <div className={cx('chapnum', 'reveal', 'light')}>
-            <b>02</b> &nbsp;The honest part
-          </div>
-          <div className={cx('head', 'reveal')}>
-            <h2 className={cx('disp')}>
-              The bit <span className={cx('it')}>others skip.</span>
-            </h2>
-          </div>
-          <div className={cx('tgrid')}>
-            <div className={cx('tcard', 'reveal')} data-d="1">
-              <div className={cx('tn')}>i</div>
-              <h3>Your trial is real</h3>
-              <p>
-                Some charge you to stand on a pitch and hope someone watches.{' '}
-                <strong>
-                  Yours is with a club that already said they want to see you.
-                </strong>
-              </p>
+          <div className={cx('truthLayout')}>
+            <div className={cx('truthLeft')}>
+              {/* Soft blue halo focused on the silhouette, fading in on hover. */}
+              <div className={cx('truthGlow')} aria-hidden="true" />
+              {/* Decorative silhouette centered behind the title. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                className={cx('truthSil')}
+                src="/silueta_atras.png"
+                alt=""
+                aria-hidden="true"
+              />
+              <div className={cx('head', 'reveal')}>
+                <h2 className={cx('disp')}>
+                  The bit <span className={cx('it')}>others skip.</span>
+                </h2>
+              </div>
             </div>
-            <div className={cx('tcard', 'reveal')} data-d="2">
-              <div className={cx('tn')}>ii</div>
-              <h3>What it costs, plainly</h3>
-              <p>
-                Building your profile is free.{' '}
-                <strong>The three month evaluation has a cost</strong>, written
-                into a Clearway contract. You cover your video and travel.
-              </p>
+            <div className={cx('tgrid')}>
+              <div className={cx('tcard', 'reveal')} data-d="1">
+                <h3>Your trial is real</h3>
+                <p>
+                  Some charge you to stand on a pitch and hope someone watches.{' '}
+                  <strong>
+                    Yours is with a club that already said they want to see you.
+                  </strong>
+                </p>
+              </div>
+              <div className={cx('tcard', 'reveal')} data-d="2">
+                <h3>What it costs, plainly</h3>
+                <p>
+                  Building your profile is free.{' '}
+                  <strong>The three month evaluation has a cost</strong>, written
+                  into a Clearway contract. You cover your video and travel.
+                </p>
+              </div>
+              <div className={cx('tcard', 'reveal')} data-d="3">
+                <h3>What we promise</h3>
+                <p>
+                  We guarantee the <strong>trial, not the signing</strong>.
+                  Nobody can promise a contract honestly. What we promise is the
+                  door, and the work permit and GBE paperwork for England.
+                </p>
+              </div>
             </div>
-            <div className={cx('tcard', 'reveal')} data-d="3">
-              <div className={cx('tn')}>iii</div>
-              <h3>What we promise</h3>
-              <p>
-                We guarantee the <strong>trial, not the signing</strong>. Nobody
-                can promise a contract honestly. What we promise is the door, and
-                the work permit and GBE paperwork for England.
-              </p>
-            </div>
           </div>
-        </div>
-      </section>
-
-      {/* ===== CAP 03 · FILTER ===== */}
-      <section className={cx('filter')}>
-        <div className={cx('wrap')}>
-          <div className={cx('chapnum', 'reveal', 'light')}>
-            <b>03</b> &nbsp;The standard
-          </div>
-          <div className={cx('big', 'reveal')}>
-            7<em>/</em>100
-          </div>
-          <h2 className={cx('reveal')}>Seven of every hundred go through.</h2>
-          <p className={cx('reveal')}>
-            That number is low on purpose. It is not us being difficult, it is us
-            being honest about what professional football actually asks for. We
-            would rather tell you the truth early than waste your summer.
-          </p>
-          <button type="button" className={cx('inline-cta', 'reveal')} onClick={openModal}>
-            Think you are one of the seven? <b>Show us →</b>
-          </button>
         </div>
       </section>
 
       {/* ===== CAP 04 · GUIDES ===== */}
       <section className={cx('guides')}>
         <div className={cx('wrap')}>
-          <div className={cx('chapnum', 'reveal', 'light')}>
-            <b>04</b> &nbsp;You are not alone
-          </div>
           <div className={cx('head', 'reveal')}>
             <h2 className={cx('disp')}>
-              Not a form in a folder.{' '}
+              Not a <span className={cx('thin')}>form in a folder.</span>
+              <br />
               <span className={cx('it')}>People who have done this.</span>
             </h2>
           </div>
@@ -584,68 +601,107 @@ export function ForPlayers() {
               <div className={cx('gphoto')}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/james.png" alt="James Fox" />
-                <div className={cx('nm')}>
-                  <span>James</span>
-                  <br />
-                  Fox.
-                </div>
               </div>
-              <div className={cx('grole')}>Founder and CEO</div>
-              <ul className={cx('glist')}>
-                <li>
-                  <strong>
-                    Registered with The Football Association in Talent
-                    Identification.
-                  </strong>
-                </li>
-                <li>
-                  <strong>Access to more than 100 clubs</strong> across eight
-                  countries in England and Europe. FIFA licensed agents available.
-                </li>
-                <li>
-                  <strong>The work permit and GBE for England, handled.</strong> We
-                  do all the paperwork.
-                </li>
-                <li>
-                  <strong>The day you walk into a club, he is there too.</strong>
-                </li>
-              </ul>
+              <div className={cx('gbody')}>
+                <div className={cx('gname')}>
+                  <span>James</span> Fox.
+                </div>
+                <div className={cx('grole')}>Founder and CEO</div>
+                <p className={cx('gdesc')}>
+                  FA-registered in Talent Identification, with access to 100+
+                  clubs across England and Europe.
+                </p>
+              </div>
             </div>
             <div className={cx('gcard', 'reveal')} data-d="2">
               <div className={cx('gphoto')}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/Cyril.png" alt="Cyril Rool" />
-                <div className={cx('nm')}>
-                  <span>Cyril</span>
-                  <br />
-                  Rool.
-                </div>
               </div>
-              <div className={cx('grole')}>Director of European Football</div>
-              <ul className={cx('glist')}>
-                <li>
-                  <strong>Over 15 years in Ligue 1</strong> with RC Lens, Girondins
-                  de Bordeaux, OGC Nice and Olympique de Marseille.
-                </li>
-                <li>
-                  <strong>France Under 21 international.</strong>
-                </li>
-                <li>
-                  <strong>Has represented and placed several players</strong> in
-                  Europe and Mexico.
-                </li>
-              </ul>
+              <div className={cx('gbody')}>
+                <div className={cx('gname')}>
+                  <span>Cyril</span> Rool.
+                </div>
+                <div className={cx('grole')}>Director of European Football</div>
+                <p className={cx('gdesc')}>
+                  Over 15 years in Ligue 1 with Lens, Bordeaux, Nice and
+                  Marseille. France U21 international.
+                </p>
+              </div>
+            </div>
+            <div className={cx('gcard', 'reveal')} data-d="3">
+              <div className={cx('gphoto')}>
+                <span className={cx('gph')} aria-hidden="true">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.3"
+                    strokeLinecap="round"
+                  >
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 21c0-4.2 3.6-7 8-7s8 2.8 8 7" />
+                  </svg>
+                </span>
+              </div>
+              <div className={cx('gbody')}>
+                <div className={cx('gname')}>Tom.</div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* ===== CAP 03 · FILTER ===== */}
+      <section className={cx('filter')}>
+        <div className={cx('wrap')}>
+          <div className={cx('big', 'reveal')}>
+            <svg className={cx('bigSvg')} viewBox="0 0 660 300" aria-hidden="true">
+              <text x="330" y="226" textAnchor="middle" className={cx('bigText')}>
+                7
+                <tspan className={cx('bigSlash')} dx="-6">
+                  /
+                </tspan>
+                <tspan dx="50">100</tspan>
+              </text>
+            </svg>
+          </div>
+          <h2 className={cx('disp', 'reveal')}>
+            Seven of <span className={cx('thin')}>every hundred</span>{' '}
+            <span className={cx('it')}>go through.</span>
+          </h2>
+          <p className={cx('reveal')}>
+            That number is low on purpose. It is not us being difficult, it is us
+            being honest about what professional football actually asks for. We
+            would rather tell you the truth early than waste your summer.
+          </p>
+          <button
+            type="button"
+            className={cx('inline-cta', 'reveal')}
+            onClick={openModal}
+          >
+            Think you are one of the seven? <b>Show us →</b>
+          </button>
+        </div>
+      </section>
+
+      {/* ===== RIBBON · scrolling clubs/countries band ===== */}
+      <div className={cx('ribbon-band')}>
+        <div className={cx('ribbon')} aria-hidden="true">
+          <div className={cx('ribbon-track')}>
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <span className={cx('ribbon-item')} key={i}>
+                {RIBBON_TEXT}
+                <span className={cx('ribbon-dot')}>·</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* ===== CAP 05 · VOICES ===== */}
       <section className={cx('voices')} ref={voicesRef}>
         <div className={cx('wrap')}>
-          <div className={cx('chapnum', 'reveal')} style={{color: 'rgba(252,252,252,.7)'}}>
-            <b style={{color: '#fff'}}>05</b> &nbsp;The ones already living it
-          </div>
           <div className={cx('head', 'reveal')}>
             <h2 className={cx('disp')}>
               Real voices. <span className={cx('it')}>Real pathways.</span>
@@ -675,68 +731,7 @@ export function ForPlayers() {
 
       {/* ===== CAP 06 · CLOSE ===== */}
       <section className={cx('close')}>
-        <div className={cx('crowd-close')} aria-hidden="true">
-          <svg
-            viewBox="0 0 1400 240"
-            preserveAspectRatio="xMidYMax slice"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <g fill="var(--navy)">
-              <g opacity=".28">
-                <path d="M20 240 L20 150 Q20 130 38 130 Q56 130 56 150 L56 240 Z M28 130 L16 100 M48 130 L60 98" />
-                <circle cx="38" cy="116" r="11" />
-                <path d="M120 240 L120 158 Q120 138 138 138 Q156 138 156 158 L156 240 Z M128 138 L116 110 M148 138 L160 108" />
-                <circle cx="138" cy="124" r="10" />
-                <path d="M230 240 L230 150 Q230 130 248 130 Q266 130 266 150 L266 240 Z M238 130 L226 100 M258 130 L270 98" />
-                <circle cx="248" cy="116" r="11" />
-                <path d="M340 240 L340 160 Q340 140 358 140 Q376 140 376 160 L376 240 Z M348 140 L336 112 M368 140 L380 110" />
-                <circle cx="358" cy="126" r="10" />
-                <path d="M450 240 L450 150 Q450 130 468 130 Q486 130 486 150 L486 240 Z M458 130 L446 100 M478 130 L490 98" />
-                <circle cx="468" cy="116" r="11" />
-                <path d="M560 240 L560 158 Q560 138 578 138 Q596 138 596 158 L596 240 Z M568 138 L556 110 M588 138 L600 108" />
-                <circle cx="578" cy="124" r="10" />
-                <path d="M670 240 L670 150 Q670 130 688 130 Q706 130 706 150 L706 240 Z M678 130 L666 100 M698 130 L710 98" />
-                <circle cx="688" cy="116" r="11" />
-                <path d="M780 240 L780 160 Q780 140 798 140 Q816 140 816 160 L816 240 Z M788 140 L776 112 M808 140 L820 110" />
-                <circle cx="798" cy="126" r="10" />
-                <path d="M890 240 L890 150 Q890 130 908 130 Q926 130 926 150 L926 240 Z M898 130 L886 100 M918 130 L930 98" />
-                <circle cx="908" cy="116" r="11" />
-                <path d="M1000 240 L1000 158 Q1000 138 1018 138 Q1036 138 1036 158 L1036 240 Z M1008 138 L996 110 M1028 138 L1040 108" />
-                <circle cx="1018" cy="124" r="10" />
-                <path d="M1110 240 L1110 150 Q1110 130 1128 130 Q1146 130 1146 150 L1146 240 Z M1118 130 L1106 100 M1138 130 L1150 98" />
-                <circle cx="1128" cy="116" r="11" />
-                <path d="M1220 240 L1220 160 Q1220 140 1238 140 Q1256 140 1256 160 L1256 240 Z M1228 140 L1216 112 M1248 140 L1260 110" />
-                <circle cx="1238" cy="126" r="10" />
-                <path d="M1330 240 L1330 150 Q1330 130 1348 130 Q1366 130 1366 150 L1366 240 Z M1338 130 L1326 100 M1358 130 L1370 98" />
-                <circle cx="1348" cy="116" r="11" />
-              </g>
-              <path d="M70 240 L70 140 Q70 116 92 116 Q114 116 114 140 L114 240 Z M80 116 L64 76 M104 116 L120 74" />
-              <circle cx="92" cy="96" r="15" />
-              <path d="M200 240 L200 152 Q200 128 222 128 Q244 128 244 152 L244 240 Z M210 128 L194 90 M234 128 L250 88" />
-              <circle cx="222" cy="108" r="14" />
-              <path d="M330 240 L330 138 Q330 114 352 114 Q374 114 374 138 L374 240 Z M340 114 L324 72 M364 114 L380 72" />
-              <circle cx="352" cy="94" r="16" />
-              <path d="M470 240 L470 150 Q470 126 492 126 Q514 126 514 150 L514 240 Z M480 126 L464 88 M504 126 L520 86" />
-              <circle cx="492" cy="106" r="14" />
-              <path d="M600 240 L600 140 Q600 116 622 116 Q644 116 644 140 L644 240 Z M610 116 L594 76 M634 116 L650 74" />
-              <circle cx="622" cy="96" r="15" />
-              <path d="M740 240 L740 152 Q740 128 762 128 Q784 128 784 152 L784 240 Z M750 128 L734 90 M774 128 L790 88" />
-              <circle cx="762" cy="108" r="14" />
-              <path d="M870 240 L870 136 Q870 112 892 112 Q914 112 914 136 L914 240 Z M880 112 L864 70 M904 112 L920 70" />
-              <circle cx="892" cy="92" r="16" />
-              <path d="M1010 240 L1010 150 Q1010 126 1032 126 Q1054 126 1054 150 L1054 240 Z M1020 126 L1004 88 M1044 126 L1060 86" />
-              <circle cx="1032" cy="106" r="14" />
-              <path d="M1140 240 L1140 140 Q1140 116 1162 116 Q1184 116 1184 140 L1184 240 Z M1150 116 L1134 76 M1174 116 L1190 74" />
-              <circle cx="1162" cy="96" r="15" />
-              <path d="M1280 240 L1280 152 Q1280 128 1302 128 Q1324 128 1324 152 L1324 240 Z M1290 128 L1274 90 M1314 128 L1330 88" />
-              <circle cx="1302" cy="108" r="14" />
-            </g>
-          </svg>
-        </div>
         <div className={cx('wrap')}>
-          <div className={cx('chapnum', 'reveal')}>
-            <b>06</b> &nbsp;Your move
-          </div>
           <h2 className={cx('disp', 'reveal')}>
             From invisible <span className={cx('it')}>to seen.</span>
           </h2>
@@ -748,32 +743,40 @@ export function ForPlayers() {
             Build my profile <span>→</span>
           </button>
         </div>
+        <div className={cx('crowd-close')} aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/publico.png?v=1782294646" alt="" />
+        </div>
       </section>
 
       {/* FOOTER */}
       <footer className={cx('foot')}>
-        <div className={cx('wrap')}>
-          <div>
-            <span className={cx('mark')}>
-              <span className={cx('c')}>CLEAR</span>
-              <span className={cx('w')}>WAY</span>
-            </span>
-            <div className={cx('serif')}>we form champions</div>
-          </div>
-          <div className={cx('foot-col')}>
-            <h4>Navigate</h4>
-            <Link href="/for-clubs">For Clubs</Link>
-            <Link href="/for-players">For Players</Link>
-            <Link href="/about">About James Fox</Link>
-          </div>
-          <div className={cx('foot-col')}>
-            <h4>Legal</h4>
-            <Link href="/privacy">Privacy Policy</Link>
-            <Link href="/terms">Terms &amp; Conditions</Link>
-          </div>
+        <div className={cx('foot-ball')} aria-hidden="true">
+          <Ball3D />
         </div>
-        <div className={cx('foot-bot')}>
-          © 2026 Clearway Performance Group · Created by SCNDAL
+        <div className={cx('wrap')}>
+          <div className={cx('foot-top')}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className={cx('foot-logo')}
+              src="/Logotipos/clearway-white.svg"
+              alt="Clearway"
+            />
+            <nav className={cx('foot-nav')}>
+              <div className={cx('foot-col')}>
+                <Link href="/for-clubs">For Clubs</Link>
+                <Link href="/for-players">For Players</Link>
+              </div>
+              <div className={cx('foot-col')}>
+                <Link href="/privacy">Privacy Policy</Link>
+                <Link href="/terms">Terms &amp; Conditions</Link>
+              </div>
+            </nav>
+          </div>
+          <div className={cx('foot-bot')}>
+            <span>© 2026 Clearway Performance Group</span>
+            <span>Created by SCNDAL</span>
+          </div>
         </div>
       </footer>
 

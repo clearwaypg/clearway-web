@@ -1,0 +1,294 @@
+/* =========================================================
+   SHARED SITE HEADER
+   One header used identically on home, /for-clubs and /for-players:
+   transparent bar at the top → floating glassmorphism card on scroll,
+   with a hamburger toggle opening a full-screen overlay menu.
+
+   Brand colours are hardcoded (not page-scoped --vars) so the component
+   is self-contained; the Archivo font comes from --font-archivo, which
+   every [locale] page wrapper defines via next/font.
+   ========================================================= */
+
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  /* The hamburger stays on the right; the logo is absolutely positioned so it
+     can glide from the left edge to the centre on scroll. */
+  justify-content: flex-end;
+  padding: 24px clamp(20px, 5vw, 60px);
+  background: transparent;
+  transition:
+    top 0.35s ease,
+    left 0.35s ease,
+    right 0.35s ease,
+    padding 0.35s ease,
+    border-radius 0.35s ease,
+    background-color 0.35s ease,
+    backdrop-filter 0.35s ease,
+    box-shadow 0.35s ease;
+}
+/* On scroll the header becomes a floating glassmorphism card — inset from the
+   edges with slightly rounded corners, semitransparent with a blur (no solid
+   color) — so the white logo and navigation stay legible. */
+.nav.scrolled {
+  top: 12px;
+  left: clamp(12px, 3vw, 28px);
+  right: clamp(12px, 3vw, 28px);
+  /* Slimmer, more compact vertical padding so the floating glassmorphism
+     header is thinner than the full-height top state. */
+  padding: 16px clamp(16px, 3vw, 26px);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(7, 44, 104, 0.32);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 12px 40px rgba(0, 0, 0, 0.28);
+}
+/* "Pinned" variant (used on /for-clubs): on scroll it gets the same inset,
+   rounded, glassmorphism floating card as home/for-players (inherited from
+   .nav.scrolled) — the only difference is the logo stays on the left instead
+   of gliding to the centre. */
+.nav.pinned.scrolled .logo {
+  left: clamp(16px, 3vw, 26px);
+  transform: translateY(-50%);
+}
+/* Logo sits at the left when the page is at the top (not at the extreme edge —
+   it keeps the same inset as the bar's padding), and glides to the centre when
+   the header collapses into the floating glassmorphism card. */
+.logo {
+  position: absolute;
+  top: 50%;
+  left: clamp(20px, 5vw, 60px);
+  transform: translateY(-50%);
+  display: block;
+  text-decoration: none;
+  color: #fff;
+  line-height: 0;
+  transition:
+    left 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.nav.scrolled .logo {
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.logo img {
+  height: 24px;
+  width: auto;
+  display: block;
+}
+
+/* ===== Header CTA pill (glassmorphism) — replaces the menu when a cta is set.
+   Keeps the pill shape and right-side position; semitransparent with a blur and
+   a subtle border, coherent with the glassmorphism header. ===== */
+.headerCta {
+  border-radius: 999px;
+  padding: 0.62em 1.3em;
+  font-family: var(--font-archivo), Archivo, sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: #fcfcfc;
+  /* Same fill as the stats boxes (7/100, 100+) in the lower section. */
+  background: rgba(8, 13, 28, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  backdrop-filter: blur(12px) saturate(140%);
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease;
+}
+.headerCta:hover {
+  background: rgba(18, 26, 50, 0.95);
+  border-color: rgba(255, 255, 255, 0.38);
+}
+
+/* ===== Menu toggle — three dots (· · ·) ===== */
+.burger {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 34px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.burger span {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #fcfcfc;
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease;
+}
+/* Dynamic hover: the three dots ripple upward in a staggered wave. */
+.burger:hover span {
+  background: #d0d8e2;
+  animation: dotWave 0.7s ease-in-out infinite;
+}
+.burger:hover span:nth-child(2) {
+  animation-delay: 0.12s;
+}
+.burger:hover span:nth-child(3) {
+  animation-delay: 0.24s;
+}
+@keyframes dotWave {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(-6px) scale(1.18);
+  }
+}
+
+/* ===== Full-screen menu overlay ===== */
+.menu {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(28px, 7vw, 80px);
+  background: rgba(6, 10, 22, 0.92);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.45s ease,
+    visibility 0.45s ease;
+}
+.menu.menuOpen {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+.menuClose {
+  position: absolute;
+  top: clamp(22px, 4vw, 38px);
+  right: clamp(20px, 5vw, 60px);
+  width: 44px;
+  height: 44px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.menuClose span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 28px;
+  height: 2px;
+  background: #fcfcfc;
+  border-radius: 2px;
+}
+.menuClose span:first-child {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.menuClose span:last-child {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+.menuClose:hover span {
+  background: #d0d8e2;
+}
+.menuLinks {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1.6vw, 18px);
+}
+.menuLink {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(14px, 2vw, 28px);
+  text-decoration: none;
+  color: #fcfcfc;
+  font-family: var(--font-archivo), Archivo, sans-serif;
+  font-weight: 800;
+  font-size: clamp(2.4rem, 9vw, 6rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease,
+    color 0.25s ease;
+}
+.menu.menuOpen .menuLink {
+  opacity: 1;
+  transform: translateY(0);
+}
+.menu.menuOpen .menuLink:nth-child(1) {
+  transition-delay: 0.12s;
+}
+.menu.menuOpen .menuLink:nth-child(2) {
+  transition-delay: 0.19s;
+}
+.menu.menuOpen .menuLink:nth-child(3) {
+  transition-delay: 0.26s;
+}
+.menuLink:hover {
+  color: #d0d8e2;
+}
+.menuNum {
+  font-size: clamp(0.8rem, 1.4vw, 1.05rem);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: #d0d8e2;
+  opacity: 0.6;
+}
+.menuFooter {
+  position: absolute;
+  bottom: clamp(28px, 6vw, 70px);
+  left: clamp(28px, 7vw, 80px);
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.5s ease 0.32s,
+    transform 0.5s ease 0.32s;
+}
+.menu.menuOpen .menuFooter {
+  opacity: 1;
+  transform: translateY(0);
+}
+.lang {
+  display: flex;
+  gap: 4px;
+}
+.lang button {
+  opacity: 0.5;
+  padding: 4px 8px;
+  color: #fcfcfc;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-archivo), Archivo, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  transition: opacity 0.2s;
+}
+.lang button:hover {
+  opacity: 0.85;
+}
+.lang button.langActive {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}

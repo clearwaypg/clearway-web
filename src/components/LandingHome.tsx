@@ -1,11 +1,10 @@
 'use client';
 
-import {useEffect, useRef, useState, useTransition} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {useLocale} from 'next-intl';
-import {useParams} from 'next/navigation';
 
-import {Link, usePathname, useRouter} from '@/i18n/navigation';
-import {routing, type Locale} from '@/i18n/routing';
+import {Link} from '@/i18n/navigation';
+import {SiteHeader} from './SiteHeader';
 import styles from './LandingHome.module.css';
 
 /* =========================================================
@@ -823,19 +822,8 @@ export function LandingHome() {
         </svg>
       </div>
 
-      {/* NAV */}
-      <nav className={cx('nav')}>
-        <Link href="/" className={cx('logo')} aria-label="Clearway Performance Group">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/Logotipos/clearway-white.svg" alt="Clearway Performance Group" />
-        </Link>
-        <div className={cx('links')}>
-          <Link href="/for-clubs">{c.nav.clubs}</Link>
-          <Link href="/for-players">{c.nav.players}</Link>
-          <Link href="/about">{c.nav.about}</Link>
-          <LangToggle />
-        </div>
-      </nav>
+      {/* NAV — shared header (logo + hamburger + full-screen overlay menu) */}
+      <SiteHeader />
 
       {/* HERO */}
       <section className={cx('hero')}>
@@ -928,7 +916,6 @@ export function LandingHome() {
           2023
         </div>
         <div className={cx('wrap')}>
-          <span className={cx('whatLine')} />
           <div className={cx('eyebrow', 'reveal')}>{c.what.eyebrow}</div>
           <h2 className={cx('reveal')} data-d="1">
             {c.what.pre}
@@ -1165,42 +1152,6 @@ export function LandingHome() {
         </div>
         <div className={cx('footBot')}>{c.foot.copyright}</div>
       </footer>
-    </div>
-  );
-}
-
-/* ----- Language toggle (EN / ES) ----- */
-function LangToggle() {
-  const activeLocale = useLocale() as Locale;
-  const router = useRouter();
-  const pathname = usePathname();
-  const params = useParams();
-  const [, startTransition] = useTransition();
-
-  function switchTo(next: Locale) {
-    if (next === activeLocale) return;
-    startTransition(() => {
-      router.replace(
-        // @ts-expect-error -- pathname/params share the same shape; next-intl types this strictly
-        {pathname, params},
-        {locale: next}
-      );
-    });
-  }
-
-  return (
-    <div className={cx('lang')}>
-      {routing.locales.map((locale) => (
-        <button
-          key={locale}
-          type="button"
-          onClick={() => switchTo(locale)}
-          aria-pressed={locale === activeLocale}
-          className={cx(locale === activeLocale && 'langActive')}
-        >
-          {locale.toUpperCase()}
-        </button>
-      ))}
     </div>
   );
 }
