@@ -20,7 +20,7 @@
   /* The hamburger stays on the right; the logo is absolutely positioned so it
      can glide from the left edge to the centre on scroll. */
   justify-content: flex-end;
-  padding: 24px clamp(20px, 5vw, 60px);
+  padding: 24px 32px;
   background: transparent;
   transition:
     top 0.35s ease,
@@ -65,7 +65,7 @@
 .logo {
   position: absolute;
   top: 50%;
-  left: clamp(20px, 5vw, 60px);
+  left: 32px;
   transform: translateY(-50%);
   display: block;
   text-decoration: none;
