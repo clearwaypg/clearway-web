@@ -1,4 +1,17 @@
 {
+  "Header": {
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "nav": {
+      "clubs": "Para Clubes",
+      "players": "Para Jugadores",
+      "about": "Sobre"
+    },
+    "cta": {
+      "players": {"long": "Crea tu perfil", "short": "Crea perfil"},
+      "clubs": {"long": "Inicia tu búsqueda", "short": "Inicia búsqueda"}
+    }
+  },
   "Nav": {
     "getInTouch": "Contáctanos",
     "openMenu": "Abrir menú",

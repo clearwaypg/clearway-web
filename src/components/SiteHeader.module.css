@@ -1,8 +1,12 @@
 /* =========================================================
    SHARED SITE HEADER
-   One header used identically on home, /for-clubs and /for-players:
-   transparent bar at the top → floating glassmorphism card on scroll,
-   with a hamburger toggle opening a full-screen overlay menu.
+   One unified header used on every page:
+     [ EN / ES ]            [ logo ]            [ cta? ] [ ··· ]
+
+   - The language toggle sits left and the actions sit right (flex,
+     space-between). The logo is absolutely centred so it stays optically
+     centred at all times, independent of the side widths.
+   - Transparent bar at the top → floating glassmorphism card on scroll.
 
    Brand colours are hardcoded (not page-scoped --vars) so the component
    is self-contained; the Archivo font comes from --font-archivo, which
@@ -17,10 +21,9 @@
   z-index: 50;
   display: flex;
   align-items: center;
-  /* The hamburger stays on the right; the logo is absolutely positioned so it
-     can glide from the left edge to the centre on scroll. */
-  justify-content: flex-end;
-  padding: 24px 32px;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 22px 32px;
   background: transparent;
   transition:
     top 0.35s ease,
@@ -39,9 +42,7 @@
   top: 12px;
   left: clamp(12px, 3vw, 28px);
   right: clamp(12px, 3vw, 28px);
-  /* Slimmer, more compact vertical padding so the floating glassmorphism
-     header is thinner than the full-height top state. */
-  padding: 16px clamp(16px, 3vw, 26px);
+  padding: 12px clamp(16px, 3vw, 26px);
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(7, 44, 104, 0.32);
@@ -51,49 +52,78 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
     0 12px 40px rgba(0, 0, 0, 0.28);
 }
-/* "Pinned" variant (used on /for-clubs): on scroll it gets the same inset,
-   rounded, glassmorphism floating card as home/for-players (inherited from
-   .nav.scrolled) — the only difference is the logo stays on the left instead
-   of gliding to the centre. */
-.nav.pinned.scrolled .logo {
-  left: clamp(16px, 3vw, 26px);
-  transform: translateY(-50%);
+
+/* ===== Left zone — language toggle ===== */
+.left {
+  display: flex;
+  align-items: center;
 }
-/* Logo sits at the left when the page is at the top (not at the extreme edge —
-   it keeps the same inset as the bar's padding), and glides to the centre when
-   the header collapses into the floating glassmorphism card. */
+
+/* ===== Centre — logo, absolutely centred (top and on scroll) ===== */
 .logo {
   position: absolute;
   top: 50%;
-  left: 32px;
-  transform: translateY(-50%);
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: block;
   text-decoration: none;
   color: #fff;
   line-height: 0;
-  transition:
-    left 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.nav.scrolled .logo {
-  left: 50%;
-  transform: translate(-50%, -50%);
 }
 .logo img {
-  height: 24px;
+  height: clamp(20px, 2.4vw, 24px);
   width: auto;
   display: block;
 }
 
-/* ===== Header CTA pill (glassmorphism) — replaces the menu when a cta is set.
-   Keeps the pill shape and right-side position; semitransparent with a blur and
-   a subtle border, coherent with the glassmorphism header. ===== */
+/* ===== Right zone — optional CTA pill + three-dots menu ===== */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 1.8vw, 18px);
+}
+
+/* ===== Language toggle (EN / ES) ===== */
+.lang {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.langItem {
+  display: flex;
+  align-items: center;
+}
+.langSep {
+  color: rgba(252, 252, 252, 0.3);
+  font-size: 0.75rem;
+}
+.lang button {
+  padding: 5px 7px;
+  color: rgba(252, 252, 252, 0.55);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-archivo), Archivo, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  transition: color 0.2s ease;
+}
+.lang button:hover {
+  color: rgba(252, 252, 252, 0.85);
+}
+.lang button.langActive {
+  color: #fcfcfc;
+}
+
+/* ===== Header CTA pill (glassmorphism) — sits next to the menu ===== */
 .headerCta {
   border-radius: 999px;
-  padding: 0.62em 1.3em;
+  padding: 0.6em 1.25em;
   font-family: var(--font-archivo), Archivo, sans-serif;
   font-weight: 700;
   font-size: 0.82rem;
+  white-space: nowrap;
   color: #fcfcfc;
   /* Same fill as the stats boxes (7/100, 100+) in the lower section. */
   background: rgba(8, 13, 28, 0.92);
@@ -109,6 +139,10 @@
   background: rgba(18, 26, 50, 0.95);
   border-color: rgba(255, 255, 255, 0.38);
 }
+/* Short label is swapped in for the full one on narrow screens (below). */
+.ctaShort {
+  display: none;
+}
 
 /* ===== Menu toggle — three dots (· · ·) ===== */
 .burger {
@@ -119,6 +153,7 @@
   gap: 5px;
   width: 40px;
   height: 34px;
+  flex: none;
   padding: 0;
   background: none;
   border: 0;
@@ -253,42 +288,38 @@
   color: #d0d8e2;
   opacity: 0.6;
 }
-.menuFooter {
-  position: absolute;
-  bottom: clamp(28px, 6vw, 70px);
-  left: clamp(28px, 7vw, 80px);
-  opacity: 0;
-  transform: translateY(16px);
-  transition:
-    opacity 0.5s ease 0.32s,
-    transform 0.5s ease 0.32s;
-}
-.menu.menuOpen .menuFooter {
-  opacity: 1;
-  transform: translateY(0);
-}
-.lang {
-  display: flex;
-  gap: 4px;
-}
-.lang button {
-  opacity: 0.5;
-  padding: 4px 8px;
-  color: #fcfcfc;
-  background: none;
-  border: 0;
-  cursor: pointer;
-  font-family: var(--font-archivo), Archivo, sans-serif;
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  transition: opacity 0.2s;
-}
-.lang button:hover {
-  opacity: 0.85;
-}
-.lang button.langActive {
-  opacity: 1;
-  text-decoration: underline;
-  text-underline-offset: 4px;
+
+/* ===== Mobile — tighten everything and swap the CTA to its short label so
+   the centred logo, the language toggle and the CTA + menu coexist without
+   crowding (the logo wordmark is wide, so room on the right is limited). ===== */
+@media (max-width: 640px) {
+  .nav {
+    padding: 14px 14px;
+    gap: 8px;
+  }
+  .nav.scrolled {
+    padding: 10px 12px;
+  }
+  .logo img {
+    height: 16px;
+  }
+  .lang button {
+    padding: 3px 4px;
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+  }
+  .actions {
+    gap: 8px;
+  }
+  .headerCta {
+    font-size: 0.66rem;
+    padding: 0.45em 0.7em;
+  }
+  /* Swap full → short label where one is provided. */
+  .hasShort .ctaFull {
+    display: none;
+  }
+  .hasShort .ctaShort {
+    display: inline;
+  }
 }

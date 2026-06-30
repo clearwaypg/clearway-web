@@ -1,16 +1,18 @@
 import {Link} from '@/i18n/navigation';
+import {SiteHeader} from './SiteHeader';
 
 type Props = {
   title: string;
   backLabel: string;
-  /* 'navy' gives the placeholder a navy hero. Defaults to the light shell. */
+  /* Defaults to the navy shell so the shared (white) header stays legible.
+     'light' gives a light shell. */
   tone?: 'light' | 'navy';
 };
 
 const NAVY = '#072c68';
 
 /* Minimal placeholder shell for routes still pending real content. */
-export function PlaceholderPage({title, backLabel, tone = 'light'}: Props) {
+export function PlaceholderPage({title, backLabel, tone = 'navy'}: Props) {
   const navy = tone === 'navy';
   const bg = navy ? NAVY : '#f3f3f3';
   const fg = navy ? '#fcfcfc' : '#191919';
@@ -33,6 +35,7 @@ export function PlaceholderPage({title, backLabel, tone = 'light'}: Props) {
         padding: '2rem'
       }}
     >
+      <SiteHeader />
       <h1
         style={{
           fontSize: 'clamp(2rem, 5vw, 4rem)',

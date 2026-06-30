@@ -22,11 +22,12 @@
   overflow-x: hidden;
 }
 
-.page * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* No blanket `.page *` reset here: Tailwind's preflight already zeroes
+   margin/padding and sets box-sizing on every element globally. A scoped
+   `.page *` rule has (0,1,0) specificity, so it tied with — and, depending on
+   CSS-module load order, overrode — single-class rules on shared components
+   rendered inside .page (e.g. SiteHeader's .nav padding), which broke the
+   header spacing on the first server render of the home page. */
 
 .wrap {
   width: min(1180px, 92vw);
@@ -640,24 +641,6 @@
   pointer-events: none;
   opacity: 0.55;
 }
-/* The 3D football (balon-futbol.glb) that drops down the trail with the scroll;
-   its vertical position is set in JS, x stays on the trail at 82%. */
-.whatBall {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 72px;
-  height: 72px;
-  z-index: 5;
-  pointer-events: none;
-  transform: translateX(-50%);
-  will-change: transform;
-}
-@media (max-width: 767px) {
-  .whatBall {
-    display: none;
-  }
-}
 .what .wrap {
   position: relative;
   z-index: 2;
@@ -711,22 +694,6 @@
    container with a ball that drops down it on scroll (set in JS). */
 /* Football centred between the two panels at the section's vertical midpoint.
    Its translateY is driven by JS for a ~0.4x parallax (see LandingHome.tsx). */
-.doorsBall {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 80px;
-  height: 80px;
-  z-index: 10;
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-  will-change: transform;
-}
-@media (max-width: 767px) {
-  .doorsBall {
-    display: none;
-  }
-}
 .door {
   position: relative;
   display: flex;
@@ -1098,26 +1065,6 @@
 /* Background video behind the left column: a ghost texture at low opacity that
    lights up on section hover. */
 /* 3D football centred behind the heading as a background element. */
-.numBallWrap {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  z-index: 0;
-  /* Slides in from the left when the left column enters view, back out when it
-     leaves (.ballIn toggled by IntersectionObserver). */
-  opacity: 0;
-  transform: translateX(-140px);
-  transition:
-    transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    opacity 0.9s ease;
-}
-.ballIn .numBallWrap {
-  opacity: 1;
-  transform: translateX(0);
-}
 /* Soft radial blue glow — a cool stadium light turning on behind the ball when
    the left column is hovered. Sits above the ball, below the text. */
 .numGlow {
@@ -1267,9 +1214,6 @@
   .numLeft {
     min-height: 0;
     overflow: visible;
-  }
-  .numBallWrap {
-    display: none;
   }
 }
 
@@ -1480,58 +1424,6 @@
   z-index: 1;
   width: min(1280px, 92vw);
   margin: 0 auto;
-}
-@property --ballx {
-  syntax: '<length>';
-  inherits: false;
-  initial-value: 0px;
-}
-@property --bally {
-  syntax: '<length>';
-  inherits: false;
-  initial-value: 0px;
-}
-.foot-ball {
-  position: absolute;
-  bottom: 16px;
-  left: 50%;
-  width: clamp(54px, 6vw, 84px);
-  aspect-ratio: 1 / 1;
-  z-index: 0;
-  pointer-events: none;
-  transform: translate(calc(-50% + var(--ballx)), var(--bally));
-  animation:
-    footBallX 12s ease-in-out infinite alternate,
-    footBallY 7s ease-in-out infinite;
-}
-@keyframes footBallX {
-  from {
-    --ballx: -165px;
-  }
-  to {
-    --ballx: 165px;
-  }
-}
-@keyframes footBallY {
-  0%,
-  13%,
-  21%,
-  44%,
-  50%,
-  70%,
-  78%,
-  100% {
-    --bally: 0px;
-  }
-  17% {
-    --bally: -22px;
-  }
-  47% {
-    --bally: -13px;
-  }
-  74% {
-    --bally: -25px;
-  }
 }
 .foot-top {
   display: flex;

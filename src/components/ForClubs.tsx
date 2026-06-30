@@ -76,7 +76,6 @@ export function ForClubs() {
   const eyebrowRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
   const scrollBallRef = useRef<HTMLDivElement>(null);
-  const sBallCanvasRef = useRef<HTMLCanvasElement>(null);
   const mapCanvasRef = useRef<HTMLCanvasElement>(null);
   const enqCanvasRef = useRef<HTMLCanvasElement>(null);
   const enqBodyRef = useRef<HTMLDivElement>(null);
@@ -268,67 +267,12 @@ export function ForClubs() {
     };
   }, []);
 
-  /* ===== Scroll-follower ball that ping-pongs across the mid sections ===== */
+  /* ===== Scroll-follower ball that ping-pongs across the mid sections. The
+     ball itself is the shared 3D <Ball3D> (it spins on its own via r3f); this
+     effect only positions the fixed wrapper and toggles its visibility. ===== */
   useEffect(() => {
     const ball = scrollBallRef.current;
-    const canvas = sBallCanvasRef.current;
-    if (!ball || !canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = 70 * dpr;
-    canvas.height = 70 * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    let rot = 0;
-    function drawSmallBall(r: number) {
-      ctx!.clearRect(0, 0, 70, 70);
-      const cx2 = 35;
-      const cy = 35;
-      const rad = 28;
-      const g = ctx!.createRadialGradient(cx2 - 8, cy - 9, 3, cx2, cy, rad * 1.1);
-      g.addColorStop(0, '#fff');
-      g.addColorStop(0.65, '#eef1f6');
-      g.addColorStop(1, '#c2cad8');
-      ctx!.beginPath();
-      ctx!.arc(cx2, cy, rad, 0, 6.28);
-      ctx!.fillStyle = g;
-      ctx!.fill();
-      ctx!.save();
-      ctx!.beginPath();
-      ctx!.arc(cx2, cy, rad, 0, 6.28);
-      ctx!.clip();
-      const off = (r % 1) * rad * 2.2;
-      for (let b = -1; b <= 1; b++) {
-        const by = cy + b * rad * 0.62;
-        for (let k = -2; k <= 2; k++) {
-          let px = cx2 + k * rad * 0.62 - off + b * rad * 0.31;
-          while (px > cx2 + rad * 1.3) px -= rad * 2.6;
-          while (px < cx2 - rad * 1.3) px += rad * 2.6;
-          const depth = 1 - Math.abs(px - cx2) / (rad * 1.3);
-          const sz = rad * 0.16 * (0.5 + depth * 0.6);
-          ctx!.beginPath();
-          for (let i = 0; i < 5; i++) {
-            const a = r * 2 + b + (i * 6.28) / 5 - Math.PI / 2;
-            const x = px + Math.cos(a) * sz;
-            const y = by + Math.sin(a) * sz;
-            if (i === 0) ctx!.moveTo(x, y);
-            else ctx!.lineTo(x, y);
-          }
-          ctx!.closePath();
-          ctx!.fillStyle = '#0a2a5e';
-          ctx!.fill();
-        }
-      }
-      ctx!.restore();
-      const sh = ctx!.createRadialGradient(cx2 - 8, cy - 9, 3, cx2, cy, rad * 1.05);
-      sh.addColorStop(0, 'rgba(255,255,255,0.3)');
-      sh.addColorStop(0.5, 'rgba(255,255,255,0)');
-      sh.addColorStop(1, 'rgba(7,26,58,0.4)');
-      ctx!.beginPath();
-      ctx!.arc(cx2, cy, rad, 0, 6.28);
-      ctx!.fillStyle = sh;
-      ctx!.fill();
-    }
+    if (!ball) return;
     function sections() {
       const cost = rootRef.current?.querySelector<HTMLElement>(`.${styles.cost}`);
       const people = rootRef.current?.querySelector<HTMLElement>(
@@ -363,10 +307,7 @@ export function ForClubs() {
       const y = viewH * 0.5 + Math.sin(clampedP * cycles * Math.PI * 2) * 40;
       ball!.style.left = x + 'px';
       ball!.style.top = y + 'px';
-      rot += 0.04;
-      drawSmallBall(rot);
     }
-    drawSmallBall(0);
     window.addEventListener('scroll', onScroll, {passive: true});
     window.addEventListener('resize', onScroll);
     onScroll();
@@ -637,10 +578,9 @@ export function ForClubs() {
         </svg>
       </div>
 
-      {/* NAV — shared header. On for-clubs the logo and menu keep their normal
-          padding/position on scroll (no floating-card collapse, no logo
-          centering); only the glassmorphism background fades in. */}
-      <SiteHeader floatingOnScroll={false} />
+      {/* NAV — shared header with the "Start your search" pill next to the
+          menu on the right. */}
+      <SiteHeader cta={{type: 'clubs', onClick: openEnq}} />
 
       {/* HERO */}
       <section ref={heroRef} className={cx('hero')} id="hero">
@@ -701,9 +641,9 @@ export function ForClubs() {
         </div>
       </section>
 
-      {/* SCROLL-FOLLOWER BALL */}
+      {/* SCROLL-FOLLOWER BALL — the real 3D model, positioned by the effect above */}
       <div ref={scrollBallRef} className={cx('scrollBall')} aria-hidden>
-        <canvas ref={sBallCanvasRef} width={80} height={80} />
+        <Ball3D />
       </div>
 
       {/* THE COST */}
@@ -1126,9 +1066,6 @@ export function ForClubs() {
 
       {/* FOOTER */}
       <footer className={cx('foot')}>
-        <div className={cx('foot-ball')} aria-hidden="true">
-          <Ball3D />
-        </div>
         <div className={cx('wrap')}>
           <div className={cx('foot-top')}>
             <Link href="/" aria-label="Clearway — home">

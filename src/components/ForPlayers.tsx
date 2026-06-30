@@ -4,7 +4,6 @@ import {useEffect, useRef, useState} from 'react';
 import {useLocale} from 'next-intl';
 
 import {Link} from '@/i18n/navigation';
-import {Ball3D} from './Ball3D';
 import {SiteHeader} from './SiteHeader';
 import styles from './ForPlayers.module.css';
 
@@ -36,9 +35,6 @@ export function ForPlayers() {
   const [card, setCard] = useState({name: '', pos: '', age: '', eu: ''});
 
   const pageRef = useRef<HTMLDivElement>(null);
-  const ballRef = useRef<HTMLDivElement>(null);
-  const truthRef = useRef<HTMLElement>(null);
-  const voicesRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
   const modalCardRef = useRef<HTMLDivElement>(null);
@@ -72,37 +68,6 @@ export function ForPlayers() {
     );
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, []);
-
-  /* Ball that travels across the pitch following the scroll, between the
-     "truth" and "voices" sections. (Placeholder for the future 3D ball.) */
-  useEffect(() => {
-    const ball = ballRef.current;
-    const truth = truthRef.current;
-    const voices = voicesRef.current;
-    if (!ball || !truth || !voices) return;
-    const vw = () => window.innerWidth;
-    function onScroll() {
-      const startY = truth!.offsetTop;
-      const endY = voices!.offsetTop + 200;
-      const y = window.scrollY + window.innerHeight * 0.5;
-      if (y < startY - 200 || y > endY + 200) {
-        ball!.classList.remove(styles.show);
-        return;
-      }
-      ball!.classList.add(styles.show);
-      let p = (y - startY) / (endY - startY);
-      p = Math.max(0, Math.min(1, p));
-      const margin = 80;
-      const span = vw() - margin * 2;
-      const xWave = Math.sin(p * Math.PI * 2.4) * 0.5 + 0.5;
-      const x = margin + xWave * span;
-      const topPx = window.innerHeight * 0.5;
-      ball!.style.transform = `translate(${x}px,calc(${topPx}px - 50%))`;
-    }
-    window.addEventListener('scroll', onScroll, {passive: true});
-    onScroll();
-    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   /* Lock scroll + Escape close while the modal is open. */
@@ -416,14 +381,9 @@ export function ForPlayers() {
         </svg>
       </div>
 
-      {/* Ball that follows the scroll — 3D GLB model */}
-      <div className={cx('ball')} ref={ballRef} aria-hidden="true">
-        <Ball3D />
-      </div>
-
-      {/* NAV — shared header with a glassmorphism "Build my profile" pill in
-          place of the menu (opens the profile modal). */}
-      <SiteHeader cta={{label: 'Build my profile →', onClick: openModal}} />
+      {/* NAV — shared header with the "Build my profile" pill next to the menu
+          on the right (opens the profile modal). */}
+      <SiteHeader cta={{type: 'players', onClick: openModal}} />
 
       {/* ===== CAP 01 · HERO ===== */}
       <section className={cx('hero')} id="hero">
@@ -535,7 +495,7 @@ export function ForPlayers() {
       </section>
 
       {/* ===== CAP 02 · TRUTH ===== */}
-      <section className={cx('truth')} ref={truthRef}>
+      <section className={cx('truth')}>
         <div className={cx('wrap')}>
           <div className={cx('truthLayout')}>
             <div className={cx('truthLeft')}>
@@ -700,7 +660,7 @@ export function ForPlayers() {
       </div>
 
       {/* ===== CAP 05 · VOICES ===== */}
-      <section className={cx('voices')} ref={voicesRef}>
+      <section className={cx('voices')}>
         <div className={cx('wrap')}>
           <div className={cx('head', 'reveal')}>
             <h2 className={cx('disp')}>
@@ -751,9 +711,6 @@ export function ForPlayers() {
 
       {/* FOOTER */}
       <footer className={cx('foot')}>
-        <div className={cx('foot-ball')} aria-hidden="true">
-          <Ball3D />
-        </div>
         <div className={cx('wrap')}>
           <div className={cx('foot-top')}>
             <Link href="/" aria-label="Clearway — home">

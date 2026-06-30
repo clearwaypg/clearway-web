@@ -20,11 +20,11 @@
   color: var(--white);
   -webkit-font-smoothing: antialiased;
 }
-.page * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* No blanket `.page *` reset here: Tailwind's preflight already zeroes
+   margin/padding and sets box-sizing globally. A scoped `.page *` rule
+   (0,1,0 specificity) could override single-class rules on shared components
+   rendered inside .page (e.g. SiteHeader's .nav padding) depending on
+   CSS-module load order. */
 
 .grain {
   position: fixed;

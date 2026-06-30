@@ -3,43 +3,9 @@
 import {useEffect, useRef, useState} from 'react';
 import {useLocale} from 'next-intl';
 
-import dynamic from 'next/dynamic';
-
 import {Link} from '@/i18n/navigation';
 import {SiteHeader} from './SiteHeader';
-import {Ball3D} from './Ball3D';
 import styles from './LandingHome.module.css';
-
-/* Lazy, client-only (WebGL canvas). The same 3D ball is reused for the WHO WE
-   ARE, doors and numbers sections. */
-const FootballBall3D = dynamic(() => import('@/components/FootballBall3D'), {
-  ssr: false
-});
-
-/* Mounts the 3D ball only while its slot is near the viewport (and unmounts it
-   when far away). Several always-on r3f canvases exhaust the browser's WebGL
-   context limit, which silently blanks the oldest ones — keeping at most one or
-   two live at a time fixes that. The wrapper keeps its px size so layout/parallax
-   never shift when the canvas mounts/unmounts. */
-function LazyFootball({width, height}: {width: number; height: number}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [show, setShow] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => setShow(e.isIntersecting)),
-      {rootMargin: '300px'}
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-  return (
-    <div ref={ref} style={{width, height}}>
-      {show && <FootballBall3D width={width} height={height} />}
-    </div>
-  );
-}
 
 /* =========================================================
    CLEARWAY PERFORMANCE GROUP — HOME
@@ -255,12 +221,10 @@ export function LandingHome() {
   const pitchRef = useRef<HTMLCanvasElement>(null);
   const whatRef = useRef<HTMLElement>(null);
   const whatCanvasRef = useRef<HTMLCanvasElement>(null);
-  const whatBallRef = useRef<HTMLDivElement>(null);
   const teamBallRef = useRef<HTMLCanvasElement>(null);
   const endRef = useRef<HTMLElement>(null);
   const vsBallRef = useRef<HTMLDivElement>(null);
   const vsMidRef = useRef<HTMLDivElement>(null);
-  const doorsBallRef = useRef<HTMLDivElement>(null);
   const numbersRef = useRef<HTMLElement>(null);
   const bgmarkRef = useRef<HTMLDivElement>(null);
   const numLeftRef = useRef<HTMLDivElement>(null);
@@ -627,23 +591,6 @@ export function LandingHome() {
     };
   }, []);
 
-  /* ===== WHO WE ARE: the 3D football floats downward with scroll (0.3x). Uses
-     the section position so it stays in view — raw window.scrollY*0.3 would push
-     it hundreds of px past this (overflow-clipped) section. ===== */
-  useEffect(() => {
-    const ball = whatBallRef.current;
-    const section = whatRef.current;
-    if (!ball || !section) return;
-    function onScroll() {
-      const r = section!.getBoundingClientRect();
-      const offset = (window.innerHeight / 2 - (r.top + r.height / 2)) * 0.3;
-      ball!.style.transform = `translate(-50%, ${offset}px)`;
-    }
-    window.addEventListener('scroll', onScroll, {passive: true});
-    onScroll();
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
   /* ===== "2023" watermark: breathes while in view, fades in/out on scroll. ===== */
   useEffect(() => {
     const el = bgmarkRef.current;
@@ -796,29 +743,6 @@ export function LandingHome() {
       eio.disconnect();
       window.removeEventListener('scroll', onScroll);
     };
-  }, []);
-
-  /* ===== Pathways: football parallax — the centre ball drifts down at ~0.3x
-     the scroll speed (slower than the page) for a floating effect. ===== */
-  useEffect(() => {
-    const ball = doorsBallRef.current;
-    if (!ball) return;
-    function onScroll() {
-      // offsetParent is the (position: relative) doors section; null when the
-      // ball is display:none (mobile), so the parallax simply no-ops there.
-      const sec = ball!.offsetParent;
-      if (!sec) return;
-      const r = sec.getBoundingClientRect();
-      // Section-relative 0.25× parallax. Raw window.scrollY*0.25 would push the
-      // ball hundreds of px below this overflow-hidden section (clipped = "not
-      // rendering"); offsetting by the section keeps it floating in view.
-      const offset =
-        (window.innerHeight / 2 - (r.top + r.height / 2)) * 0.25;
-      ball!.style.transform = `translate(-50%, -50%) translateY(${offset}px)`;
-    }
-    window.addEventListener('scroll', onScroll, {passive: true});
-    onScroll();
-    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   /* ===== THE NUMBERS: when the section scrolls into view, the stat rows
@@ -1022,9 +946,6 @@ export function LandingHome() {
       {/* WHO WE ARE */}
       <section ref={whatRef} className={cx('what', 'reveal')}>
         <canvas ref={whatCanvasRef} className={cx('whatcanvas')} aria-hidden />
-        <div ref={whatBallRef} className={cx('whatBall')} aria-hidden>
-          <LazyFootball width={72} height={72} />
-        </div>
         <div ref={bgmarkRef} className={cx('bgmark')} aria-hidden>
           2023
         </div>
@@ -1060,9 +981,6 @@ export function LandingHome() {
             <span>{c.doors.clubs.enter}</span> <span className={cx('arr')}>→</span>
           </span>
         </Link>
-        <div ref={doorsBallRef} className={cx('doorsBall')} aria-hidden="true">
-          <LazyFootball width={80} height={80} />
-        </div>
         <Link
           href="/for-players"
           className={cx('door', 'doorPlayers', 'reveal')}
@@ -1153,9 +1071,6 @@ export function LandingHome() {
         <div className={cx('wrap')}>
           <div className={cx('numLayout')}>
             <div ref={numLeftRef} className={cx('numLeft')}>
-              <div className={cx('numBallWrap')} aria-hidden="true">
-                <LazyFootball width={320} height={320} />
-              </div>
               <div className={cx('numGlow')} aria-hidden="true" />
               <div className={cx('numHead')}>
                 <h2>
@@ -1219,9 +1134,6 @@ export function LandingHome() {
 
       {/* FOOTER */}
       <footer className={cx('foot')}>
-        <div className={cx('foot-ball')} aria-hidden="true">
-          <Ball3D />
-        </div>
         <div className={cx('wrap')}>
           <div className={cx('foot-top')}>
             <Link href="/" aria-label="Clearway — home">

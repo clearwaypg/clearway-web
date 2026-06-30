@@ -1,4 +1,17 @@
 {
+  "Header": {
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "nav": {
+      "clubs": "For Clubs",
+      "players": "For Players",
+      "about": "About"
+    },
+    "cta": {
+      "players": {"long": "Build my profile", "short": "Build profile"},
+      "clubs": {"long": "Start your search", "short": "Start search"}
+    }
+  },
   "Nav": {
     "getInTouch": "Get in Touch",
     "openMenu": "Open menu",

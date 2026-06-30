@@ -3,6 +3,7 @@
 import {useEffect, useRef} from 'react';
 
 import {Link} from '@/i18n/navigation';
+import {SiteHeader} from './SiteHeader';
 import styles from './NotFound.module.css';
 
 /* =========================================================
@@ -454,16 +455,7 @@ export function NotFound() {
         </svg>
       </div>
 
-      <nav className={cx('nav')}>
-        <Link href="/" className={cx('logo')} aria-label="Clearway Performance Group">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/Logotipos/clearway-white.svg" alt="Clearway Performance Group" />
-        </Link>
-        <div className={cx('navLinks')}>
-          <Link href="/for-clubs">For Clubs</Link>
-          <Link href="/for-players">For Players</Link>
-        </div>
-      </nav>
+      <SiteHeader />
 
       <div ref={ghostRef} className={cx('ghost')} aria-hidden>
         404
