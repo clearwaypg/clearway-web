@@ -281,7 +281,7 @@ const COPY = {
       footTermsLink: 'Términos'
     }
   }
-} as const;
+};
 
 export function ForPlayers() {
   const locale = useLocale();
