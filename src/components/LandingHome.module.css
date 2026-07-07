@@ -11,12 +11,23 @@
   --dew: #d0d8e2;
   --bg: #f3f3f3;
   --white: #fcfcfc;
+  /* The hero's navy-tinted black. Reused as the brand dark surface so the
+     people cards and the stat boxes match the hero instead of using their own
+     duller darks. */
+  --hero-bg: radial-gradient(120% 90% at 50% 38%, #13284f 0%, #0c0c0c 70%);
   --font: var(--font-archivo), Archivo, sans-serif;
   --serif: var(--font-eb), 'EB Garamond', Georgia, serif;
 
   position: relative;
   font-family: var(--font);
-  background: #0c0c0c;
+  /* One continuous page-wide background: the hero's navy glow occupies the
+     first viewport, then fades into a flat #0c0c0c that runs unbroken down the
+     whole page. Every section below is transparent over this, so there are no
+     seams where one section meets the next. */
+  background-color: #0c0c0c;
+  background-image: var(--hero-bg);
+  background-repeat: no-repeat;
+  background-size: 100% 100vh;
   color: var(--white);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
@@ -277,7 +288,7 @@
   justify-content: center;
   text-align: center;
   overflow: hidden;
-  background: radial-gradient(120% 90% at 50% 38%, #13284f 0%, #0c0c0c 70%);
+  background: transparent;
 }
 .pitch {
   position: absolute;
@@ -380,12 +391,15 @@
 }
 .sub {
   margin-top: 34px;
-  font-size: clamp(1rem, 1.5vw, 1.18rem);
-  color: #c4ccd8;
-  max-width: min(640px, 90vw);
+  font-size: clamp(2rem, 4.4vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  max-width: min(26ch, 94vw);
   margin-left: auto;
   margin-right: auto;
-  line-height: 1.5;
+  line-height: 1.05;
+  text-wrap: balance;
   opacity: 0;
   animation: rise 1.1s ease 0.7s forwards;
 }
@@ -421,7 +435,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  justify-content: center;
   padding: 1.3em 1.8em;
   text-decoration: none;
   cursor: pointer;
@@ -430,16 +444,6 @@
 }
 .hb + .hb {
   border-left: 1px solid rgba(208, 216, 226, 0.25);
-}
-.hbK {
-  font-size: 0.64rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  opacity: 0.6;
-  position: relative;
-  z-index: 2;
-  transition: 0.3s;
 }
 .hbT {
   position: relative;
@@ -501,6 +505,13 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  transition: color 0.25s ease;
+}
+.scrollCue:hover {
+  color: var(--dew);
 }
 .scrollCue .bar {
   width: 1px;
@@ -567,7 +578,7 @@
 /* ===== QUE ES CLEARWAY: fluye desde el hero ===== */
 .what {
   position: relative;
-  background: linear-gradient(180deg, #0c0c0c 0%, #0e1a30 50%, var(--black) 100%);
+  background: transparent;
   padding: clamp(100px, 16vh, 200px) 0;
   overflow: hidden;
 }
@@ -663,11 +674,11 @@
   background: var(--dew);
 }
 .what h2 {
-  font-size: clamp(1.9rem, 4.6vw, 3.8rem);
-  line-height: 1.1;
+  font-size: clamp(1.35rem, 2.8vw, 2.3rem);
+  line-height: 1.3;
   font-weight: 300;
-  max-width: 22ch;
-  letter-spacing: -0.02em;
+  max-width: 40ch;
+  letter-spacing: -0.01em;
 }
 .what h2 b {
   font-weight: 900;
@@ -684,11 +695,13 @@
   position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(96px, 9vw, 150px);
+  /* Central gap matches the lateral padding so the space between the two cards
+     equals their distance to the screen edges. */
+  gap: clamp(12px, 1.8vw, 24px);
   padding: clamp(12px, 1.8vw, 24px);
   min-height: 90vh;
   overflow: hidden;
-  background: var(--black);
+  background: transparent;
 }
 /* Intermediate element centred between the two doors: a slightly-rounded
    container with a ball that drops down it on scroll (set in JS). */
@@ -883,7 +896,7 @@
 /* ===== JAMES Y CYRIL ===== */
 .team {
   position: relative;
-  background: var(--black);
+  background: transparent;
   color: #fff;
   padding: clamp(90px, 13vh, 150px) 0;
   overflow: hidden;
@@ -936,7 +949,7 @@
   aspect-ratio: 3 / 4;
   border-radius: 14px;
   overflow: hidden;
-  background: linear-gradient(160deg, #0a2a5e 0%, #061c40 52%, #04122c 100%);
+  background: var(--hero-bg);
   border: 1px solid rgba(208, 216, 226, 0.14);
   transition:
     border-color 0.35s ease,
@@ -1033,10 +1046,11 @@
 
 /* ===== MARCADOR DE PARTIDO ===== */
 .proof {
-  background: var(--black);
+  background: transparent;
   color: #fff;
-  /* Vertical padding cut ~40% so the section is more compact. */
-  padding: clamp(54px, 8vh, 96px) 0;
+  /* Tighter at the top (it followed too much space) and roomier at the bottom so
+     the block sits evenly balanced between the sections before and after it. */
+  padding: clamp(32px, 5vh, 60px) 0 clamp(80px, 12vh, 140px);
 }
 /* Editorial split: stacked stat strips on the left (40%); the heading pinned
    to the top of the right column (60%), floating against the data below. */
@@ -1134,25 +1148,23 @@
 .numGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  width: 380px;
+  gap: 24px;
+  width: 460px;
   max-width: 100%;
 }
 .numStat {
   width: 100%;
-  min-height: 140px;
-  padding: 24px 28px;
+  min-height: 180px;
+  padding: 34px 32px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  background: rgba(15, 30, 60, 0.65);
+  background: var(--hero-bg);
   border: 1px solid rgba(80, 130, 220, 0.18);
   border-radius: 14px;
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
   transition: all 0.3s ease;
   animation: floatCard 4s ease-in-out infinite;
 }
@@ -1184,16 +1196,16 @@
   box-shadow: 0 0 20px rgba(60, 120, 255, 0.15);
 }
 .sbN {
-  font-size: 52px;
+  font-size: 60px;
   font-style: italic;
   font-family: var(--serif);
   color: #fff;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   font-variant-numeric: tabular-nums;
 }
 .numLabel b {
   display: block;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1201,9 +1213,9 @@
 }
 .numLabel span {
   display: block;
-  font-size: 10px;
+  font-size: 15px;
   color: rgba(255, 255, 255, 0.5);
-  margin-top: 2px;
+  margin-top: 4px;
 }
 /* Mobile: 3D ball hidden, cards become a static 2×2 grid. */
 @media (max-width: 767px) {
@@ -1219,7 +1231,7 @@
 
 /* ===== CIERRE TIPO VS ===== */
 .end {
-  background: #0c0c0c;
+  background: transparent;
   padding: 0;
   overflow: hidden;
 }
@@ -1545,98 +1557,6 @@
   font-size: 0.78rem;
   letter-spacing: 0.04em;
   color: #8fa0b5;
-}
-
-/* TESTIMONIALS — same carousel as for-players: two marquee rows of dark-blue
-   glassmorphism cards scrolling opposite ways; hovering a card pauses its row
-   and grows the card. */
-.voices {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(180deg, #191919 0%, #0a2249 50%, #191919 100%);
-  padding: clamp(60px, 9vh, 110px) 0 clamp(70px, 11vh, 140px);
-}
-.voices .head {
-  text-align: center;
-  margin-bottom: 20px;
-}
-.voices .head h2 {
-  font-size: clamp(2rem, 5vw, 2.7rem);
-  font-weight: 700;
-  color: #fff;
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-}
-.voices .head h2 .it {
-  font-family: var(--serif);
-  font-style: italic;
-  font-weight: 400;
-  text-transform: none;
-  color: var(--dew);
-}
-.voices .head p {
-  color: rgba(252, 252, 252, 0.78);
-  margin-top: 14px;
-  font-size: clamp(1.05rem, 1.5vw, 1.25rem);
-}
-.vmarquee {
-  position: relative;
-  margin-top: clamp(40px, 6vh, 72px);
-}
-.vrow {
-  display: flex;
-  gap: 20px;
-  width: max-content;
-  animation: vscroll 46s linear infinite;
-}
-.vrow.r2 {
-  animation-duration: 58s;
-  animation-direction: reverse;
-  margin-top: 20px;
-}
-.vrow:has(.vcard:hover) {
-  animation-play-state: paused;
-}
-@keyframes vscroll {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-.vcard {
-  position: relative;
-  width: 330px;
-  flex-shrink: 0;
-  background: rgba(8, 24, 56, 0.5);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
-  backdrop-filter: blur(16px) saturate(140%);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 14px;
-  padding: 26px;
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.vcard:hover {
-  transform: scale(1.06);
-  z-index: 2;
-}
-.vcard p {
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 1.1rem;
-  color: #eaf0fb;
-  line-height: 1.45;
-}
-.vcard .who {
-  display: block;
-  margin-top: 14px;
-  font-style: normal;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--dew);
 }
 
 @media (max-width: 900px) {

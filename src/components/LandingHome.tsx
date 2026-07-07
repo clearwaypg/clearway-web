@@ -5,6 +5,8 @@ import {useLocale} from 'next-intl';
 
 import {Link} from '@/i18n/navigation';
 import {SiteHeader} from './SiteHeader';
+import {SiteFooter} from './SiteFooter';
+import {getLenis} from './SmoothScroll';
 import styles from './LandingHome.module.css';
 
 /* =========================================================
@@ -32,32 +34,28 @@ const COPY = {
   en: {
     nav: {clubs: 'For Clubs', players: 'For Players', about: 'About'},
     hero: {
-      tagline: 'International talent identification · Est. 2023',
+      tagline: 'International talent identification',
       pg: 'Performance Group',
-      sub: 'We identify talent and open the door to clubs across England and Europe. Quietly, honestly, and only for the few who are ready.',
-      clubK: 'I am a club',
-      clubT: 'For Clubs',
-      playerK: 'I am a player',
-      playerT: 'For Players',
+      sub: 'We identify talent and open the door to clubs across England and Europe.',
+      clubT: 'Clubs',
+      playerT: 'Players',
       cue: 'Who we are'
     },
     what: {
       eyebrow: 'Who we are',
-      pre: 'The honest ',
-      it: 'bridge',
-      mid: ' between a player who is ready and a club that is looking. ',
-      bold: 'We reveal just enough to be credible, and we never promise what we cannot deliver.'
+      opening: 'Most promise the dream. We measure it.',
+      bold: 'Clearway is an international football talent identification company. The standard is the one professional clubs actually use. The door opens to over 100 clubs across England and Europe.'
     },
     doors: {
       clubs: {
-        dlabel: 'If you are a club',
+        dlabel: 'Clubs',
         thin: 'We bring you',
         bold: 'the right player.',
         p: 'Identified, checked and ready. With the work permit and GBE paperwork for England already handled.',
         enter: "Let's go"
       },
       players: {
-        dlabel: 'If you are a player',
+        dlabel: 'Players',
         thin: 'We open the',
         bold: 'door for you.',
         p: 'We measure you against a real professional standard and put you in front of the clubs that fit. We guarantee the trial, not the signing. Men and women.',
@@ -67,8 +65,8 @@ const COPY = {
     team: {
       eyebrow: 'The names that open doors',
       thin: 'They have seen it before.',
-      bold: 'They know what it takes.',
-      it: 'And they believe in the ones who do.',
+      bold: 'They have seen it before. They know what it takes.',
+      it: 'They can make it happen.',
       jamesRole: 'Founder and CEO',
       jamesDesc:
         'FA-registered in Talent Identification, with access to 100+ clubs across England and Europe.',
@@ -85,7 +83,10 @@ const COPY = {
         'Over **15 years in Ligue 1** with RC Lens, Bordeaux, OGC Nice and Olympique de Marseille.',
         '**France Under 21 international.**',
         'Has represented and placed several players in **Europe and Mexico**.'
-      ]
+      ],
+      timoRole: 'Director of USA and Mexico Football',
+      timoDesc:
+        'Former French professional defender with fifteen years at Lyon, Nice, Saint-Étienne, Sevilla, Borussia Mönchengladbach and Tigres. UEFA Europa League winner. He leads talent identification across the USA and Mexico.'
     },
     proof: {
       eyebrow: 'The record',
@@ -122,32 +123,28 @@ const COPY = {
   es: {
     nav: {clubs: 'Para Clubes', players: 'Para Jugadores', about: 'Sobre'},
     hero: {
-      tagline: 'Identificación internacional de talento · Est. 2023',
+      tagline: 'Identificación internacional de talento',
       pg: 'Performance Group',
-      sub: 'Identificamos talento y abrimos la puerta a clubes en Inglaterra y Europa. En silencio, con honestidad, y solo para los pocos que están listos.',
-      clubK: 'Soy un club',
-      clubT: 'Para Clubes',
-      playerK: 'Soy jugador',
-      playerT: 'Para Jugadores',
+      sub: 'Identificamos talento y abrimos la puerta a clubes en Inglaterra y Europa.',
+      clubT: 'Clubes',
+      playerT: 'Jugadores',
       cue: 'Quiénes somos'
     },
     what: {
       eyebrow: 'Quiénes somos',
-      pre: 'El ',
-      it: 'puente',
-      mid: ' honesto entre un jugador que está listo y un club que está buscando. ',
-      bold: 'Revelamos lo justo para ser creíbles, y nunca prometemos lo que no podemos cumplir.'
+      opening: 'Muchos prometen el sueño. Nosotros lo medimos.',
+      bold: 'Clearway es una empresa internacional de identificación de talento futbolístico. El estándar es el que los clubes profesionales usan de verdad. La puerta se abre a más de 100 clubes en Inglaterra y Europa.'
     },
     doors: {
       clubs: {
-        dlabel: 'Si eres un club',
+        dlabel: 'Clubes',
         thin: 'Te traemos',
         bold: 'al jugador correcto.',
         p: 'Identificado, verificado y listo. Con el permiso de trabajo y el papeleo GBE para Inglaterra ya resueltos.',
         enter: 'Vamos allá'
       },
       players: {
-        dlabel: 'Si eres jugador',
+        dlabel: 'Jugadores',
         thin: 'Te abrimos',
         bold: 'la puerta.',
         p: 'Te medimos contra un estándar profesional real y te ponemos frente a los clubes que encajan. Garantizamos la prueba, no la firma. Hombres y mujeres.',
@@ -157,8 +154,8 @@ const COPY = {
     team: {
       eyebrow: 'Los nombres que abren puertas',
       thin: 'Ya lo han vivido.',
-      bold: 'Saben lo que hace falta.',
-      it: 'Y creen en quienes lo tienen.',
+      bold: 'Ya lo han vivido. Saben lo que se necesita.',
+      it: 'Pueden hacerlo posible.',
       jamesRole: 'Fundador y CEO',
       jamesDesc:
         'Registrado en la FA en Identificación de Talento, con acceso a más de 100 clubes en Inglaterra y Europa.',
@@ -175,7 +172,10 @@ const COPY = {
         'Más de **15 años en la Ligue 1** con RC Lens, Burdeos, OGC Nice y Olympique de Marsella.',
         '**Internacional con la Francia Sub-21.**',
         'Ha representado y colocado a varios jugadores en **Europa y México**.'
-      ]
+      ],
+      timoRole: 'Director de Fútbol de Estados Unidos y México',
+      timoDesc:
+        'Exdefensa profesional francés con quince años en Lyon, Niza, Saint-Étienne, Sevilla, Borussia Mönchengladbach y Tigres. Campeón de la UEFA Europa League. Lidera la identificación de talento en Estados Unidos y México.'
     },
     proof: {
       eyebrow: 'El historial',
@@ -826,6 +826,17 @@ export function LandingHome() {
     return () => cio.disconnect();
   }, []);
 
+  /* Hero "Who we are" cue → smooth-scroll down to the WHO WE ARE section.
+     Uses the shared Lenis instance so it animates through Lenis; falls back to
+     native smooth scroll when Lenis is absent (reduced motion). */
+  const scrollToWhat = () => {
+    const el = whatRef.current;
+    if (!el) return;
+    const lenis = getLenis();
+    if (lenis) lenis.scrollTo(el);
+    else el.scrollIntoView({behavior: 'smooth'});
+  };
+
   return (
     <div ref={rootRef} className={cx('page')}>
       {/* film grain */}
@@ -877,14 +888,6 @@ export function LandingHome() {
 
         <div className={cx('heroInner')}>
           <div className={cx('tagline')}>{c.hero.tagline}</div>
-          <div className={cx('logoBig')}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              className={cx('logoSvg')}
-              src="/Logotipos/clearway-white.svg"
-              alt="Clearway Performance Group"
-            />
-          </div>
           <p className={cx('sub')}>{c.hero.sub}</p>
           <div className={cx('heroCta')}>
             <Link
@@ -899,7 +902,6 @@ export function LandingHome() {
                 resetVideo(clubsVideoRef);
               }}
             >
-              <span className={cx('hbK')}>{c.hero.clubK}</span>
               <span className={cx('hbT')}>
                 {c.hero.clubT} <span className={cx('arr')}>→</span>
               </span>
@@ -916,14 +918,25 @@ export function LandingHome() {
                 resetVideo(playersVideoRef);
               }}
             >
-              <span className={cx('hbK')}>{c.hero.playerK}</span>
               <span className={cx('hbT')}>
                 {c.hero.playerT} <span className={cx('arr')}>→</span>
               </span>
             </Link>
           </div>
         </div>
-        <div className={cx('scrollCue')}>
+        <div
+          className={cx('scrollCue')}
+          role="button"
+          tabIndex={0}
+          aria-label={c.hero.cue}
+          onClick={scrollToWhat}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              scrollToWhat();
+            }
+          }}
+        >
           <span>{c.hero.cue}</span>
           <span className={cx('bar')} />
           <svg
@@ -952,9 +965,7 @@ export function LandingHome() {
         <div className={cx('wrap')}>
           <div className={cx('eyebrow', 'reveal')}>{c.what.eyebrow}</div>
           <h2 className={cx('reveal')} data-d="1">
-            {c.what.pre}
-            <span className={cx('it')}>{c.what.it}</span>
-            {c.what.mid}
+            <span className={cx('it')}>{c.what.opening}</span>{' '}
             <b>{c.what.bold}</b>
           </h2>
         </div>
@@ -1020,11 +1031,11 @@ export function LandingHome() {
             <div className={cx('tcard', 'reveal')} data-d="1">
               <div className={cx('tphoto')}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/Cyril.png" alt="" />
+                <img src="/cyril.webp" alt="" />
               </div>
               <div className={cx('tinfo')}>
                 <div className={cx('tname')}>
-                  <span>Cyril</span> Rool.
+                  <span>Cyril</span> Rool
                 </div>
                 <div className={cx('trole')}>{c.team.cyrilRole}</div>
                 <p className={cx('tdesc')}>{c.team.cyrilDesc}</p>
@@ -1033,11 +1044,11 @@ export function LandingHome() {
             <div className={cx('tcard', 'reveal')} data-d="2">
               <div className={cx('tphoto')}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/james.png" alt="" />
+                <img src="/james.webp" alt="" />
               </div>
               <div className={cx('tinfo')}>
                 <div className={cx('tname')}>
-                  <span>James</span> Fox.
+                  <span>James</span> Fox
                 </div>
                 <div className={cx('trole')}>{c.team.jamesRole}</div>
                 <p className={cx('tdesc')}>{c.team.jamesDesc}</p>
@@ -1045,21 +1056,15 @@ export function LandingHome() {
             </div>
             <div className={cx('tcard', 'reveal')} data-d="3">
               <div className={cx('tphoto')}>
-                <span className={cx('tph')} aria-hidden="true">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.3"
-                    strokeLinecap="round"
-                  >
-                    <circle cx="12" cy="8" r="4" />
-                    <path d="M4 21c0-4.2 3.6-7 8-7s8 2.8 8 7" />
-                  </svg>
-                </span>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/timothee.webp" alt="" />
               </div>
               <div className={cx('tinfo')}>
-                <div className={cx('tname')}>Tom.</div>
+                <div className={cx('tname')}>
+                  <span>Timothée</span> Kolodziejczak
+                </div>
+                <div className={cx('trole')}>{c.team.timoRole}</div>
+                <p className={cx('tdesc')}>{c.team.timoDesc}</p>
               </div>
             </div>
           </div>
@@ -1102,120 +1107,9 @@ export function LandingHome() {
         </div>
       </section>
 
-      {/* TESTIMONIALS — dark-blue glassmorphism carousel; row pauses and card
-          grows on hover */}
-      <section className={cx('voices')}>
-        <div className={cx('wrap')}>
-          <div className={cx('head', 'reveal')}>
-            <h2>
-              Real voices. <span className={cx('it')}>Real pathways.</span>
-            </h2>
-          </div>
-        </div>
-        <div className={cx('vmarquee')}>
-          <div className={cx('vrow', 'r1')}>
-            {VOICES_R1.concat(VOICES_R1).map((v, i) => (
-              <div className={cx('vcard')} key={`r1-${i}`}>
-                <p>{v.quote}</p>
-                <span className={cx('who')}>{v.who}</span>
-              </div>
-            ))}
-          </div>
-          <div className={cx('vrow', 'r2')}>
-            {VOICES_R2.concat(VOICES_R2).map((v, i) => (
-              <div className={cx('vcard')} key={`r2-${i}`}>
-                <p>{v.quote}</p>
-                <span className={cx('who')}>{v.who}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* FOOTER */}
-      <footer className={cx('foot')}>
-        <div className={cx('wrap')}>
-          <div className={cx('foot-top')}>
-            <Link href="/" aria-label="Clearway — home">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                className={cx('foot-logo')}
-                src="/Logotipos/clearway-white.svg"
-                alt="Clearway"
-              />
-            </Link>
-            <nav className={cx('foot-nav')}>
-              <div className={cx('foot-col')}>
-                <Link href="/for-clubs">For Clubs</Link>
-                <Link href="/for-players">For Players</Link>
-                <Link href="/">About Clearway</Link>
-              </div>
-              <div className={cx('foot-col')}>
-                <Link href="/privacy">Privacy Policy</Link>
-                <Link href="/terms">Terms &amp; Conditions</Link>
-              </div>
-            </nav>
-          </div>
-          <div className={cx('foot-bot')}>
-            <span>© 2026 Clearway Performance Group</span>
-            <span>Created by SCNDAL</span>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
 
-const VOICES_R1 = [
-  {
-    quote:
-      '"Every player you sent was worth the trip. Not one wasted trial all season."',
-    who: 'Sporting Director'
-  },
-  {
-    quote:
-      '"Your professionalism at every stage has been incredible. We already feel Clearway."',
-    who: 'Parent of a player'
-  },
-  {
-    quote:
-      '"Having someone on the ground who has actually watched the player live changes everything."',
-    who: 'Head of Recruitment'
-  },
-  {
-    quote:
-      '"It is always very professional, clear and exciting getting news from you."',
-    who: 'Parent of a player'
-  },
-  {
-    quote:
-      '"The work permit and GBE were cleared before we even met him. That never happens."',
-    who: 'Technical Director'
-  }
-];
-
-const VOICES_R2 = [
-  {
-    quote: '"We signed two from your shortlist. Both are still in the side."',
-    who: 'Head of Academy'
-  },
-  {
-    quote:
-      '"I had not realised you would be there in person on the first day. That is truly priceless."',
-    who: 'Parent of a player'
-  },
-  {
-    quote:
-      '"The honesty up front saved us months chasing the wrong profiles."',
-    who: 'Director of Football'
-  },
-  {
-    quote:
-      '"Reading your messages is highly motivating. We will follow your recommendations."',
-    who: 'Parent of a player'
-  },
-  {
-    quote: '"Finally a partner who understands what our level actually needs."',
-    who: 'Sporting Director'
-  }
-];

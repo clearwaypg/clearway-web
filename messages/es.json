@@ -5,7 +5,7 @@
     "nav": {
       "clubs": "Para Clubes",
       "players": "Para Jugadores",
-      "about": "Sobre"
+      "home": "Inicio"
     },
     "cta": {
       "players": {"long": "Crea tu perfil", "short": "Crea perfil"},

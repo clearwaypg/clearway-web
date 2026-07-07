@@ -144,11 +144,11 @@
   display: none;
 }
 
-/* ===== Menu toggle — three dots (· · ·) ===== */
+/* ===== Menu toggle — hamburger (three left-aligned lines) ===== */
 .burger {
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   justify-content: center;
   gap: 5px;
   width: 40px;
@@ -159,35 +159,29 @@
   border: 0;
   cursor: pointer;
 }
+/* Three horizontal lines, each a different length, uniform gap between them. */
 .burger span {
   display: block;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
+  height: 2px;
+  border-radius: 2px;
   background: #fcfcfc;
   transition:
-    transform 0.25s ease,
+    width 0.25s ease,
     background 0.25s ease;
 }
-/* Dynamic hover: the three dots ripple upward in a staggered wave. */
+.burger span:nth-child(1) {
+  width: 24px;
+}
+.burger span:nth-child(2) {
+  width: 16px;
+}
+.burger span:nth-child(3) {
+  width: 20px;
+}
+/* Hover: the lines extend to a common length and lighten. */
 .burger:hover span {
+  width: 24px;
   background: #d0d8e2;
-  animation: dotWave 0.7s ease-in-out infinite;
-}
-.burger:hover span:nth-child(2) {
-  animation-delay: 0.12s;
-}
-.burger:hover span:nth-child(3) {
-  animation-delay: 0.24s;
-}
-@keyframes dotWave {
-  0%,
-  100% {
-    transform: translateY(0) scale(1);
-  }
-  40% {
-    transform: translateY(-6px) scale(1.18);
-  }
 }
 
 /* ===== Full-screen menu overlay ===== */

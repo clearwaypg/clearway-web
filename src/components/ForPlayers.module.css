@@ -154,16 +154,30 @@
 .hero {
   position: relative;
   min-height: 100vh;
-  display: grid;
-  grid-template-columns: 1fr 0.82fr;
-  gap: clamp(24px, 4vw, 56px);
-  /* Top-align the two columns so the title and the card start at the same level.
-     With center alignment the taller (text + stats) column pushed the shorter
-     card down to the middle; top-aligning keeps them on the same visual line. */
-  align-items: start;
+  /* Flex-centre the content block within the full viewport height (both axes), so
+     the hero sits balanced instead of stuck to the top with a void below. The
+     section grows past 100vh if the content is taller (short screens), so nothing
+     is ever clipped under the fixed nav. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 120px clamp(20px, 5vw, 60px) 60px;
   overflow: hidden;
   background: #0c0c0c;
+}
+/* Inner content: a capped, centred two-column grid. The max-width keeps it a
+   normal, balanced two-column layout on large/ultra-wide screens instead of
+   stretching edge to edge. */
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1240px;
+  display: grid;
+  grid-template-columns: 1fr 0.82fr;
+  gap: clamp(24px, 4vw, 56px);
+  /* Keep the two columns top-aligned to each other (title and card start level). */
+  align-items: start;
 }
 /* Shared morph surface — expands from the clicked home panel. */
 .hero-bg {
@@ -346,11 +360,8 @@
   z-index: 5;
   display: flex;
   flex-direction: column;
-  /* Center the card in its column and nudge it left so it sits roughly centered
-     between the end of "GOOD" in the headline and the right edge of the screen.
-     The vw-based shift keeps that balance across screen widths. */
+  /* Centre the card within its grid column. */
   align-items: center;
-  transform: translateX(-4vw);
   min-width: 0;
   gap: 18px;
 }
@@ -1203,33 +1214,35 @@
 .guides .head h2 .it {
   color: var(--dew);
 }
-.team {
+/* Profile cards — identical treatment to the home / for-clubs team section: a
+   vertical portrait card (photo on top, name/role/desc below); on hover the photo
+   zooms and expands to fill the whole card. Three cards (James, Cyril & Timothée)
+   in a 3-column grid. */
+.teamGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: clamp(20px, 2.4vw, 32px);
 }
-/* Vertical portrait card: photo fills most of the top, name/role/description
-   below. On hover the photo zooms and expands to cover the whole card. All
-   three cards share the same size and structure. */
-.gcard {
+.tmcard {
   position: relative;
-  /* Above the travelling ball (z-index 40) so it passes behind the cards. */
+  /* Sits above the drifting tactical ball so it passes behind the cards. */
   z-index: 45;
   aspect-ratio: 3 / 4;
   border-radius: 14px;
   overflow: hidden;
-  background: linear-gradient(160deg, #0a2a5e 0%, #061c40 52%, #04122c 100%);
+  /* home's --hero-bg, inlined. */
+  background: radial-gradient(120% 90% at 50% 38%, #13284f 0%, #0c0c0c 70%);
   border: 1px solid rgba(208, 216, 226, 0.14);
   transition:
     border-color 0.35s ease,
     box-shadow 0.35s ease;
+  cursor: pointer;
 }
-/* On hover the border lights up subtly (no back shadow). */
-.gcard:hover {
+.tmcard:hover {
   border-color: rgba(140, 185, 255, 0.75);
   box-shadow: 0 0 16px rgba(90, 150, 255, 0.28);
 }
-.gphoto {
+.tphoto {
   position: absolute;
   top: 0;
   left: 0;
@@ -1240,7 +1253,7 @@
   background: linear-gradient(150deg, #0a3a86, #04193f);
   transition: height 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.gphoto img {
+.tphoto img {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -1250,33 +1263,20 @@
   display: block;
   transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.gphoto::after {
+.tphoto::after {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
   background: linear-gradient(to top, rgba(4, 18, 46, 0.5) 0%, transparent 32%);
 }
-.gcard:hover .gphoto {
+.tmcard:hover .tphoto {
   height: 100%;
 }
-.gcard:hover .gphoto img {
+.tmcard:hover .tphoto img {
   transform: scale(1.08);
 }
-/* Placeholder (Tom): keeps the layout with no photo. */
-.gph {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(208, 216, 226, 0.28);
-}
-.gph svg {
-  width: 32%;
-  height: auto;
-}
-.gbody {
+.tinfo {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -1287,17 +1287,18 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-width: 0;
 }
-.gname {
-  font-size: clamp(1.2rem, 1.8vw, 1.55rem);
+.tname {
+  font-size: clamp(1.15rem, 1.7vw, 1.5rem);
   font-weight: 900;
   color: #fff;
   line-height: 1;
 }
-.gname span {
+.tname span {
   font-weight: 300;
 }
-.grole {
+.trole {
   font-size: 0.64rem;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -1305,8 +1306,8 @@
   color: var(--dew);
   margin-top: 9px;
 }
-.gdesc {
-  font-size: 0.76rem;
+.tdesc {
+  font-size: 0.8rem;
   line-height: 1.4;
   color: #aebac9;
   margin-top: 9px;
@@ -1322,7 +1323,14 @@
    black gap or colour cut. Its padding gives the generous space and centres the
    ribbon within it as a separator. */
 .ribbon-band {
-  background: var(--navy);
+  /* Holds navy at the top (blending with "THE STANDARD" above) then fades to dew
+     at the bottom so it hands off seamlessly to the close section below. */
+  background: linear-gradient(
+    180deg,
+    var(--navy) 0%,
+    var(--navy) 45%,
+    var(--dew) 100%
+  );
   padding: clamp(54px, 8vh, 104px) 0;
 }
 .ribbon {
@@ -1359,112 +1367,6 @@
   to {
     transform: translateX(-50%);
   }
-}
-
-/* =================== CAP 05 · voices =================== */
-.voices {
-  /* Hold the navy (= the colour the guides section ends on) at the top so the
-     seam blends with no visible cut, then fade smoothly to dew. */
-  background: linear-gradient(
-    180deg,
-    var(--navy) 0%,
-    var(--navy) 12%,
-    var(--dew) 100%
-  );
-  padding: clamp(40px, 5.5vh, 68px) 0 clamp(90px, 13vh, 160px);
-  position: relative;
-  overflow: hidden;
-}
-.voices .wrap,
-.voices .vmarquee {
-  position: relative;
-  z-index: 2;
-}
-/* Testimonial cards sit above the travelling ball (z-index 40) so it passes
-   behind them. */
-.voices .vmarquee {
-  z-index: 45;
-}
-.voices .head {
-  text-align: center;
-  margin-top: clamp(14px, 3vh, 40px);
-  margin-bottom: 20px;
-}
-.voices .head h2 {
-  font-size: clamp(2rem, 5vw, 3.6rem);
-  font-weight: 700;
-  color: #fff;
-}
-.voices .head h2 .it {
-  color: #fff;
-}
-.voices .head p {
-  color: rgba(252, 252, 252, 0.85);
-  margin-top: 14px;
-  font-size: clamp(1.05rem, 1.5vw, 1.25rem);
-}
-.vmarquee {
-  position: relative;
-  margin-top: clamp(50px, 7vh, 84px);
-}
-.vrow {
-  display: flex;
-  gap: 20px;
-  width: max-content;
-  animation: vscroll 46s linear infinite;
-}
-.vrow.r2 {
-  animation-duration: 58s;
-  animation-direction: reverse;
-  margin-top: 20px;
-}
-/* Hovering a card pauses its row so it can be read. */
-.vrow:has(.vcard:hover) {
-  animation-play-state: paused;
-}
-@keyframes vscroll {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-/* Dark-blue glassmorphism: semitransparent navy with blur and a subtle border. */
-.vcard {
-  position: relative;
-  width: 330px;
-  flex-shrink: 0;
-  background: rgba(8, 24, 56, 0.5);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
-  backdrop-filter: blur(16px) saturate(140%);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 14px;
-  padding: 26px;
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-}
-/* Grows smoothly on hover (the row pauses via .vrow:has(.vcard:hover)). */
-.vcard:hover {
-  transform: scale(1.06);
-  z-index: 2;
-}
-.vcard p {
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 1.1rem;
-  color: #eaf0fb;
-  line-height: 1.45;
-}
-.vcard .who {
-  display: block;
-  margin-top: 14px;
-  font-family: var(--font);
-  font-style: normal;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--dew);
 }
 
 /* =================== CAP 06 · close =================== */
@@ -1866,15 +1768,18 @@
 
 @media (max-width: 980px) {
   .hero {
+    /* Stacked content can exceed the viewport here — top-align so the top is
+       never clipped under the nav (the section grows and scrolls instead). */
+    align-items: start;
+  }
+  .hero-inner {
     grid-template-columns: 1fr;
     gap: 30px;
   }
-  .cardcol {
-    transform: none;
-  }
-  .team {
+  .teamGrid {
     grid-template-columns: 1fr;
-    max-width: 380px;
+    gap: 22px;
+    max-width: 340px;
     margin: 0 auto;
   }
   .truthLayout {
@@ -1922,7 +1827,7 @@
     transform: none;
   }
   .tgrid,
-  .team {
+  .teamGrid {
     grid-template-columns: 1fr;
   }
 }

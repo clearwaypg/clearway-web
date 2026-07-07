@@ -1,10 +1,12 @@
 'use client';
 
 import {useCallback, useEffect, useRef, useState} from 'react';
+import {useLocale} from 'next-intl';
 
 import {Link} from '@/i18n/navigation';
 import {Ball3D} from './Ball3D';
 import {SiteHeader} from './SiteHeader';
+import {SiteFooter} from './SiteFooter';
 import styles from './ForClubs.module.css';
 
 /* =========================================================
@@ -21,35 +23,255 @@ const cx = (...names: Array<string | false | null | undefined>) =>
     .map((n) => styles[n as string] ?? (n as string))
     .join(' ');
 
-/* Turn **bold** markers into <strong> for the credit lines. */
-function rich(s: string) {
-  return s
-    .split(/\*\*(.+?)\*\*/g)
-    .map((part, i) => (i % 2 === 1 ? <strong key={i}>{part}</strong> : part));
-}
+type Copy = (typeof COPY)['en'];
 
-const PEOPLE = {
-  james: {
-    role: 'Founder and CEO',
-    creds: [
-      'Over **30 years** in professional sport, as athlete, coach and manager.',
-      'Alongside **Olympic gold medallists, Wimbledon champions, world number ones and EFL footballers.**',
-      '**Registered with The Football Association in Talent Identification.**',
-      '**100+ clubs** across England and Europe. FIFA licensed agents available. Men and women.',
-      '**Work permit and GBE for England**, handled in full.'
-    ]
+const COPY = {
+  en: {
+    hero: {
+      eyebrow: 'For clubs · England and Europe',
+      thin: 'We send you the signal.',
+      bold: 'Not the noise.',
+      sub: 'Every player already filtered, watched and cleared. You only meet the ones ready to walk onto your pitch.',
+      cta: 'Start your search'
+    },
+    cost: {
+      eyebrow: 'The cost of the old way',
+      thin: '93 trials',
+      bold: 'nobody needed.',
+      items: [
+        {
+          title: 'Wasted trials',
+          desc: 'Flights, hotels and staff time spent on players who were never close to your level.'
+        },
+        {
+          title: 'No eyes on the ground',
+          desc: 'Decisions made on edited highlight reels, with no one who has watched the player live.'
+        },
+        {
+          title: 'The paperwork wall',
+          desc: 'Work permits and GBE points that sink a signing months after you committed to it.'
+        }
+      ]
+    },
+    versus: {
+      eyebrow: 'What you actually get',
+      thin: 'The old way',
+      bold: 'gets a red card.',
+      oldTag: 'The old way',
+      oldItems: [
+        'Hundreds of unfiltered CVs and reels',
+        'Trials booked on a hunch',
+        'No one watching live',
+        'Paperwork discovered too late',
+        'You carry all the risk'
+      ],
+      oldFoot: 'Off the pitch',
+      clearTag: 'The Clearway way',
+      clearItems: [
+        'Only the 7% that clear the filter',
+        'Three months of real evaluation first',
+        'Watched in person, on the ground',
+        'Work permit and GBE cleared up front',
+        'The trial is guaranteed, the signing is earned'
+      ],
+      clearFoot: 'Cleared to play'
+    },
+    map: {
+      eyebrow: 'Two ways we work with clubs',
+      thin: 'One network.',
+      bold: 'Two pathways.',
+      ukNode: 'England and Europe',
+      mxNode: 'Mexico and Texas',
+      card1: {
+        tag: 'Clubs in the UK and Europe',
+        thin: 'Recruitment you can',
+        bold: 'actually trust.',
+        p: 'Fully filtered talent, watched in person, ready to trial. We do the first 93 rejections so your staff only meet the seven.',
+        pts: [
+          'Players measured against your level before they reach you',
+          'Eyes on the ground, not just highlight reels',
+          'Work permit and GBE handled end to end'
+        ]
+      },
+      card2: {
+        tag: 'Clubs in Mexico and Texas',
+        thin: 'Your door into',
+        bold: 'European football.',
+        p: 'A direct bridge to clubs across England and Europe, and the partnerships that come with being inside the network rather than outside it.',
+        pts: [
+          'A real pathway for your players into Europe',
+          'Partnerships with clubs already in the network',
+          'The same filter, working in your favour'
+        ]
+      }
+    },
+    people: {
+      eyebrow: 'The people behind it',
+      thin: 'Clearway is not a directory.',
+      bold: 'It is three careers.',
+      lede: 'When they put a player in front of you, it carries their name. That is the whole promise.',
+      james: {
+        role: 'Founder and CEO',
+        desc: 'FA-registered in Talent Identification, with access to 100+ clubs across England and Europe.'
+      },
+      cyril: {
+        role: 'Director of European Football',
+        desc: '15+ years in Ligue 1 — Lens, Bordeaux, Nice and Marseille. France U21 international.'
+      },
+      timo: {
+        role: 'Director of USA and Mexico Football',
+        desc: 'Former French professional defender with fifteen years at Lyon, Nice, Saint-Étienne, Sevilla, Borussia Mönchengladbach and Tigres. UEFA Europa League winner. He leads talent identification across the USA and Mexico.'
+      }
+    },
+    end: {
+      eyebrow: 'The next signing starts here',
+      thin: 'Tell us the player',
+      bold: 'you are missing.',
+      p: 'Five quick answers, and it reaches Clearway directly. We reply in person. No bots, no middlemen.',
+      cta: 'Start your search',
+      fine: 'Every enquiry is treated in confidence. No player is ever named publicly without permission.'
+    },
+    enq: {
+      dialogLabel: 'Club enquiry',
+      close: 'Close',
+      step: 'Step',
+      of: 'of',
+      done: 'Done',
+      s1: {kicker: 'Let us find your player', qa: 'Which club is', qb: 'this', qbold: 'for?', placeholder: 'Club name', err: 'Please tell us the club.'},
+      s2: {kicker: 'Your level', qa: 'Country and', qbold: 'league.', placeholder: 'e.g. England, Championship', err: 'Please tell us where you are.'},
+      s3: {kicker: 'The gap in your squad', qa: 'Who are you', qbold: 'looking for?', placeholder: 'e.g. Right back, U21, left footed', hint: 'One line is enough. You can be more specific later.'},
+      s4: {kicker: 'Your timeline', qa: 'When do you', qbold: 'need them?', options: ['This window', 'Next window', 'Just exploring'], err: 'Pick one to continue.'},
+      s5: {kicker: 'Where Clearway reaches you', qa: 'Your name', qb: 'and', qbold: 'email.', placeholderName: 'Your name', placeholderEmail: 'Your email', err: 'A name and a valid email, please.'},
+      doneStep: {qa: 'Clearway', qbold: 'is on it.', p: 'Every enquiry goes straight to Clearway. We reply in person, in confidence. The search starts now.'},
+      back: '← Back',
+      send: 'Send to Clearway',
+      continue: 'Continue'
+    }
   },
-  cyril: {
-    role: 'Director of European Football',
-    creds: [
-      'Over **15 years in Ligue 1** with RC Lens, Bordeaux, OGC Nice and Olympique de Marseille.',
-      '**France Under 21 international.**',
-      'Has represented and placed players across **Europe and Mexico.**'
-    ]
+  es: {
+    hero: {
+      eyebrow: 'Para clubes · Inglaterra y Europa',
+      thin: 'Te enviamos la señal.',
+      bold: 'No el ruido.',
+      sub: 'Cada jugador ya filtrado, observado y verificado. Solo conoces a los que están listos para saltar a tu campo.',
+      cta: 'Inicia tu búsqueda'
+    },
+    cost: {
+      eyebrow: 'El coste del método antiguo',
+      thin: '93 pruebas',
+      bold: 'que nadie necesitaba.',
+      items: [
+        {
+          title: 'Pruebas desperdiciadas',
+          desc: 'Vuelos, hoteles y horas de tu staff invertidos en jugadores que nunca estuvieron cerca de tu nivel.'
+        },
+        {
+          title: 'Sin ojos sobre el terreno',
+          desc: 'Decisiones tomadas sobre vídeos de resúmenes editados, sin nadie que haya visto al jugador en directo.'
+        },
+        {
+          title: 'El muro burocrático',
+          desc: 'Permisos de trabajo y puntos GBE que hunden un fichaje meses después de haberte comprometido.'
+        }
+      ]
+    },
+    versus: {
+      eyebrow: 'Lo que realmente obtienes',
+      thin: 'El método antiguo',
+      bold: 've la tarjeta roja.',
+      oldTag: 'El método antiguo',
+      oldItems: [
+        'Cientos de CVs y vídeos sin filtrar',
+        'Pruebas reservadas por corazonada',
+        'Nadie viendo en directo',
+        'Papeleo descubierto demasiado tarde',
+        'Tú cargas con todo el riesgo'
+      ],
+      oldFoot: 'Fuera del campo',
+      clearTag: 'El método Clearway',
+      clearItems: [
+        'Solo el 7% que supera el filtro',
+        'Tres meses de evaluación real primero',
+        'Observados en persona, sobre el terreno',
+        'Permiso de trabajo y GBE resueltos de antemano',
+        'La prueba está garantizada, el fichaje se gana'
+      ],
+      clearFoot: 'Listos para jugar'
+    },
+    map: {
+      eyebrow: 'Dos formas de trabajar con clubes',
+      thin: 'Una red.',
+      bold: 'Dos caminos.',
+      ukNode: 'Inglaterra y Europa',
+      mxNode: 'México y Texas',
+      card1: {
+        tag: 'Clubes en Reino Unido y Europa',
+        thin: 'Un reclutamiento en el que',
+        bold: 'sí puedes confiar.',
+        p: 'Talento totalmente filtrado, observado en persona, listo para la prueba. Nosotros hacemos los primeros 93 descartes para que tu staff solo conozca a los siete.',
+        pts: [
+          'Jugadores medidos contra tu nivel antes de llegar a ti',
+          'Ojos sobre el terreno, no solo vídeos de resúmenes',
+          'Permiso de trabajo y GBE gestionados de principio a fin'
+        ]
+      },
+      card2: {
+        tag: 'Clubes en México y Texas',
+        thin: 'Tu puerta al',
+        bold: 'fútbol europeo.',
+        p: 'Un puente directo a clubes en Inglaterra y Europa, y las alianzas que solo llegan cuando estás dentro de la red y no fuera de ella.',
+        pts: [
+          'Un camino real para tus jugadores hacia Europa',
+          'Alianzas con clubes que ya están en la red',
+          'El mismo filtro, trabajando a tu favor'
+        ]
+      }
+    },
+    people: {
+      eyebrow: 'Las personas detrás',
+      thin: 'Clearway no es un directorio.',
+      bold: 'Son tres carreras.',
+      lede: 'Cuando ponen a un jugador frente a ti, lleva su nombre. Esa es toda la promesa.',
+      james: {
+        role: 'Fundador y CEO',
+        desc: 'Registrado en la FA en Identificación de Talento, con acceso a más de 100 clubes en Inglaterra y Europa.'
+      },
+      cyril: {
+        role: 'Director de Fútbol Europeo',
+        desc: 'Más de 15 años en la Ligue 1 — Lens, Burdeos, Niza y Marsella. Internacional sub-21 con Francia.'
+      },
+      timo: {
+        role: 'Director de Fútbol de Estados Unidos y México',
+        desc: 'Exdefensa profesional francés con quince años en Lyon, Niza, Saint-Étienne, Sevilla, Borussia Mönchengladbach y Tigres. Campeón de la UEFA Europa League. Lidera la identificación de talento en Estados Unidos y México.'
+      }
+    },
+    end: {
+      eyebrow: 'El próximo fichaje empieza aquí',
+      thin: 'Dinos el jugador',
+      bold: 'que te falta.',
+      p: 'Cinco respuestas rápidas y llega directo a Clearway. Respondemos en persona. Sin bots, sin intermediarios.',
+      cta: 'Inicia tu búsqueda',
+      fine: 'Cada consulta se trata con confidencialidad. Ningún jugador se nombra públicamente sin permiso.'
+    },
+    enq: {
+      dialogLabel: 'Consulta de club',
+      close: 'Cerrar',
+      step: 'Paso',
+      of: 'de',
+      done: 'Listo',
+      s1: {kicker: 'Encontremos a tu jugador', qa: '¿Para qué club', qb: 'es', qbold: 'esto?', placeholder: 'Nombre del club', err: 'Dinos el club, por favor.'},
+      s2: {kicker: 'Tu nivel', qa: 'País y', qbold: 'liga.', placeholder: 'p. ej. Inglaterra, Championship', err: 'Dinos dónde estás, por favor.'},
+      s3: {kicker: 'El hueco en tu plantilla', qa: '¿A quién', qbold: 'buscas?', placeholder: 'p. ej. Lateral derecho, sub-21, zurdo', hint: 'Una línea basta. Podrás concretar más adelante.'},
+      s4: {kicker: 'Tus plazos', qa: '¿Cuándo lo', qbold: 'necesitas?', options: ['Este mercado', 'Próximo mercado', 'Solo explorando'], err: 'Elige una para continuar.'},
+      s5: {kicker: 'Dónde te contacta Clearway', qa: 'Tu nombre', qb: 'y', qbold: 'correo.', placeholderName: 'Tu nombre', placeholderEmail: 'Tu correo', err: 'Un nombre y un correo válido, por favor.'},
+      doneStep: {qa: 'Clearway', qbold: 'se encarga.', p: 'Cada consulta llega directo a Clearway. Respondemos en persona y con confidencialidad. La búsqueda empieza ahora.'},
+      back: '← Atrás',
+      send: 'Enviar a Clearway',
+      continue: 'Continuar'
+    }
   }
 };
 
-const TIMELINE_OPTIONS = ['This window', 'Next window', 'Just exploring'];
 const TOTAL = 5;
 
 type EnqData = {
@@ -70,15 +292,14 @@ const EMPTY_DATA: EnqData = {
 };
 
 export function ForClubs() {
+  const locale = useLocale();
+  const c: Copy = COPY[locale === 'es' ? 'es' : 'en'];
+
   const rootRef = useRef<HTMLDivElement>(null);
-  const heroRef = useRef<HTMLElement>(null);
-  const introRef = useRef<HTMLDivElement>(null);
-  const eyebrowRef = useRef<HTMLDivElement>(null);
-  const hintRef = useRef<HTMLDivElement>(null);
-  const scrollBallRef = useRef<HTMLDivElement>(null);
   const mapCanvasRef = useRef<HTMLCanvasElement>(null);
   const enqCanvasRef = useRef<HTMLCanvasElement>(null);
   const enqBodyRef = useRef<HTMLDivElement>(null);
+  const travelBallRef = useRef<HTMLDivElement>(null);
 
   /* ----- Enquiry modal state ----- */
   const [enqOpen, setEnqOpen] = useState(false);
@@ -98,6 +319,117 @@ export function ForClubs() {
   }, []);
 
   const closeEnq = useCallback(() => setEnqOpen(false), []);
+
+  /* ===== Traveling ball — one persistent 3D ball whose FIXED position reacts to
+     scroll progress: it advances left→right and bounces (parabolic arcs off a
+     floor line that descends with scroll), so it appears to travel down the page
+     with you. Pure position animation — the page scrolls normally, nothing is
+     pinned, sticky or scroll-jacked. ===== */
+  useEffect(() => {
+    const ball = travelBallRef.current;
+    if (!ball) return;
+    let raf = 0;
+
+    const place = () => {
+      raf = 0;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const docH = document.documentElement.scrollHeight;
+      const max = Math.max(1, docH - vh);
+      const p = Math.max(0, Math.min(1, window.scrollY / max));
+
+      // Ball footprint scales with the viewport (see .travelBall clamp).
+      const size = Math.max(70, Math.min(120, vw * 0.08));
+      const marginX = Math.max(16, vw * 0.05);
+      const clampX = (v: number) =>
+        Math.max(marginX, Math.min(vw - size - marginX, v));
+
+      // A clear resting Y inside a section, given its text block: prefer the
+      // clear band below the text, else above it, else the section's bottom edge.
+      // Measured from the DOM so it holds at any screen size.
+      const clearRestY = (sectionRect: DOMRect, textRect: DOMRect) => {
+        const gapBelow = sectionRect.bottom - textRect.bottom;
+        const gapAbove = textRect.top - sectionRect.top;
+        if (gapBelow >= size + 20) return textRect.bottom + gapBelow * 0.5 - size / 2;
+        if (gapAbove >= size + 20) return sectionRect.top + gapAbove * 0.5 - size / 2;
+        return sectionRect.bottom - size - 12;
+      };
+
+      // Traveling trajectory (takes over once scrolling): sweep from the right
+      // across to the left, bouncing in parabolic arcs off a descending floor.
+      const travelX = clampX(
+        vw * 0.72 - p * (vw * 0.46) + Math.sin(p * Math.PI * 3) * (vw * 0.08)
+      );
+      const bounces = 5;
+      const bt = (p * bounces) % 1;
+      const arc = 4 * bt * (1 - bt); // 0 at each floor contact, 1 at the apex
+      const floorY = vh * 0.5 + p * (vh * 0.28);
+      const apex = Math.min(vh * 0.3, 260);
+      const travelY = floorY - arc * apex - size / 2;
+
+      let x = travelX;
+      let y = travelY;
+
+      // Hero rest (before any scroll): a clear zone that never overlaps the
+      // headline. Blend into the travel trajectory over the first sliver of scroll.
+      const hero = document.getElementById('hero');
+      const stage = hero
+        ? hero.querySelector<HTMLElement>('.' + styles.heroStage)
+        : null;
+      if (hero && stage) {
+        const t = Math.min(1, p / 0.05);
+        if (t < 1) {
+          const restY = clearRestY(
+            hero.getBoundingClientRect(),
+            stage.getBoundingClientRect()
+          );
+          const restX = clampX(vw * 0.72);
+          x = restX + (travelX - restX) * t;
+          y = restY + (travelY - restY) * t;
+        }
+      }
+
+      // Closing section: the ball keeps its natural bounce trajectory, but while
+      // the framed module is in view it is bounded to that frame — the same way it
+      // stays within the viewport on the rest of the page. It is not pinned to a
+      // fixed decorative spot; it just settles inside the frame along its path.
+      const endEl = document.getElementById('enquiry');
+      const endCard = endEl
+        ? endEl.querySelector<HTMLElement>('.' + styles.endCard)
+        : null;
+      let fade = 1;
+      if (endEl && endCard) {
+        const cr = endCard.getBoundingClientRect();
+        const enter = Math.max(0, Math.min(1, (vh * 0.95 - cr.top) / (vh * 0.6)));
+        if (enter > 0) {
+          const inset = size * 0.5 + 10;
+          const fx = Math.max(cr.left + inset, Math.min(cr.right - inset, x));
+          const fy = Math.max(cr.top + inset, Math.min(cr.bottom - inset, y));
+          x = x + (fx - x) * enter;
+          y = y + (fy - y) * enter;
+        }
+        // No fade on entry or within the section; fade only as the section scrolls
+        // up out of view (into the footer).
+        fade = Math.max(0, Math.min(1, endEl.getBoundingClientRect().bottom / (vh * 0.4)));
+      }
+
+      ball.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      ball.style.opacity = String(fade);
+    };
+
+    const onScroll = () => {
+      if (!raf) raf = window.requestAnimationFrame(place);
+    };
+
+    place();
+    window.addEventListener('scroll', onScroll, {passive: true});
+    window.addEventListener('resize', onScroll);
+    return () => {
+      if (raf) window.cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, []);
 
   // Slide the current step out, then swap to the next after the transition.
   function goTo(n: number) {
@@ -200,123 +532,6 @@ export function ForClubs() {
       leaving === null && i === cur && 'active'
     );
 
-  /* ===== HERO: scroll through the 200vh fades the intro out and the pills in,
-     while the ball stays put. ===== */
-  useEffect(() => {
-    const hero = heroRef.current;
-    if (!hero) return;
-    const intro = introRef.current;
-    const eyebrow = eyebrowRef.current;
-    const hint = hintRef.current;
-    const sats = Array.from(
-      rootRef.current?.querySelectorAll<HTMLElement>(`.${styles.hstat}`) ?? []
-    );
-    const clamp = (v: number) => Math.max(0, Math.min(1, v));
-
-    function apply() {
-      const rect = hero!.getBoundingClientRect();
-      const total = hero!.offsetHeight - window.innerHeight;
-      // Mobile / no sticky room: show everything, no scroll transition.
-      if (total <= 0) {
-        [intro, eyebrow, hint].forEach((el) => {
-          if (!el) return;
-          el.style.opacity = '';
-          el.style.transform = '';
-          el.style.pointerEvents = '';
-        });
-        sats.forEach((s) => s.classList.add(styles.show));
-        return;
-      }
-      const p = clamp(-rect.top / total);
-      const out = clamp(p / 0.42); // intro fully gone by ~42% of the scroll
-
-      if (intro) {
-        if (out <= 0) {
-          intro.style.opacity = '';
-          intro.style.transform = '';
-          intro.style.pointerEvents = '';
-        } else {
-          intro.style.opacity = String(1 - out);
-          intro.style.transform = `translateY(${-out * 56}px)`;
-          intro.style.pointerEvents = out > 0.5 ? 'none' : 'auto';
-        }
-      }
-      if (eyebrow) {
-        if (out <= 0) {
-          eyebrow.style.opacity = '';
-          eyebrow.style.transform = '';
-        } else {
-          eyebrow.style.opacity = String(1 - out);
-          eyebrow.style.transform = `translateY(${-out * 34}px)`;
-        }
-      }
-      if (hint) hint.style.opacity = out <= 0 ? '' : String(1 - clamp(p / 0.12));
-
-      sats.forEach((s, i) => {
-        const trigger = 0.16 + i * 0.1;
-        s.classList.toggle(styles.show, p >= trigger);
-      });
-    }
-
-    apply();
-    window.addEventListener('scroll', apply, {passive: true});
-    window.addEventListener('resize', apply);
-    return () => {
-      window.removeEventListener('scroll', apply);
-      window.removeEventListener('resize', apply);
-    };
-  }, []);
-
-  /* ===== Scroll-follower ball that ping-pongs across the mid sections. The
-     ball itself is the shared 3D <Ball3D> (it spins on its own via r3f); this
-     effect only positions the fixed wrapper and toggles its visibility. ===== */
-  useEffect(() => {
-    const ball = scrollBallRef.current;
-    if (!ball) return;
-    function sections() {
-      const cost = rootRef.current?.querySelector<HTMLElement>(`.${styles.cost}`);
-      const people = rootRef.current?.querySelector<HTMLElement>(
-        `.${styles.people}`
-      );
-      if (!cost || !people) return null;
-      const top = cost.getBoundingClientRect().top + window.scrollY;
-      const bottom = people.getBoundingClientRect().bottom + window.scrollY;
-      return {top, bottom};
-    }
-    function onScroll() {
-      const s = sections();
-      if (!s) return;
-      const scrollY = window.scrollY;
-      const viewH = window.innerHeight;
-      const sectionStart = s.top - viewH * 0.2;
-      const sectionEnd = s.bottom - viewH * 0.8;
-      if (scrollY < sectionStart || scrollY > sectionEnd) {
-        ball!.classList.remove(styles.visible);
-        return;
-      }
-      ball!.classList.add(styles.visible);
-      const p = (scrollY - sectionStart) / (sectionEnd - sectionStart);
-      const clampedP = Math.max(0, Math.min(1, p));
-      const cycles = 4;
-      const cp = (clampedP * cycles) % 1;
-      const isEven = Math.floor(clampedP * cycles) % 2 === 0;
-      const xFrac = isEven ? cp : 1 - cp;
-      const margin = 50;
-      const bw = 70;
-      const x = margin + xFrac * (window.innerWidth - margin * 2 - bw);
-      const y = viewH * 0.5 + Math.sin(clampedP * cycles * Math.PI * 2) * 40;
-      ball!.style.left = x + 'px';
-      ball!.style.top = y + 'px';
-    }
-    window.addEventListener('scroll', onScroll, {passive: true});
-    window.addEventListener('resize', onScroll);
-    onScroll();
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-    };
-  }, []);
-
   /* ===== Map: continent silhouettes + animated route MX <-> UK ===== */
   useEffect(() => {
     const canvas = mapCanvasRef.current;
@@ -328,8 +543,8 @@ export function ForClubs() {
     let raf = 0;
     let t = 0;
     let started = false;
-    const MX = {x: 0.21, y: 0.62};
-    const UK = {x: 0.74, y: 0.34};
+    const MX = {x: 0.216, y: 0.567};
+    const UK = {x: 0.498, y: 0.327};
     function resize() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       W = canvas!.clientWidth;
@@ -337,34 +552,6 @@ export function ForClubs() {
       canvas!.width = W * dpr;
       canvas!.height = H * dpr;
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-    const america = [
-      [0.05, 0.08], [0.1, 0.05], [0.16, 0.06], [0.22, 0.04], [0.28, 0.08],
-      [0.3, 0.14], [0.26, 0.18], [0.28, 0.24], [0.24, 0.3], [0.2, 0.36],
-      [0.18, 0.42], [0.2, 0.5], [0.16, 0.56], [0.14, 0.64], [0.12, 0.72],
-      [0.1, 0.78], [0.13, 0.84], [0.17, 0.88], [0.14, 0.92], [0.1, 0.9],
-      [0.07, 0.85], [0.05, 0.75], [0.03, 0.62], [0.02, 0.48], [0.03, 0.36],
-      [0.02, 0.22], [0.04, 0.14], [0.05, 0.08]
-    ];
-    const europa = [
-      [0.6, 0.12], [0.65, 0.1], [0.72, 0.08], [0.78, 0.1], [0.84, 0.08],
-      [0.88, 0.12], [0.9, 0.18], [0.86, 0.22], [0.88, 0.28], [0.84, 0.34],
-      [0.8, 0.38], [0.82, 0.44], [0.8, 0.52], [0.76, 0.6], [0.72, 0.68],
-      [0.68, 0.78], [0.66, 0.86], [0.7, 0.92], [0.66, 0.95], [0.62, 0.92],
-      [0.6, 0.84], [0.58, 0.72], [0.6, 0.62], [0.64, 0.54], [0.62, 0.46],
-      [0.6, 0.38], [0.58, 0.3], [0.6, 0.22], [0.58, 0.16], [0.6, 0.12]
-    ];
-    function drawContinent(pts: number[][], col: string, fillOpacity: number) {
-      if (!pts.length) return;
-      ctx!.beginPath();
-      ctx!.moveTo(pts[0][0] * W, pts[0][1] * H);
-      for (let i = 1; i < pts.length; i++) ctx!.lineTo(pts[i][0] * W, pts[i][1] * H);
-      ctx!.closePath();
-      ctx!.fillStyle = `rgba(${col},${fillOpacity})`;
-      ctx!.fill();
-      ctx!.strokeStyle = `rgba(${col},0.45)`;
-      ctx!.lineWidth = 1.5;
-      ctx!.stroke();
     }
     function arcPoint(p: number) {
       const cx2 = (MX.x + UK.x) / 2;
@@ -378,8 +565,6 @@ export function ForClubs() {
     function loop() {
       ctx!.clearRect(0, 0, W, H);
       t += 0.006;
-      drawContinent(america, '15,52,104', 0.25);
-      drawContinent(europa, '15,52,104', 0.25);
       ctx!.beginPath();
       for (let p = 0; p <= 1; p += 0.02) {
         const pt = arcPoint(p);
@@ -564,7 +749,10 @@ export function ForClubs() {
 
   const progressPct =
     cur >= TOTAL ? 100 : (Math.min(cur + 1, TOTAL) / TOTAL) * 100;
-  const stepLabel = cur >= TOTAL ? 'Done' : `Step ${Math.min(cur + 1, TOTAL)} of ${TOTAL}`;
+  const stepLabel =
+    cur >= TOTAL
+      ? c.enq.done
+      : `${c.enq.step} ${Math.min(cur + 1, TOTAL)} ${c.enq.of} ${TOTAL}`;
 
   return (
     <div ref={rootRef} className={cx('page')}>
@@ -578,114 +766,79 @@ export function ForClubs() {
         </svg>
       </div>
 
+      {/* TRAVELING BALL — one persistent 3D ball, fixed, repositioned on scroll
+          (bouncing arcs). Decorative; never blocks scroll or clicks. */}
+      <div ref={travelBallRef} className={cx('travelBall')} aria-hidden="true">
+        <Ball3D />
+      </div>
+
       {/* NAV — shared header with the "Start your search" pill next to the
           menu on the right. */}
       <SiteHeader cta={{type: 'clubs', onClick: openEnq}} />
 
-      {/* HERO */}
-      <section ref={heroRef} className={cx('hero')} id="hero">
+      {/* HERO — static, normal scroll (no scroll-jacking / parallax) */}
+      <section className={cx('hero')} id="hero">
         <div className={cx('heroSticky')}>
           <div className={cx('heroGlow')} aria-hidden />
-          <div ref={eyebrowRef} className={cx('eyebrow', 'heroEyebrow')}>
-            For clubs · England and Europe · Est. 2023
-          </div>
-          <div className={cx('heroBallZone')}>
-            <div className={cx('ball')}>
-              <Ball3D />
-            </div>
+          <div className={cx('eyebrow', 'heroEyebrow')}>
+            {c.hero.eyebrow}
           </div>
           <div className={cx('heroStage')}>
-            {/* Intro copy — fades up and out as you scroll */}
-            <div ref={introRef} className={cx('heroIntro')}>
+            <div className={cx('heroIntro')}>
               <h1 className={cx('heroTitle')}>
-                <span className={cx('thin')}>We send you the signal.</span>{' '}
-                <b>Not the noise.</b>
+                <span className={cx('thin')}>{c.hero.thin}</span>{' '}
+                <b>{c.hero.bold}</b>
               </h1>
-              <p className={cx('heroSub')}>
-                Every player already filtered, watched and cleared. You only meet
-                the ones ready to walk onto your pitch.
-              </p>
+              <p className={cx('heroSub')}>{c.hero.sub}</p>
               <button
                 type="button"
                 className={cx('hbtn', 'hbtnSolid', 'heroCtaBtn')}
                 onClick={openEnq}
               >
-                Start your search <span className={cx('arr')}>→</span>
+                {c.hero.cta} <span className={cx('arr')}>→</span>
               </button>
             </div>
-            {/* Stat pills — fade in (staggered) as the intro leaves */}
-            <div className={cx('heroStats')}>
-              <div className={cx('hstat')}>
-                <b>100<span>+</span></b> Clubs in England and Europe
-              </div>
-              <div className={cx('hstat')}>
-                <b>7<span>%</span></b> Make it past the filter
-              </div>
-              <div className={cx('hstat')}>
-                <b>66</b> Countries scouted
-              </div>
-              <div className={cx('hstat')}>
-                <b>30</b> Years in the game
-              </div>
-              <div className={cx('hstat')}>
-                <span className={cx('ic')}>✓</span> Work permit and GBE handled
-              </div>
-              <div className={cx('hstat')}>
-                <span className={cx('ic')}>◎</span> Trial guaranteed, not the signing
-              </div>
-            </div>
-          </div>
-          <div ref={hintRef} className={cx('scrollhint')}>
-            Scroll <span>↓</span>
           </div>
         </div>
       </section>
-
-      {/* SCROLL-FOLLOWER BALL — the real 3D model, positioned by the effect above */}
-      <div ref={scrollBallRef} className={cx('scrollBall')} aria-hidden>
-        <Ball3D />
-      </div>
 
       {/* THE COST */}
       <section className={cx('cost')}>
         <div className={cx('wrap')}>
           <div className={cx('costHead', 'reveal')}>
-            <div className={cx('eyebrow')}>The cost of the old way</div>
+            <div className={cx('eyebrow')}>{c.cost.eyebrow}</div>
             <h2>
-              <span className={cx('thin')}>93 trials</span>
+              <span className={cx('thin')}>{c.cost.thin}</span>
               <br />
-              <b>nobody needed.</b>
+              <b>{c.cost.bold}</b>
             </h2>
           </div>
           <div className={cx('costList')}>
             <div className={cx('costRow', 'reveal')} data-d="1">
-              <div className={cx('costBig')}>£££</div>
+              <div className={cx('costBig')} aria-hidden="true">
+                <span className={cx('costIcon', 'costIconMoney')} />
+              </div>
               <div className={cx('costTxt')}>
-                <h3>Wasted trials</h3>
-                <p>
-                  Flights, hotels and staff time spent on players who were never
-                  close to your level.
-                </p>
+                <h3>{c.cost.items[0].title}</h3>
+                <p>{c.cost.items[0].desc}</p>
               </div>
             </div>
             <div className={cx('costRow', 'reveal')} data-d="2">
-              <div className={cx('costBig')}>??</div>
+              <div className={cx('costBig')} aria-hidden="true">
+                <span className={cx('costIcon', 'costIconVisual')} />
+              </div>
               <div className={cx('costTxt')}>
-                <h3>No eyes on the ground</h3>
-                <p>
-                  Decisions made on edited highlight reels, with no one who has
-                  watched the player live.
-                </p>
+                <h3>{c.cost.items[1].title}</h3>
+                <p>{c.cost.items[1].desc}</p>
               </div>
             </div>
             <div className={cx('costRow', 'reveal')} data-d="3">
-              <div className={cx('costBig')}>⛔</div>
+              <div className={cx('costBig')} aria-hidden="true">
+                <span className={cx('costIcon', 'costIconSign')} />
+              </div>
               <div className={cx('costTxt')}>
-                <h3>The paperwork wall</h3>
-                <p>
-                  Work permits and GBE points that sink a signing months after you
-                  committed to it.
-                </p>
+                <h3>{c.cost.items[2].title}</h3>
+                <p>{c.cost.items[2].desc}</p>
               </div>
             </div>
           </div>
@@ -696,40 +849,36 @@ export function ForClubs() {
       <section className={cx('versus')} id="how">
         <div className={cx('wrap')}>
           <div className={cx('versusHead', 'reveal')}>
-            <div className={cx('eyebrow')}>What you actually get</div>
+            <div className={cx('eyebrow')}>{c.versus.eyebrow}</div>
             <h2>
-              <span className={cx('thin')}>The old way</span>{' '}
-              <b>gets a red card.</b>
+              <span className={cx('thin')}>{c.versus.thin}</span>{' '}
+              <b>{c.versus.bold}</b>
             </h2>
           </div>
           <div className={cx('cardsBoard', 'reveal')} data-d="1">
             <div className={cx('refCard', 'refRed')}>
               <div className={cx('refCardTop')}>
-                <span className={cx('refTag')}>The old way</span>
+                <span className={cx('refTag')}>{c.versus.oldTag}</span>
                 <span className={cx('refMark')}>✕</span>
               </div>
               <ul>
-                <li>Hundreds of unfiltered CVs and reels</li>
-                <li>Trials booked on a hunch</li>
-                <li>No one watching live</li>
-                <li>Paperwork discovered too late</li>
-                <li>You carry all the risk</li>
+                {c.versus.oldItems.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
               </ul>
-              <div className={cx('refFoot')}>Off the pitch</div>
+              <div className={cx('refFoot')}>{c.versus.oldFoot}</div>
             </div>
             <div className={cx('refCard', 'refGreen')}>
               <div className={cx('refCardTop')}>
-                <span className={cx('refTag')}>The Clearway way</span>
+                <span className={cx('refTag')}>{c.versus.clearTag}</span>
                 <span className={cx('refMark')}>✓</span>
               </div>
               <ul>
-                <li>Only the 7% that clear the filter</li>
-                <li>Three months of real evaluation first</li>
-                <li>Watched in person, on the ground</li>
-                <li>Work permit and GBE cleared up front</li>
-                <li>The trial is guaranteed, the signing is earned</li>
+                {c.versus.clearItems.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
               </ul>
-              <div className={cx('refFoot')}>Cleared to play</div>
+              <div className={cx('refFoot')}>{c.versus.clearFoot}</div>
             </div>
           </div>
         </div>
@@ -739,60 +888,53 @@ export function ForClubs() {
       <section className={cx('aud')}>
         <div className={cx('wrap')}>
           <div className={cx('head', 'reveal')}>
-            <div className={cx('eyebrow')}>Two ways we work with clubs</div>
+            <div className={cx('eyebrow')}>{c.map.eyebrow}</div>
             <h2>
-              <span className={cx('thin')}>One network.</span> <b>Two pathways.</b>
+              <span className={cx('thin')}>{c.map.thin}</span> <b>{c.map.bold}</b>
             </h2>
           </div>
           <div className={cx('mapStage', 'reveal')} data-d="1">
             <canvas ref={mapCanvasRef} className={cx('mapCanvas')} aria-hidden />
             <div className={cx('mapNode', 'mapNodeUk')}>
               <span className={cx('mnDot')} />
-              <span className={cx('mnLabel')}>England and Europe</span>
+              <span className={cx('mnLabel')}>{c.map.ukNode}</span>
             </div>
             <div className={cx('mapNode', 'mapNodeMx')}>
               <span className={cx('mnDot')} />
-              <span className={cx('mnLabel')}>Mexico and Texas</span>
+              <span className={cx('mnLabel')}>{c.map.mxNode}</span>
             </div>
           </div>
           <div className={cx('mapCards')}>
             <div className={cx('mapCard', 'reveal')} data-d="1">
               <div className={cx('mcTop')}>
                 <span className={cx('mcNum')}>01</span>
-                <span className={cx('mcTag')}>Clubs in the UK and Europe</span>
+                <span className={cx('mcTag')}>{c.map.card1.tag}</span>
               </div>
               <h3>
-                <span className={cx('thin')}>Recruitment you can</span>{' '}
-                <b>actually trust.</b>
+                <span className={cx('thin')}>{c.map.card1.thin}</span>{' '}
+                <b>{c.map.card1.bold}</b>
               </h3>
-              <p>
-                Fully filtered talent, watched in person, ready to trial. We do the
-                first 93 rejections so your staff only meet the seven.
-              </p>
+              <p>{c.map.card1.p}</p>
               <ul className={cx('pts')}>
-                <li>Players measured against your level before they reach you</li>
-                <li>Eyes on the ground, not just highlight reels</li>
-                <li>Work permit and GBE handled end to end</li>
+                {c.map.card1.pts.map((pt, i) => (
+                  <li key={i}>{pt}</li>
+                ))}
               </ul>
             </div>
             <div className={cx('mapCard', 'reveal')} data-d="2">
               <div className={cx('mcTop')}>
                 <span className={cx('mcNum')}>02</span>
-                <span className={cx('mcTag')}>Clubs in Mexico and Texas</span>
+                <span className={cx('mcTag')}>{c.map.card2.tag}</span>
               </div>
               <h3>
-                <span className={cx('thin')}>Your door into</span>{' '}
-                <b>European football.</b>
+                <span className={cx('thin')}>{c.map.card2.thin}</span>{' '}
+                <b>{c.map.card2.bold}</b>
               </h3>
-              <p>
-                A direct bridge to clubs across England and Europe, and the
-                partnerships that come with being inside the network rather than
-                outside it.
-              </p>
+              <p>{c.map.card2.p}</p>
               <ul className={cx('pts')}>
-                <li>A real pathway for your players into Europe</li>
-                <li>Partnerships with clubs already in the network</li>
-                <li>The same filter, working in your favour</li>
+                {c.map.card2.pts.map((pt, i) => (
+                  <li key={i}>{pt}</li>
+                ))}
               </ul>
             </div>
           </div>
@@ -803,81 +945,79 @@ export function ForClubs() {
       <section className={cx('people')}>
         <div className={cx('wrap')}>
           <div className={cx('peopleHead', 'reveal')}>
-            <div className={cx('eyebrow')}>The people behind it</div>
+            <div className={cx('eyebrow')}>{c.people.eyebrow}</div>
             <h2>
-              <span className={cx('thin')}>Clearway is not a directory.</span>
+              <span className={cx('thin')}>{c.people.thin}</span>
               <br />
-              <b>It is two careers.</b>
+              <b>{c.people.bold}</b>
             </h2>
-            <p className={cx('lede')}>
-              When they put a player in front of you, it carries their name. That is
-              the whole promise.
-            </p>
+            <p className={cx('lede')}>{c.people.lede}</p>
           </div>
-          <div className={cx('peopleDuo')}>
-            <div className={cx('pcard', 'reveal')} data-d="1">
-              <div className={cx('pcardPhoto')}>
+          <div className={cx('teamGrid')}>
+            <div className={cx('tcard', 'reveal')} data-d="1">
+              <div className={cx('tphoto')}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/james.png" alt="James Fox" />
+                <img src="/james.webp" alt="James Fox" />
               </div>
-              <div className={cx('pcardBody')}>
-                <div className={cx('prole')}>{PEOPLE.james.role}</div>
-                <h3>
-                  <span className={cx('thin')}>James</span> <b>Fox</b>
-                </h3>
-                <ul className={cx('pcreds')}>
-                  {PEOPLE.james.creds.map((line, i) => (
-                    <li key={i}>{rich(line)}</li>
-                  ))}
-                </ul>
+              <div className={cx('tinfo')}>
+                <div className={cx('tname')}>
+                  <span>James</span> Fox
+                </div>
+                <div className={cx('trole')}>{c.people.james.role}</div>
+                <p className={cx('tdesc')}>{c.people.james.desc}</p>
               </div>
             </div>
-            <div className={cx('pcard', 'reveal')} data-d="2">
-              <div className={cx('pcardPhoto')}>
+            <div className={cx('tcard', 'reveal')} data-d="2">
+              <div className={cx('tphoto')}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/Cyril.png" alt="Cyril Rool" />
+                <img src="/cyril.webp" alt="Cyril Rool" />
               </div>
-              <div className={cx('pcardBody')}>
-                <div className={cx('prole')}>{PEOPLE.cyril.role}</div>
-                <h3>
-                  <span className={cx('thin')}>Cyril</span> <b>Rool</b>
-                </h3>
-                <ul className={cx('pcreds')}>
-                  {PEOPLE.cyril.creds.map((line, i) => (
-                    <li key={i}>{rich(line)}</li>
-                  ))}
-                </ul>
+              <div className={cx('tinfo')}>
+                <div className={cx('tname')}>
+                  <span>Cyril</span> Rool
+                </div>
+                <div className={cx('trole')}>{c.people.cyril.role}</div>
+                <p className={cx('tdesc')}>{c.people.cyril.desc}</p>
+              </div>
+            </div>
+            <div className={cx('tcard', 'reveal')} data-d="3">
+              <div className={cx('tphoto')}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/timothee.webp" alt="Timothée Kolodziejczak" />
+              </div>
+              <div className={cx('tinfo')}>
+                <div className={cx('tname')}>
+                  <span>Timothée</span> Kolodziejczak
+                </div>
+                <div className={cx('trole')}>{c.people.timo.role}</div>
+                <p className={cx('tdesc')}>{c.people.timo.desc}</p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CLOSING */}
+      {/* CLOSING — a contained closing card, inset from the page edges */}
       <section className={cx('end')} id="enquiry">
-        <div className={cx('wrap')}>
-          <div className={cx('eyebrow', 'reveal')}>
-            The next signing starts here
-          </div>
-          <h2 className={cx('reveal')} data-d="1">
-            <span className={cx('thin')}>Tell Clearway the player</span>{' '}
-            <b>you are missing.</b>
-          </h2>
-          <p className={cx('reveal')} data-d="2">
-            Five quick answers, and it reaches Clearway directly. We reply in
-            person. No bots, no middlemen.
-          </p>
-          <button
-            type="button"
-            className={cx('email', 'reveal')}
-            data-d="2"
-            onClick={openEnq}
-          >
-            Start your search <span className={cx('arr')}>→</span>
-          </button>
-          <div className={cx('discreet', 'reveal')} data-d="3">
-            Every enquiry is treated in confidence. No player is ever named publicly
-            without permission.
+        <div className={cx('endCard')}>
+          <div className={cx('endInner')}>
+            <div className={cx('eyebrow', 'reveal')}>{c.end.eyebrow}</div>
+            <h2 className={cx('reveal')} data-d="1">
+              <span className={cx('thin')}>{c.end.thin}</span>{' '}
+              <b>{c.end.bold}</b>
+            </h2>
+            <p className={cx('reveal')} data-d="2">{c.end.p}</p>
+            <button
+              type="button"
+              className={cx('email', 'reveal')}
+              data-d="2"
+              onClick={openEnq}
+            >
+              {c.end.cta} <span className={cx('arr')}>→</span>
+            </button>
+            <div className={cx('discreet', 'reveal')} data-d="3">
+              {c.end.fine}
+            </div>
           </div>
         </div>
       </section>
@@ -892,11 +1032,11 @@ export function ForClubs() {
         onKeyDown={onEnqKeyDown}
       >
         <canvas ref={enqCanvasRef} className={cx('enqCanvas')} aria-hidden />
-        <div className={cx('enqModal')} role="dialog" aria-modal="true" aria-label="Club enquiry">
+        <div className={cx('enqModal')} role="dialog" aria-modal="true" aria-label={c.enq.dialogLabel}>
           <button
             type="button"
             className={cx('enqClose')}
-            aria-label="Close"
+            aria-label={c.enq.close}
             onClick={closeEnq}
           >
             ✕
@@ -915,74 +1055,72 @@ export function ForClubs() {
           <div className={cx('enqBody')} ref={enqBodyRef}>
             {/* step 1 */}
             <div className={stepCls(0)}>
-              <div className={cx('enqKicker')}>Let us find your player</div>
+              <div className={cx('enqKicker')}>{c.enq.s1.kicker}</div>
               <h3>
-                Which club is
+                {c.enq.s1.qa}
                 <br />
-                this <b>for?</b>
+                {c.enq.s1.qb} <b>{c.enq.s1.qbold}</b>
               </h3>
               <input
                 type="text"
                 className={cx('enqInput', flagged.has('club') && 'err')}
-                placeholder="Club name"
+                placeholder={c.enq.s1.placeholder}
                 autoComplete="off"
                 value={data.club}
                 onChange={(e) => setField('club', e.target.value)}
               />
               <div className={cx('enqErr', errors.club && 'show')}>
-                Please tell us the club.
+                {c.enq.s1.err}
               </div>
             </div>
             {/* step 2 */}
             <div className={stepCls(1)}>
-              <div className={cx('enqKicker')}>Your level</div>
+              <div className={cx('enqKicker')}>{c.enq.s2.kicker}</div>
               <h3>
-                Country and
+                {c.enq.s2.qa}
                 <br />
-                <b>league.</b>
+                <b>{c.enq.s2.qbold}</b>
               </h3>
               <input
                 type="text"
                 className={cx('enqInput', flagged.has('region') && 'err')}
-                placeholder="e.g. England, Championship"
+                placeholder={c.enq.s2.placeholder}
                 autoComplete="off"
                 value={data.region}
                 onChange={(e) => setField('region', e.target.value)}
               />
               <div className={cx('enqErr', errors.region && 'show')}>
-                Please tell us where you are.
+                {c.enq.s2.err}
               </div>
             </div>
             {/* step 3 */}
             <div className={stepCls(2)}>
-              <div className={cx('enqKicker')}>The gap in your squad</div>
+              <div className={cx('enqKicker')}>{c.enq.s3.kicker}</div>
               <h3>
-                Who are you
+                {c.enq.s3.qa}
                 <br />
-                <b>looking for?</b>
+                <b>{c.enq.s3.qbold}</b>
               </h3>
               <input
                 type="text"
                 className={cx('enqInput')}
-                placeholder="e.g. Right back, U21, left footed"
+                placeholder={c.enq.s3.placeholder}
                 autoComplete="off"
                 value={data.profile}
                 onChange={(e) => setField('profile', e.target.value)}
               />
-              <div className={cx('enqHint')}>
-                One line is enough. You can be more specific later.
-              </div>
+              <div className={cx('enqHint')}>{c.enq.s3.hint}</div>
             </div>
             {/* step 4 */}
             <div className={stepCls(3)}>
-              <div className={cx('enqKicker')}>Your timeline</div>
+              <div className={cx('enqKicker')}>{c.enq.s4.kicker}</div>
               <h3>
-                When do you
+                {c.enq.s4.qa}
                 <br />
-                <b>need them?</b>
+                <b>{c.enq.s4.qbold}</b>
               </h3>
               <div className={cx('enqChips')}>
-                {TIMELINE_OPTIONS.map((opt) => (
+                {c.enq.s4.options.map((opt) => (
                   <button
                     key={opt}
                     type="button"
@@ -994,21 +1132,21 @@ export function ForClubs() {
                 ))}
               </div>
               <div className={cx('enqErr', errors.timeline && 'show')}>
-                Pick one to continue.
+                {c.enq.s4.err}
               </div>
             </div>
             {/* step 5 */}
             <div className={stepCls(4)}>
-              <div className={cx('enqKicker')}>Where Clearway reaches you</div>
+              <div className={cx('enqKicker')}>{c.enq.s5.kicker}</div>
               <h3>
-                Your name
+                {c.enq.s5.qa}
                 <br />
-                and <b>email.</b>
+                {c.enq.s5.qb} <b>{c.enq.s5.qbold}</b>
               </h3>
               <input
                 type="text"
                 className={cx('enqInput', flagged.has('name') && 'err')}
-                placeholder="Your name"
+                placeholder={c.enq.s5.placeholderName}
                 autoComplete="off"
                 value={data.name}
                 onChange={(e) => setField('name', e.target.value)}
@@ -1016,14 +1154,14 @@ export function ForClubs() {
               <input
                 type="email"
                 className={cx('enqInput', flagged.has('email') && 'err')}
-                placeholder="Your email"
+                placeholder={c.enq.s5.placeholderEmail}
                 autoComplete="off"
                 style={{marginTop: 14}}
                 value={data.email}
                 onChange={(e) => setField('email', e.target.value)}
               />
               <div className={cx('enqErr', errors.contact && 'show')}>
-                A name and a valid email, please.
+                {c.enq.s5.err}
               </div>
             </div>
             {/* done */}
@@ -1035,14 +1173,11 @@ export function ForClubs() {
                 </svg>
               </div>
               <h3>
-                Clearway
+                {c.enq.doneStep.qa}
                 <br />
-                <b>is on it.</b>
+                <b>{c.enq.doneStep.qbold}</b>
               </h3>
-              <p>
-                Every enquiry goes straight to Clearway. We reply in person, in
-                confidence. The search starts now.
-              </p>
+              <p>{c.enq.doneStep.p}</p>
             </div>
           </div>
 
@@ -1053,10 +1188,10 @@ export function ForClubs() {
                 className={cx('enqBack', cur > 0 && 'show')}
                 onClick={() => cur > 0 && goTo(cur - 1)}
               >
-                ← Back
+                {c.enq.back}
               </button>
               <button type="button" className={cx('enqNext')} onClick={validateAndNext}>
-                {cur === TOTAL - 1 ? 'Send to Clearway' : 'Continue'}{' '}
+                {cur === TOTAL - 1 ? c.enq.send : c.enq.continue}{' '}
                 <span className={cx('arr')}>→</span>
               </button>
             </div>
@@ -1065,35 +1200,7 @@ export function ForClubs() {
       </div>
 
       {/* FOOTER */}
-      <footer className={cx('foot')}>
-        <div className={cx('wrap')}>
-          <div className={cx('foot-top')}>
-            <Link href="/" aria-label="Clearway — home">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                className={cx('foot-logo')}
-                src="/Logotipos/clearway-white.svg"
-                alt="Clearway"
-              />
-            </Link>
-            <nav className={cx('foot-nav')}>
-              <div className={cx('foot-col')}>
-                <Link href="/for-clubs">For Clubs</Link>
-                <Link href="/for-players">For Players</Link>
-                <Link href="/">About Clearway</Link>
-              </div>
-              <div className={cx('foot-col')}>
-                <Link href="/privacy">Privacy Policy</Link>
-                <Link href="/terms">Terms &amp; Conditions</Link>
-              </div>
-            </nav>
-          </div>
-          <div className={cx('foot-bot')}>
-            <span>© 2026 Clearway Performance Group</span>
-            <span>Created by SCNDAL</span>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

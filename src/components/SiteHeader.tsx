@@ -70,9 +70,9 @@ export function SiteHeader({
   }, [menuOpen]);
 
   const links = [
-    {href: '/for-clubs', label: t('nav.clubs')},
+    {href: '/', label: t('nav.home')},
     {href: '/for-players', label: t('nav.players')},
-    {href: '/about', label: t('nav.about')}
+    {href: '/for-clubs', label: t('nav.clubs')}
   ] as const;
 
   return (

@@ -5,7 +5,7 @@
     "nav": {
       "clubs": "For Clubs",
       "players": "For Players",
-      "about": "About"
+      "home": "Home"
     },
     "cta": {
       "players": {"long": "Build my profile", "short": "Build profile"},

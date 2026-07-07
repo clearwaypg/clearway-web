@@ -17,7 +17,7 @@ import {defineRouting} from 'next-intl/routing';
    Nothing else needs rebuilding — the toggle and /es routes come back on.
    ========================================================= */
 export const routing = defineRouting({
-  locales: ['en'],
+  locales: ['en', 'es'],
   defaultLocale: 'en',
   localePrefix: 'always'
 });

@@ -5,6 +5,7 @@ import {useLocale} from 'next-intl';
 
 import {Link} from '@/i18n/navigation';
 import {SiteHeader} from './SiteHeader';
+import {SiteFooter} from './SiteFooter';
 import styles from './ForPlayers.module.css';
 
 /* Join scoped module classes by their guide names, dropping falsy values. */
@@ -14,19 +15,277 @@ const cx = (...names: Array<string | false | null | undefined>) =>
     .map((n) => styles[n as string] ?? (n as string))
     .join(' ');
 
-const STEP_NAMES = [
-  'The essentials',
-  'Who you are',
-  'Your game',
-  'Your record',
-  'Your footage'
-];
+/* Length only — used for step navigation logic. Display names come from COPY. */
+const STEP_COUNT = 5;
 
-const RIBBON_TEXT =
-  'Acceso a más de 100 clubes · Inglaterra · España · Francia · Italia · Alemania · Austria · Bélgica · Hungría';
+type Copy = (typeof COPY)['en'];
+
+const COPY = {
+  en: {
+    hero: {
+      chapter: 'The invisible player',
+      hl1a: 'You can be ',
+      hl1b: 'good',
+      hl2: 'and still',
+      hl3: 'never get seen.',
+      leadA: 'Measured against the same standard a professional club uses. ',
+      leadB: 'Most do not meet it yet.',
+      stat1: 'past the filter',
+      stat2: 'clubs in Europe',
+      cue: 'The story begins'
+    },
+    card: {
+      namePlaceholder: 'Write your name',
+      nameAria: 'Your name',
+      euPass: 'EU PASS',
+      ageCat: 'AGE CAT',
+      position: 'POSITION',
+      ctaAria: 'This could be your card. Build it',
+      ctaA: 'This could be your card. ',
+      ctaB: 'Build it →',
+      note: 'Free to build · Players from Mexico and the world'
+    },
+    truth: {
+      headA: 'The bit ',
+      headB: 'others skip.',
+      c1t: 'Your trial is real',
+      c1a: 'Some charge you to stand on a pitch and hope someone watches. ',
+      c1b: 'Yours is with a club that already said they want to see you.',
+      c2t: 'What it costs, plainly',
+      c2a: 'Building your profile is free. ',
+      c2b: 'The three month evaluation has a cost',
+      c2c: ', written into a Clearway contract. You cover your video and travel.',
+      c3t: 'What we promise',
+      c3a: 'We guarantee the ',
+      c3b: 'trial, not the signing',
+      c3c: '. Nobody can guarantee a signing. What we promise is the door, and the work permit and GBE paperwork for England.'
+    },
+    guides: {
+      headA: 'Not a ',
+      headThin: 'form in a folder.',
+      headIt: 'People who have done this.',
+      jamesRole: 'Founder and CEO',
+      jamesDesc:
+        'FA-registered in Talent Identification, with access to 100+ clubs across England and Europe.',
+      cyrilRole: 'Director of European Football',
+      cyrilDesc:
+        '15+ years in Ligue 1 — Lens, Bordeaux, Nice and Marseille. France U21 international.',
+      timoRole: 'Director of USA and Mexico Football',
+      timoDesc:
+        'Former French professional defender with fifteen years at Lyon, Nice, Saint-Étienne, Sevilla, Borussia Mönchengladbach and Tigres. UEFA Europa League winner. He leads talent identification across the USA and Mexico.'
+    },
+    filter: {
+      h2a: 'Seven of ',
+      h2thin: 'every hundred',
+      h2it: 'go through.',
+      p: 'That number is low on purpose. It is not us being difficult, it is us being transparent about what professional football actually asks for. We would rather tell you the truth early than waste your summer.',
+      ctaA: 'Think you are one of the seven? ',
+      ctaB: 'Show us →'
+    },
+    ribbon:
+      'Access to 100+ clubs · England · Spain · France · Italy · Germany · Austria · Belgium · Hungary',
+    close: {
+      h2a: 'From invisible ',
+      h2it: 'to seen.',
+      p: 'Build your profile. If it fits, you will hear from the Clearway team. If it does not, you will hear that too. Either way, no guessing.',
+      cta: 'Build my profile'
+    },
+    modal: {
+      kick: 'Player application · Clearway',
+      title: 'Build your player profile',
+      close: 'Close',
+      steps: [
+        'The essentials',
+        'Who you are',
+        'Your game',
+        'Your record',
+        'Your footage'
+      ],
+      stepWord: 'Step',
+      ofWord: 'of',
+      sent: 'Application sent',
+      positionLabel: 'Main position',
+      positionPh: 'e.g. Striker, Centre back',
+      ageLabel: 'Age category',
+      agePh: 'U17, U20, senior',
+      euLabel: 'Do you hold a European or EU passport?',
+      euOptions: ['Yes', 'No', 'In process'],
+      euHint: 'This changes how we place you. There is a pathway either way.',
+      natLabel: 'Sporting nationality',
+      natPh: 'e.g. Mexican, Spanish, dual',
+      nameLabel: 'Full name',
+      dobLabel: 'Date of birth',
+      dobPh: 'DD/MM/YYYY',
+      countryLabel: 'Current country',
+      emailLabel: 'Email',
+      whatsappLabel: 'WhatsApp',
+      repLabel: 'Do you currently have a representative or agent?',
+      repOptions: ['Yes', 'No'],
+      secPosLabel: 'Secondary position',
+      footLabel: 'Strong foot',
+      footPh: 'Left / Right / Both',
+      heightLabel: 'Height (cm)',
+      weightLabel: 'Weight (kg)',
+      clubLabel: 'Current club and league',
+      prevLabel: 'Previous clubs',
+      levelLabel: 'Level',
+      levelPh: 'Amateur / Semipro / Pro',
+      seasonLabel: 'This season (games, goals, assists)',
+      videoLabel: 'Video links (YouTube, Vimeo or Drive)',
+      videoPh: 'Paste one or more, separated by commas',
+      videoHint: 'The more match footage the better. This is what matters most.',
+      igLabel: 'Instagram',
+      coachLabel: 'Coach reference and contact',
+      consent1a: 'I accept the ',
+      privacyLink: 'Privacy Policy',
+      consent1mid: ' and ',
+      termsLink: 'Terms',
+      consent1end: '.',
+      consent2:
+        'I am over 18, or a parent or guardian authorises this application and will be the contact.',
+      back: 'Back',
+      send: 'Send to Clearway →',
+      next: 'Next →',
+      successTitle: 'That is your profile.',
+      successBody:
+        'This is what the Clearway team sees. If it fits what a club is looking for, they get in touch themselves.',
+      footNote:
+        'Building your profile is free. The three month evaluation has a cost, set out in the Clearway contract. ',
+      footTermsLink: 'Terms'
+    }
+  },
+  es: {
+    hero: {
+      chapter: 'El jugador invisible',
+      hl1a: 'Puedes ser ',
+      hl1b: 'bueno',
+      hl2: 'y aun así',
+      hl3: 'nunca ser visto.',
+      leadA: 'Medido con el mismo estándar que usa un club profesional. ',
+      leadB: 'La mayoría todavía no lo alcanza.',
+      stat1: 'superan el filtro',
+      stat2: 'clubes en Europa',
+      cue: 'Aquí empieza la historia'
+    },
+    card: {
+      namePlaceholder: 'Escribe tu nombre',
+      nameAria: 'Tu nombre',
+      euPass: 'PASE UE',
+      ageCat: 'CAT. EDAD',
+      position: 'POSICIÓN',
+      ctaAria: 'Esta podría ser tu tarjeta. Constrúyela',
+      ctaA: 'Esta podría ser tu tarjeta. ',
+      ctaB: 'Constrúyela →',
+      note: 'Gratis de crear · Jugadores de México y del mundo'
+    },
+    truth: {
+      headA: 'La parte ',
+      headB: 'que otros omiten.',
+      c1t: 'Tu prueba es real',
+      c1a: 'Algunos te cobran por pisar un campo y esperar que alguien te mire. ',
+      c1b: 'La tuya es con un club que ya dijo que quiere verte.',
+      c2t: 'Lo que cuesta, sin rodeos',
+      c2a: 'Crear tu perfil es gratis. ',
+      c2b: 'La evaluación de tres meses tiene un costo',
+      c2c: ', fijado en un contrato de Clearway. Tú cubres tu video y tus viajes.',
+      c3t: 'Lo que prometemos',
+      c3a: 'Garantizamos la ',
+      c3b: 'prueba, no el fichaje',
+      c3c: '. Nadie puede garantizar un fichaje. Lo que prometemos es la puerta, y los trámites del permiso de trabajo y la GBE para Inglaterra.'
+    },
+    guides: {
+      headA: 'No es un ',
+      headThin: 'formulario en un cajón.',
+      headIt: 'Gente que ya lo ha hecho.',
+      jamesRole: 'Fundador y CEO',
+      jamesDesc:
+        'Registrado en la FA en Identificación de Talento, con acceso a más de 100 clubes en Inglaterra y Europa.',
+      cyrilRole: 'Director de Fútbol Europeo',
+      cyrilDesc:
+        'Más de 15 años en la Ligue 1 — Lens, Bordeaux, Nice y Marseille. Internacional sub-21 con Francia.',
+      timoRole: 'Director de Fútbol de EE. UU. y México',
+      timoDesc:
+        'Exdefensa profesional francés con quince años en Lyon, Nice, Saint-Étienne, Sevilla, Borussia Mönchengladbach y Tigres. Campeón de la UEFA Europa League. Lidera la identificación de talento en EE. UU. y México.'
+    },
+    filter: {
+      h2a: 'Siete de ',
+      h2thin: 'cada cien',
+      h2it: 'pasan.',
+      p: 'Ese número es bajo a propósito. No es que seamos difíciles, es que somos transparentes sobre lo que el fútbol profesional realmente exige. Preferimos decirte la verdad pronto antes que desperdiciar tu verano.',
+      ctaA: '¿Crees que eres uno de los siete? ',
+      ctaB: 'Demuéstralo →'
+    },
+    ribbon:
+      'Acceso a más de 100 clubes · Inglaterra · España · Francia · Italia · Alemania · Austria · Bélgica · Hungría',
+    close: {
+      h2a: 'De invisible ',
+      h2it: 'a visto.',
+      p: 'Crea tu perfil. Si encaja, el equipo de Clearway te contactará. Si no, también lo sabrás. En cualquier caso, sin adivinanzas.',
+      cta: 'Crear mi perfil'
+    },
+    modal: {
+      kick: 'Solicitud de jugador · Clearway',
+      title: 'Crea tu perfil de jugador',
+      close: 'Cerrar',
+      steps: ['Lo esencial', 'Quién eres', 'Tu juego', 'Tu trayectoria', 'Tu video'],
+      stepWord: 'Paso',
+      ofWord: 'de',
+      sent: 'Solicitud enviada',
+      positionLabel: 'Posición principal',
+      positionPh: 'p. ej. Delantero, Defensa central',
+      ageLabel: 'Categoría de edad',
+      agePh: 'Sub-17, Sub-20, absoluta',
+      euLabel: '¿Tienes pasaporte europeo o de la UE?',
+      euOptions: ['Sí', 'No', 'En trámite'],
+      euHint: 'Esto cambia cómo te ubicamos. Hay un camino en cualquier caso.',
+      natLabel: 'Nacionalidad deportiva',
+      natPh: 'p. ej. mexicana, española, doble',
+      nameLabel: 'Nombre completo',
+      dobLabel: 'Fecha de nacimiento',
+      dobPh: 'DD/MM/AAAA',
+      countryLabel: 'País actual',
+      emailLabel: 'Correo electrónico',
+      whatsappLabel: 'WhatsApp',
+      repLabel: '¿Tienes actualmente un representante o agente?',
+      repOptions: ['Sí', 'No'],
+      secPosLabel: 'Posición secundaria',
+      footLabel: 'Pie hábil',
+      footPh: 'Izquierdo / Derecho / Ambos',
+      heightLabel: 'Estatura (cm)',
+      weightLabel: 'Peso (kg)',
+      clubLabel: 'Club y liga actuales',
+      prevLabel: 'Clubes anteriores',
+      levelLabel: 'Nivel',
+      levelPh: 'Amateur / Semipro / Pro',
+      seasonLabel: 'Esta temporada (partidos, goles, asistencias)',
+      videoLabel: 'Enlaces de video (YouTube, Vimeo o Drive)',
+      videoPh: 'Pega uno o varios, separados por comas',
+      videoHint: 'Cuanto más metraje de partidos, mejor. Esto es lo que más importa.',
+      igLabel: 'Instagram',
+      coachLabel: 'Referencia y contacto de tu entrenador',
+      consent1a: 'Acepto la ',
+      privacyLink: 'Política de Privacidad',
+      consent1mid: ' y los ',
+      termsLink: 'Términos',
+      consent1end: '.',
+      consent2:
+        'Soy mayor de 18 años, o un padre, madre o tutor autoriza esta solicitud y será el contacto.',
+      back: 'Atrás',
+      send: 'Enviar a Clearway →',
+      next: 'Siguiente →',
+      successTitle: 'Ese es tu perfil.',
+      successBody:
+        'Esto es lo que ve el equipo de Clearway. Si encaja con lo que busca un club, ellos mismos se ponen en contacto.',
+      footNote:
+        'Crear tu perfil es gratis. La evaluación de tres meses tiene un costo, establecido en el contrato de Clearway. ',
+      footTermsLink: 'Términos'
+    }
+  }
+} as const;
 
 export function ForPlayers() {
   const locale = useLocale();
+  const c: Copy = COPY[locale === 'es' ? 'es' : 'en'];
   const [playing, setPlaying] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [step, setStep] = useState(0);
@@ -353,7 +612,7 @@ export function ForPlayers() {
       return;
     }
     setErrors(new Set());
-    if (step < STEP_NAMES.length - 1) {
+    if (step < STEP_COUNT - 1) {
       setStep(step + 1);
       modalCardRef.current?.scrollTo(0, 0);
     } else {
@@ -366,8 +625,8 @@ export function ForPlayers() {
 
   const errCls = (name: string) => (errors.has(name) ? styles.err : undefined);
   const stepLabel = submitted
-    ? 'Application sent'
-    : `Step ${step + 1} of 5 · ${STEP_NAMES[step]}`;
+    ? c.modal.sent
+    : `${c.modal.stepWord} ${step + 1} ${c.modal.ofWord} ${STEP_COUNT} · ${c.modal.steps[step]}`;
 
   return (
     <div className={cx('page', playing && 'play')} ref={pageRef}>
@@ -388,32 +647,33 @@ export function ForPlayers() {
       {/* ===== CAP 01 · HERO ===== */}
       <section className={cx('hero')} id="hero">
         <div className={cx('hero-bg')} aria-hidden="true" />
+        <div className={cx('hero-inner')}>
         <div className={cx('stage')}>
-          <div className={cx('chapter')}>The invisible player</div>
+          <div className={cx('chapter')}>{c.hero.chapter}</div>
           <div className={cx('headline')}>
             <span className={cx('hl', 'hl1', 'reveal-line')}>
               <span>
-                You can be <b>good</b>
+                {c.hero.hl1a}<b>{c.hero.hl1b}</b>
               </span>
             </span>
             <span className={cx('hl', 'hl2', 'reveal-line')}>
-              <span>and still</span>
+              <span>{c.hero.hl2}</span>
             </span>
-            <span className={cx('hl', 'hl3', 'anim', 'd4')}>never get seen.</span>
+            <span className={cx('hl', 'hl3', 'anim', 'd4')}>{c.hero.hl3}</span>
           </div>
           <div className={cx('undertext', 'anim', 'd5')}>
             <p className={cx('lead')}>
-              Measured against the same standard a professional club uses.{' '}
-              <b>Most do not meet it yet.</b>
+              {c.hero.leadA}
+              <b>{c.hero.leadB}</b>
             </p>
             <div className={cx('stats')}>
               <div className={cx('stat')}>
                 <div className={cx('n')}>7/100</div>
-                <div className={cx('l')}>past the filter</div>
+                <div className={cx('l')}>{c.hero.stat1}</div>
               </div>
               <div className={cx('stat')}>
                 <div className={cx('n')}>100+</div>
-                <div className={cx('l')}>clubs in Europe</div>
+                <div className={cx('l')}>{c.hero.stat2}</div>
               </div>
             </div>
           </div>
@@ -452,16 +712,14 @@ export function ForPlayers() {
                   onChange={(e) =>
                     setCard((c) => ({...c, name: e.target.value}))
                   }
-                  placeholder={
-                    locale === 'es' ? 'Escribe tu nombre' : 'Write your name'
-                  }
-                  aria-label={locale === 'es' ? 'Tu nombre' : 'Your name'}
+                  placeholder={c.card.namePlaceholder}
+                  aria-label={c.card.nameAria}
                 />
               </div>
               <div className={cx('pcard-footer')}>
-                <div className={cx('pcard-fc')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z"/></svg><div className={cx('pcard-fc-lbl')}>EU PASS</div><div className={cx('pcard-fc-val')} id="cEu">{u(card.eu, '—')}</div></div>
-                <div className={cx('pcard-fc')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><div className={cx('pcard-fc-lbl')}>AGE CAT</div><div className={cx('pcard-fc-val')} id="cAge">{u(card.age, '—')}</div></div>
-                <div className={cx('pcard-fc')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg><div className={cx('pcard-fc-lbl')}>POSITION</div><div className={cx('pcard-fc-val')}></div></div>
+                <div className={cx('pcard-fc')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z"/></svg><div className={cx('pcard-fc-lbl')}>{c.card.euPass}</div><div className={cx('pcard-fc-val')} id="cEu">{u(card.eu, '—')}</div></div>
+                <div className={cx('pcard-fc')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><div className={cx('pcard-fc-lbl')}>{c.card.ageCat}</div><div className={cx('pcard-fc-val')} id="cAge">{u(card.age, '—')}</div></div>
+                <div className={cx('pcard-fc')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg><div className={cx('pcard-fc-lbl')}>{c.card.position}</div><div className={cx('pcard-fc-val')}></div></div>
               </div>
             </div>
           </div>
@@ -471,26 +729,25 @@ export function ForPlayers() {
               type="button"
               className={cx('card-cta')}
               onClick={openModal}
-              aria-label="This could be your card. Build it"
+              aria-label={c.card.ctaAria}
             >
               <span className={cx('card-cta-text')} aria-hidden="true">
                 <span className={cx('card-cta-track')}>
                   {[0, 1, 2, 3, 4, 5].map((i) => (
                     <span className={cx('card-cta-item')} key={i}>
-                      This could be your card. <b>Build it →</b>
+                      {c.card.ctaA}<b>{c.card.ctaB}</b>
                     </span>
                   ))}
                 </span>
               </span>
             </button>
           </div>
-          <div className={cx('card-note')}>
-            Free to build · Players from Mexico and the world
-          </div>
+          <div className={cx('card-note')}>{c.card.note}</div>
+        </div>
         </div>
         <div className={cx('scroll-cue', 'anim', 'd5')}>
           <span className={cx('bar')} />
-          <span>The story begins</span>
+          <span>{c.hero.cue}</span>
         </div>
       </section>
 
@@ -511,34 +768,29 @@ export function ForPlayers() {
               />
               <div className={cx('head', 'reveal')}>
                 <h2 className={cx('disp')}>
-                  The bit <span className={cx('it')}>others skip.</span>
+                  {c.truth.headA}<span className={cx('it')}>{c.truth.headB}</span>
                 </h2>
               </div>
             </div>
             <div className={cx('tgrid')}>
               <div className={cx('tcard', 'reveal')} data-d="1">
-                <h3>Your trial is real</h3>
+                <h3>{c.truth.c1t}</h3>
                 <p>
-                  Some charge you to stand on a pitch and hope someone watches.{' '}
-                  <strong>
-                    Yours is with a club that already said they want to see you.
-                  </strong>
+                  {c.truth.c1a}
+                  <strong>{c.truth.c1b}</strong>
                 </p>
               </div>
               <div className={cx('tcard', 'reveal')} data-d="2">
-                <h3>What it costs, plainly</h3>
+                <h3>{c.truth.c2t}</h3>
                 <p>
-                  Building your profile is free.{' '}
-                  <strong>The three month evaluation has a cost</strong>, written
-                  into a Clearway contract. You cover your video and travel.
+                  {c.truth.c2a}
+                  <strong>{c.truth.c2b}</strong>{c.truth.c2c}
                 </p>
               </div>
               <div className={cx('tcard', 'reveal')} data-d="3">
-                <h3>What we promise</h3>
+                <h3>{c.truth.c3t}</h3>
                 <p>
-                  We guarantee the <strong>trial, not the signing</strong>.
-                  Nobody can promise a contract honestly. What we promise is the
-                  door, and the work permit and GBE paperwork for England.
+                  {c.truth.c3a}<strong>{c.truth.c3b}</strong>{c.truth.c3c}
                 </p>
               </div>
             </div>
@@ -551,61 +803,49 @@ export function ForPlayers() {
         <div className={cx('wrap')}>
           <div className={cx('head', 'reveal')}>
             <h2 className={cx('disp')}>
-              Not a <span className={cx('thin')}>form in a folder.</span>
+              {c.guides.headA}<span className={cx('thin')}>{c.guides.headThin}</span>
               <br />
-              <span className={cx('it')}>People who have done this.</span>
+              <span className={cx('it')}>{c.guides.headIt}</span>
             </h2>
           </div>
-          <div className={cx('team')}>
-            <div className={cx('gcard', 'reveal')} data-d="1">
-              <div className={cx('gphoto')}>
+          <div className={cx('teamGrid')}>
+            <div className={cx('tmcard', 'reveal')} data-d="1">
+              <div className={cx('tphoto')}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/james.png" alt="James Fox" />
+                <img src="/james.webp" alt="James Fox" />
               </div>
-              <div className={cx('gbody')}>
-                <div className={cx('gname')}>
-                  <span>James</span> Fox.
+              <div className={cx('tinfo')}>
+                <div className={cx('tname')}>
+                  <span>James</span> Fox
                 </div>
-                <div className={cx('grole')}>Founder and CEO</div>
-                <p className={cx('gdesc')}>
-                  FA-registered in Talent Identification, with access to 100+
-                  clubs across England and Europe.
-                </p>
+                <div className={cx('trole')}>{c.guides.jamesRole}</div>
+                <p className={cx('tdesc')}>{c.guides.jamesDesc}</p>
               </div>
             </div>
-            <div className={cx('gcard', 'reveal')} data-d="2">
-              <div className={cx('gphoto')}>
+            <div className={cx('tmcard', 'reveal')} data-d="2">
+              <div className={cx('tphoto')}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/Cyril.png" alt="Cyril Rool" />
+                <img src="/cyril.webp" alt="Cyril Rool" />
               </div>
-              <div className={cx('gbody')}>
-                <div className={cx('gname')}>
-                  <span>Cyril</span> Rool.
+              <div className={cx('tinfo')}>
+                <div className={cx('tname')}>
+                  <span>Cyril</span> Rool
                 </div>
-                <div className={cx('grole')}>Director of European Football</div>
-                <p className={cx('gdesc')}>
-                  Over 15 years in Ligue 1 with Lens, Bordeaux, Nice and
-                  Marseille. France U21 international.
-                </p>
+                <div className={cx('trole')}>{c.guides.cyrilRole}</div>
+                <p className={cx('tdesc')}>{c.guides.cyrilDesc}</p>
               </div>
             </div>
-            <div className={cx('gcard', 'reveal')} data-d="3">
-              <div className={cx('gphoto')}>
-                <span className={cx('gph')} aria-hidden="true">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.3"
-                    strokeLinecap="round"
-                  >
-                    <circle cx="12" cy="8" r="4" />
-                    <path d="M4 21c0-4.2 3.6-7 8-7s8 2.8 8 7" />
-                  </svg>
-                </span>
+            <div className={cx('tmcard', 'reveal')} data-d="3">
+              <div className={cx('tphoto')}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/timothee.webp" alt="Timothée Kolodziejczak" />
               </div>
-              <div className={cx('gbody')}>
-                <div className={cx('gname')}>Tom.</div>
+              <div className={cx('tinfo')}>
+                <div className={cx('tname')}>
+                  <span>Timothée</span> Kolodziejczak
+                </div>
+                <div className={cx('trole')}>{c.guides.timoRole}</div>
+                <p className={cx('tdesc')}>{c.guides.timoDesc}</p>
               </div>
             </div>
           </div>
@@ -627,20 +867,16 @@ export function ForPlayers() {
             </svg>
           </div>
           <h2 className={cx('disp', 'reveal')}>
-            Seven of <span className={cx('thin')}>every hundred</span>{' '}
-            <span className={cx('it')}>go through.</span>
+            {c.filter.h2a}<span className={cx('thin')}>{c.filter.h2thin}</span>{' '}
+            <span className={cx('it')}>{c.filter.h2it}</span>
           </h2>
-          <p className={cx('reveal')}>
-            That number is low on purpose. It is not us being difficult, it is us
-            being honest about what professional football actually asks for. We
-            would rather tell you the truth early than waste your summer.
-          </p>
+          <p className={cx('reveal')}>{c.filter.p}</p>
           <button
             type="button"
             className={cx('inline-cta', 'reveal')}
             onClick={openModal}
           >
-            Think you are one of the seven? <b>Show us →</b>
+            {c.filter.ctaA}<b>{c.filter.ctaB}</b>
           </button>
         </div>
       </section>
@@ -651,7 +887,7 @@ export function ForPlayers() {
           <div className={cx('ribbon-track')}>
             {[0, 1, 2, 3, 4, 5].map((i) => (
               <span className={cx('ribbon-item')} key={i}>
-                {RIBBON_TEXT}
+                {c.ribbon}
                 <span className={cx('ribbon-dot')}>·</span>
               </span>
             ))}
@@ -659,48 +895,15 @@ export function ForPlayers() {
         </div>
       </div>
 
-      {/* ===== CAP 05 · VOICES ===== */}
-      <section className={cx('voices')}>
-        <div className={cx('wrap')}>
-          <div className={cx('head', 'reveal')}>
-            <h2 className={cx('disp')}>
-              Real voices. <span className={cx('it')}>Real pathways.</span>
-            </h2>
-            <p>From families already on the journey. No names, that is the point.</p>
-          </div>
-        </div>
-        <div className={cx('vmarquee')}>
-          <div className={cx('vrow', 'r1')}>
-            {VOICES_R1.concat(VOICES_R1).map((v, i) => (
-              <div className={cx('vcard')} key={`r1-${i}`}>
-                <p>{v.quote}</p>
-                <span className={cx('who')}>{v.who}</span>
-              </div>
-            ))}
-          </div>
-          <div className={cx('vrow', 'r2')}>
-            {VOICES_R2.concat(VOICES_R2).map((v, i) => (
-              <div className={cx('vcard')} key={`r2-${i}`}>
-                <p>{v.quote}</p>
-                <span className={cx('who')}>{v.who}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ===== CAP 06 · CLOSE ===== */}
       <section className={cx('close')}>
         <div className={cx('wrap')}>
           <h2 className={cx('disp', 'reveal')}>
-            From invisible <span className={cx('it')}>to seen.</span>
+            {c.close.h2a}<span className={cx('it')}>{c.close.h2it}</span>
           </h2>
-          <p className={cx('reveal')}>
-            Build your profile. If it fits, you will hear from the Clearway team.
-            If it does not, you will hear that too. Either way, no guessing.
-          </p>
+          <p className={cx('reveal')}>{c.close.p}</p>
           <button type="button" className={cx('cta', 'reveal')} onClick={openModal}>
-            Build my profile <span>→</span>
+            {c.close.cta} <span>→</span>
           </button>
         </div>
         <div className={cx('crowd-close')} aria-hidden="true">
@@ -710,35 +913,7 @@ export function ForPlayers() {
       </section>
 
       {/* FOOTER */}
-      <footer className={cx('foot')}>
-        <div className={cx('wrap')}>
-          <div className={cx('foot-top')}>
-            <Link href="/" aria-label="Clearway — home">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                className={cx('foot-logo')}
-                src="/Logotipos/clearway-white.svg"
-                alt="Clearway"
-              />
-            </Link>
-            <nav className={cx('foot-nav')}>
-              <div className={cx('foot-col')}>
-                <Link href="/for-clubs">For Clubs</Link>
-                <Link href="/for-players">For Players</Link>
-                <Link href="/">About Clearway</Link>
-              </div>
-              <div className={cx('foot-col')}>
-                <Link href="/privacy">Privacy Policy</Link>
-                <Link href="/terms">Terms &amp; Conditions</Link>
-              </div>
-            </nav>
-          </div>
-          <div className={cx('foot-bot')}>
-            <span>© 2026 Clearway Performance Group</span>
-            <span>Created by SCNDAL</span>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
 
       {/* ===== MODAL · application form ===== */}
       <div
@@ -754,14 +929,14 @@ export function ForPlayers() {
           <div className={cx('modal-head')}>
             <div className={cx('row')}>
               <div>
-                <div className={cx('kick')}>Player application · Clearway</div>
-                <div className={cx('t')}>Build your player profile</div>
+                <div className={cx('kick')}>{c.modal.kick}</div>
+                <div className={cx('t')}>{c.modal.title}</div>
               </div>
               <button
                 type="button"
                 className={cx('x')}
                 onClick={closeModal}
-                aria-label="Close"
+                aria-label={c.modal.close}
               >
                 ✕
               </button>
@@ -781,63 +956,61 @@ export function ForPlayers() {
             <div ref={formRef} style={{display: submitted ? 'none' : 'block'}}>
               {/* STEP 1 */}
               <div className={cx('mstep', step === 0 && 'active')}>
-                <div className={cx('mstepn')}>The essentials</div>
+                <div className={cx('mstepn')}>{c.modal.steps[0]}</div>
                 <div className={cx('mrow2')}>
                   <div className={cx('mf')}>
                     <label>
-                      Main position <span className={cx('req')}>*</span>
+                      {c.modal.positionLabel} <span className={cx('req')}>*</span>
                     </label>
                     <input
                       type="text"
                       name="position"
-                      placeholder="e.g. Striker, Centre back"
+                      placeholder={c.modal.positionPh}
                       className={errCls('position')}
-                      onChange={(e) => setCard((c) => ({...c, pos: e.target.value}))}
+                      onChange={(e) => setCard((cd) => ({...cd, pos: e.target.value}))}
                     />
                   </div>
                   <div className={cx('mf')}>
                     <label>
-                      Age category <span className={cx('req')}>*</span>
+                      {c.modal.ageLabel} <span className={cx('req')}>*</span>
                     </label>
                     <input
                       type="text"
                       name="age_category"
-                      placeholder="U17, U20, senior"
+                      placeholder={c.modal.agePh}
                       className={errCls('age_category')}
-                      onChange={(e) => setCard((c) => ({...c, age: e.target.value}))}
+                      onChange={(e) => setCard((cd) => ({...cd, age: e.target.value}))}
                     />
                   </div>
                 </div>
                 <div className={cx('mf')}>
                   <label>
-                    Do you hold a European or EU passport?{' '}
+                    {c.modal.euLabel}{' '}
                     <span className={cx('req')}>*</span>
                   </label>
                   <div className={cx('mseg', errors.has('eu_passport') && 'err')}>
-                    {['Yes', 'No', 'In process'].map((v) => (
+                    {c.modal.euOptions.map((v) => (
                       <label key={v}>
                         <input
                           type="radio"
                           name="eu_passport"
                           value={v}
-                          onChange={() => setCard((c) => ({...c, eu: v}))}
+                          onChange={() => setCard((cd) => ({...cd, eu: v}))}
                         />
                         <span>{v}</span>
                       </label>
                     ))}
                   </div>
-                  <div className={cx('hint')}>
-                    This changes how we place you. There is a pathway either way.
-                  </div>
+                  <div className={cx('hint')}>{c.modal.euHint}</div>
                 </div>
                 <div className={cx('mf')}>
                   <label>
-                    Sporting nationality <span className={cx('req')}>*</span>
+                    {c.modal.natLabel} <span className={cx('req')}>*</span>
                   </label>
                   <input
                     type="text"
                     name="sporting_nationality"
-                    placeholder="e.g. Mexican, Spanish, dual"
+                    placeholder={c.modal.natPh}
                     className={errCls('sporting_nationality')}
                   />
                 </div>
@@ -845,33 +1018,33 @@ export function ForPlayers() {
 
               {/* STEP 2 */}
               <div className={cx('mstep', step === 1 && 'active')}>
-                <div className={cx('mstepn')}>Who you are</div>
+                <div className={cx('mstepn')}>{c.modal.steps[1]}</div>
                 <div className={cx('mf')}>
                   <label>
-                    Full name <span className={cx('req')}>*</span>
+                    {c.modal.nameLabel} <span className={cx('req')}>*</span>
                   </label>
                   <input
                     type="text"
                     name="full_name"
                     className={errCls('full_name')}
-                    onChange={(e) => setCard((c) => ({...c, name: e.target.value}))}
+                    onChange={(e) => setCard((cd) => ({...cd, name: e.target.value}))}
                   />
                 </div>
                 <div className={cx('mrow2')}>
                   <div className={cx('mf')}>
                     <label>
-                      Date of birth <span className={cx('req')}>*</span>
+                      {c.modal.dobLabel} <span className={cx('req')}>*</span>
                     </label>
                     <input
                       type="text"
                       name="dob"
-                      placeholder="DD/MM/YYYY"
+                      placeholder={c.modal.dobPh}
                       className={errCls('dob')}
                     />
                   </div>
                   <div className={cx('mf')}>
                     <label>
-                      Current country <span className={cx('req')}>*</span>
+                      {c.modal.countryLabel} <span className={cx('req')}>*</span>
                     </label>
                     <input type="text" name="country" className={errCls('country')} />
                   </div>
@@ -879,22 +1052,22 @@ export function ForPlayers() {
                 <div className={cx('mrow2')}>
                   <div className={cx('mf')}>
                     <label>
-                      Email <span className={cx('req')}>*</span>
+                      {c.modal.emailLabel} <span className={cx('req')}>*</span>
                     </label>
                     <input type="email" name="email" className={errCls('email')} />
                   </div>
                   <div className={cx('mf')}>
-                    <label>WhatsApp</label>
+                    <label>{c.modal.whatsappLabel}</label>
                     <input type="text" name="whatsapp" />
                   </div>
                 </div>
                 <div className={cx('mf')}>
                   <label>
-                    Do you currently have a representative or agent?{' '}
+                    {c.modal.repLabel}{' '}
                     <span className={cx('req')}>*</span>
                   </label>
                   <div className={cx('mseg', errors.has('has_representative') && 'err')}>
-                    {['Yes', 'No'].map((v) => (
+                    {c.modal.repOptions.map((v) => (
                       <label key={v}>
                         <input type="radio" name="has_representative" value={v} />
                         <span>{v}</span>
@@ -906,24 +1079,24 @@ export function ForPlayers() {
 
               {/* STEP 3 */}
               <div className={cx('mstep', step === 2 && 'active')}>
-                <div className={cx('mstepn')}>Your game</div>
+                <div className={cx('mstepn')}>{c.modal.steps[2]}</div>
                 <div className={cx('mrow2')}>
                   <div className={cx('mf')}>
-                    <label>Secondary position</label>
+                    <label>{c.modal.secPosLabel}</label>
                     <input type="text" name="secondary_position" />
                   </div>
                   <div className={cx('mf')}>
-                    <label>Strong foot</label>
-                    <input type="text" name="strong_foot" placeholder="Left / Right / Both" />
+                    <label>{c.modal.footLabel}</label>
+                    <input type="text" name="strong_foot" placeholder={c.modal.footPh} />
                   </div>
                 </div>
                 <div className={cx('mrow2')}>
                   <div className={cx('mf')}>
-                    <label>Height (cm)</label>
+                    <label>{c.modal.heightLabel}</label>
                     <input type="text" name="height_cm" />
                   </div>
                   <div className={cx('mf')}>
-                    <label>Weight (kg)</label>
+                    <label>{c.modal.weightLabel}</label>
                     <input type="text" name="weight_kg" />
                   </div>
                 </div>
@@ -931,52 +1104,50 @@ export function ForPlayers() {
 
               {/* STEP 4 */}
               <div className={cx('mstep', step === 3 && 'active')}>
-                <div className={cx('mstepn')}>Your record</div>
+                <div className={cx('mstepn')}>{c.modal.steps[3]}</div>
                 <div className={cx('mf')}>
-                  <label>Current club and league</label>
+                  <label>{c.modal.clubLabel}</label>
                   <input type="text" name="current_club" />
                 </div>
                 <div className={cx('mrow2')}>
                   <div className={cx('mf')}>
-                    <label>Previous clubs</label>
+                    <label>{c.modal.prevLabel}</label>
                     <input type="text" name="previous_clubs" />
                   </div>
                   <div className={cx('mf')}>
-                    <label>Level</label>
-                    <input type="text" name="level" placeholder="Amateur / Semipro / Pro" />
+                    <label>{c.modal.levelLabel}</label>
+                    <input type="text" name="level" placeholder={c.modal.levelPh} />
                   </div>
                 </div>
                 <div className={cx('mf')}>
-                  <label>This season (games, goals, assists)</label>
+                  <label>{c.modal.seasonLabel}</label>
                   <input type="text" name="season_stats" />
                 </div>
               </div>
 
               {/* STEP 5 */}
               <div className={cx('mstep', step === 4 && 'active')}>
-                <div className={cx('mstepn')}>Your footage</div>
+                <div className={cx('mstepn')}>{c.modal.steps[4]}</div>
                 <div className={cx('mf')}>
                   <label>
-                    Video links (YouTube, Vimeo or Drive){' '}
+                    {c.modal.videoLabel}{' '}
                     <span className={cx('req')}>*</span>
                   </label>
                   <input
                     type="text"
                     name="video_links"
-                    placeholder="Paste one or more, separated by commas"
+                    placeholder={c.modal.videoPh}
                     className={errCls('video_links')}
                   />
-                  <div className={cx('hint')}>
-                    The more match footage the better. This is what matters most.
-                  </div>
+                  <div className={cx('hint')}>{c.modal.videoHint}</div>
                 </div>
                 <div className={cx('mrow2')}>
                   <div className={cx('mf')}>
-                    <label>Instagram</label>
+                    <label>{c.modal.igLabel}</label>
                     <input type="text" name="instagram" />
                   </div>
                   <div className={cx('mf')}>
-                    <label>Coach reference and contact</label>
+                    <label>{c.modal.coachLabel}</label>
                     <input type="text" name="coach_reference" />
                   </div>
                 </div>
@@ -984,22 +1155,21 @@ export function ForPlayers() {
                   <label>
                     <input type="checkbox" name="consent_terms" id="mPriv" />
                     <span>
-                      I accept the{' '}
+                      {c.modal.consent1a}
                       <Link href="/privacy" target="_blank">
-                        Privacy Policy
-                      </Link>{' '}
-                      and{' '}
-                      <Link href="/terms" target="_blank">
-                        Terms
+                        {c.modal.privacyLink}
                       </Link>
-                      . <span className={cx('req')}>*</span>
+                      {c.modal.consent1mid}
+                      <Link href="/terms" target="_blank">
+                        {c.modal.termsLink}
+                      </Link>
+                      {c.modal.consent1end} <span className={cx('req')}>*</span>
                     </span>
                   </label>
                   <label>
                     <input type="checkbox" name="consent_age" id="mAge" />
                     <span>
-                      I am over 18, or a parent or guardian authorises this
-                      application and will be the contact.{' '}
+                      {c.modal.consent2}{' '}
                       <span className={cx('req')}>*</span>
                     </span>
                   </label>
@@ -1010,11 +1180,8 @@ export function ForPlayers() {
             {/* success */}
             <div className={cx('msuccess', submitted && 'show')}>
               <div className={cx('chk')}>✓</div>
-              <h3>That is your profile.</h3>
-              <p>
-                This is what the Clearway team sees. If it fits what a club is
-                looking for, they get in touch themselves.
-              </p>
+              <h3>{c.modal.successTitle}</h3>
+              <p>{c.modal.successBody}</p>
             </div>
 
             {!submitted && (
@@ -1025,16 +1192,16 @@ export function ForPlayers() {
                   onClick={onBack}
                   style={{visibility: step === 0 ? 'hidden' : 'visible'}}
                 >
-                  Back
+                  {c.modal.back}
                 </button>
                 <button type="button" className={cx('mbtn', 'mbtn-solid')} onClick={onNext}>
-                  {step === STEP_NAMES.length - 1 ? 'Send to Clearway →' : 'Next →'}
+                  {step === STEP_COUNT - 1 ? c.modal.send : c.modal.next}
                 </button>
               </div>
             )}
             <div className={cx('mfoot-note')}>
-              Building your profile is free. The three month evaluation has a cost,
-              set out in the Clearway contract. <Link href="/terms">Terms</Link>
+              {c.modal.footNote}
+              <Link href="/terms">{c.modal.footTermsLink}</Link>
             </div>
           </div>
         </div>
@@ -1042,50 +1209,3 @@ export function ForPlayers() {
     </div>
   );
 }
-
-const VOICES_R1 = [
-  {
-    quote:
-      '"Your professionalism at every stage has been incredible. We already feel Clearway, and your son, as if JP were with his family from England."',
-    who: 'Parent of a player'
-  },
-  {
-    quote:
-      '"It is always very professional, clear and exciting getting news from you."',
-    who: 'Parent of a player'
-  },
-  {
-    quote: '"Thank you for this initiative. It is really motivating us."',
-    who: 'Parent of a player'
-  },
-  {
-    quote:
-      '"I had not realised you would be there in person on the first day. That is truly priceless."',
-    who: 'Parent of a player'
-  },
-  {
-    quote:
-      '"Sounds amazing. We are very excited to train in a new environment. Thank you."',
-    who: 'Player'
-  }
-];
-
-const VOICES_R2 = [
-  {
-    quote:
-      '"Everything has been a wonderful experience so far, and it is great that you will be there during those days."',
-    who: "A player's mum"
-  },
-  {
-    quote:
-      '"Thank you for your support. This will be a great summer experience for us."',
-    who: 'Parent of a player'
-  },
-  {
-    quote:
-      '"Reading your messages is highly motivating. We will follow your recommendations with absolute discipline."',
-    who: 'Parent of a player'
-  },
-  {quote: '"We feel very fortunate to have you."', who: 'Parent of a player'},
-  {quote: '"When I grow up, I want to be like you."', who: 'Parent of a player'}
-];
