@@ -11,8 +11,8 @@
   --dew: #d0d8e2;
   --bg: #f3f3f3;
   --white: #fcfcfc;
-  --font: var(--font-archivo), Archivo, sans-serif;
-  --serif: var(--font-eb), 'EB Garamond', Georgia, serif;
+  --font: var(--font-golos), 'Golos Text', sans-serif;
+  --serif: var(--font-fraunces), 'Fraunces', Georgia, serif;
 
   position: relative;
   font-family: var(--font);
@@ -1247,7 +1247,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 64%;
+  height: 48%;
   z-index: 2;
   overflow: hidden;
   background: linear-gradient(150deg, #0a3a86, #04193f);
@@ -1281,19 +1281,20 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 36%;
+  height: 52%;
   z-index: 1;
-  padding: 16px 20px;
+  padding: 14px 18px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   min-width: 0;
+  overflow: hidden;
 }
 .tname {
-  font-size: clamp(1.15rem, 1.7vw, 1.5rem);
+  font-size: clamp(1.02rem, 1.5vw, 1.32rem);
   font-weight: 900;
   color: #fff;
-  line-height: 1;
+  line-height: 1.05;
 }
 .tname span {
   font-weight: 300;
@@ -1304,13 +1305,13 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--dew);
-  margin-top: 9px;
+  margin-top: 6px;
 }
 .tdesc {
-  font-size: 0.8rem;
-  line-height: 1.4;
+  font-size: clamp(0.64rem, 0.85vw, 0.78rem);
+  line-height: 1.38;
   color: #aebac9;
-  margin-top: 9px;
+  margin-top: 7px;
 }
 
 /* =================== RIBBON (clubs/countries marquee) ===================

@@ -1,12 +1,12 @@
 import {setRequestLocale} from 'next-intl/server';
-import {Archivo, Archivo_Narrow, EB_Garamond} from 'next/font/google';
+import {Golos_Text, Archivo_Narrow, Fraunces} from 'next/font/google';
 
 import {ForPlayers} from '@/components/ForPlayers';
 
-const archivo = Archivo({
+const golos = Golos_Text({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700', '800', '900'],
-  variable: '--font-archivo',
+  weight: ['400', '500', '600', '700', '800', '900'],
+  variable: '--font-golos',
   display: 'swap'
 });
 
@@ -17,11 +17,11 @@ const archivoNarrow = Archivo_Narrow({
   display: 'swap'
 });
 
-const ebGaramond = EB_Garamond({
+const fraunces = Fraunces({
   subsets: ['latin'],
-  weight: ['400'],
+  weight: ['400', '500', '600'],
   style: ['italic'],
-  variable: '--font-eb',
+  variable: '--font-fraunces',
   display: 'swap'
 });
 
@@ -33,7 +33,7 @@ export default async function ForPlayersPage({
 
   return (
     <div
-      className={`${archivo.variable} ${archivoNarrow.variable} ${ebGaramond.variable}`}
+      className={`${golos.variable} ${archivoNarrow.variable} ${fraunces.variable}`}
     >
       <ForPlayers />
     </div>

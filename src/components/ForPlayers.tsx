@@ -64,15 +64,15 @@ const COPY = {
       headA: 'Not a ',
       headThin: 'form in a folder.',
       headIt: 'People who have done this.',
-      jamesRole: 'Founder and CEO',
+      jamesRole: 'Founder & CEO',
       jamesDesc:
-        'FA-registered in Talent Identification, with access to 100+ clubs across England and Europe.',
+        'Has spent thirty years in elite sport across 66 countries as a professional athlete, coach and manager, working alongside Olympic Gold Medalists, Wimbledon champions and world number ones. A University of Liverpool graduate, he brought that global experience into football, and is now registered with The Football Association in Talent Identification, the foundation Clearway is built on.',
       cyrilRole: 'Director of European Football',
       cyrilDesc:
-        '15+ years in Ligue 1 — Lens, Bordeaux, Nice and Marseille. France U21 international.',
-      timoRole: 'Director of USA and Mexico Football',
+        'Spent over 15 years as a professional footballer in Ligue 1, playing for RC Lens, Girondins de Bordeaux, OGC Nice and Olympique de Marseille, and earned France Under-21 honours. That playing career became a second one off the pitch: he has represented and placed players across Europe and Mexico, and now brings that network and experience to Clearway.',
+      timoRole: 'Director of USA & Mexico Football',
       timoDesc:
-        'Former French professional defender with fifteen years at Lyon, Nice, Saint-Étienne, Sevilla, Borussia Mönchengladbach and Tigres. UEFA Europa League winner. He leads talent identification across the USA and Mexico.'
+        'Spent over 15 years as a professional defender across Europe and Mexico, playing for Lyon, Nice, Saint-Étienne, Sevilla, Borussia Mönchengladbach and Tigres UANL, and won the UEFA Europa League with Sevilla. Having competed at the top level in Ligue 1, La Liga, the Bundesliga and Liga MX, he now leads talent identification and player assessment for Clearway across the USA and Mexico.'
     },
     filter: {
       h2a: 'Seven of ',
@@ -199,13 +199,13 @@ const COPY = {
       headIt: 'Gente que ya lo ha hecho.',
       jamesRole: 'Fundador y CEO',
       jamesDesc:
-        'Registrado en la FA en Identificación de Talento, con acceso a más de 100 clubes en Inglaterra y Europa.',
+        'Ha pasado treinta años en el deporte de élite en 66 países como atleta profesional, entrenador y mánager, trabajando junto a medallistas de oro olímpicos, campeones de Wimbledon y números uno del mundo. Graduado de la Universidad de Liverpool, llevó esa experiencia global al fútbol y hoy está registrado en The Football Association en Identificación de Talento, la base sobre la que se construye Clearway.',
       cyrilRole: 'Director de Fútbol Europeo',
       cyrilDesc:
-        'Más de 15 años en la Ligue 1 — Lens, Bordeaux, Nice y Marseille. Internacional sub-21 con Francia.',
-      timoRole: 'Director de Fútbol de EE. UU. y México',
+        'Pasó más de 15 años como futbolista profesional en la Ligue 1, jugando para el RC Lens, Girondins de Burdeos, OGC Nice y Olympique de Marsella, y fue internacional con la selección Sub-21 de Francia. Esa carrera como jugador dio paso a una segunda fuera del campo: ha representado y colocado jugadores en Europa y México, y ahora aporta esa red y experiencia a Clearway.',
+      timoRole: 'Director de Fútbol de Estados Unidos y México',
       timoDesc:
-        'Exdefensa profesional francés con quince años en Lyon, Nice, Saint-Étienne, Sevilla, Borussia Mönchengladbach y Tigres. Campeón de la UEFA Europa League. Lidera la identificación de talento en EE. UU. y México.'
+        'Pasó más de 15 años como defensa profesional en Europa y México, jugando para el Lyon, Niza, Saint-Étienne, Sevilla, Borussia Mönchengladbach y Tigres UANL, y ganó la UEFA Europa League con el Sevilla. Tras competir al máximo nivel en la Ligue 1, La Liga, la Bundesliga y la Liga MX, hoy lidera la identificación de talento y la evaluación de jugadores para Clearway en Estados Unidos y México.'
     },
     filter: {
       h2a: 'Siete de ',

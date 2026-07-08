@@ -9,8 +9,8 @@
   --navy: #072c68;
   --dew: #d0d8e2;
   --white: #fcfcfc;
-  --font: var(--font-archivo), Archivo, sans-serif;
-  --serif: var(--font-eb), 'EB Garamond', Georgia, serif;
+  --font: var(--font-golos), 'Golos Text', sans-serif;
+  --serif: var(--font-fraunces), 'Fraunces', Georgia, serif;
 
   position: fixed;
   inset: 0;

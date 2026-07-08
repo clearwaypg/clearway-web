@@ -27,6 +27,13 @@ const cx = (...names: Array<string | false | null | undefined>) =>
     .map((n) => styles[n as string] ?? (n as string))
     .join(' ');
 
+/* Turn **key phrases** into <b> so body copy can mix a light base weight with
+   bold highlights, matching the Who We Are treatment. */
+const rich = (s: string) =>
+  s
+    .split(/\*\*(.+?)\*\*/g)
+    .map((part, i) => (i % 2 === 1 ? <b key={i}>{part}</b> : part));
+
 
 type Copy = (typeof COPY)['en'];
 
@@ -36,7 +43,9 @@ const COPY = {
     hero: {
       tagline: 'International talent identification',
       pg: 'Performance Group',
-      sub: 'We identify talent and open the door to clubs across England and Europe.',
+      subA: 'We ',
+      subIt: 'identify talent',
+      subB: ' and open the doors to clubs across England, Europe, USA and Mexico.',
       clubT: 'Clubs',
       playerT: 'Players',
       cue: 'Who we are'
@@ -46,12 +55,15 @@ const COPY = {
       opening: 'Most promise the dream. We measure it.',
       bold: 'Clearway is an international football talent identification company. The standard is the one professional clubs actually use. The door opens to over 100 clubs across England and Europe.'
     },
+    story: {
+      p: 'Founded to create **genuine opportunities for talented footballers**, while giving clubs trusted eyes on the ground in emerging markets. We combine elite playing experience, professional scouting and licensed FIFA representation into **a complete pathway that builds long-term careers, not just trials.** **Relationships, integrity and professionalism** sit at the heart of it: **creating clear opportunities and always delivering what we promise.**'
+    },
     doors: {
       clubs: {
         dlabel: 'Clubs',
         thin: 'We bring you',
         bold: 'the right player.',
-        p: 'Identified, checked and ready. With the work permit and GBE paperwork for England already handled.',
+        p: 'We bring you the right player. Identified, checked and ready.',
         enter: "Let's go"
       },
       players: {
@@ -67,9 +79,9 @@ const COPY = {
       thin: 'They have seen it before.',
       bold: 'They have seen it before. They know what it takes.',
       it: 'They can make it happen.',
-      jamesRole: 'Founder and CEO',
+      jamesRole: 'Founder & CEO',
       jamesDesc:
-        'FA-registered in Talent Identification, with access to 100+ clubs across England and Europe.',
+        'Has spent thirty years in elite sport across 66 countries as a professional athlete, coach and manager, working alongside Olympic Gold Medalists, Wimbledon champions and world number ones. A University of Liverpool graduate, he brought that global experience into football, and is now registered with The Football Association in Talent Identification, the foundation Clearway is built on.',
       jamesCreds: [
         'Over **30 years in professional sport**, as athlete, coach and manager. Alongside Olympic gold medallists, Wimbledon champions, world number ones and EFL footballers.',
         '**Registered with The Football Association in Talent Identification.**',
@@ -78,15 +90,15 @@ const COPY = {
       ],
       cyrilRole: 'Director of European Football',
       cyrilDesc:
-        '15+ years in Ligue 1 — Lens, Bordeaux, Nice and Marseille. France U21 international.',
+        'Spent over 15 years as a professional footballer in Ligue 1, playing for RC Lens, Girondins de Bordeaux, OGC Nice and Olympique de Marseille, and earned France Under-21 honours. That playing career became a second one off the pitch: he has represented and placed players across Europe and Mexico, and now brings that network and experience to Clearway.',
       cyrilCreds: [
         'Over **15 years in Ligue 1** with RC Lens, Bordeaux, OGC Nice and Olympique de Marseille.',
         '**France Under 21 international.**',
         'Has represented and placed several players in **Europe and Mexico**.'
       ],
-      timoRole: 'Director of USA and Mexico Football',
+      timoRole: 'Director of USA & Mexico Football',
       timoDesc:
-        'Former French professional defender with fifteen years at Lyon, Nice, Saint-Étienne, Sevilla, Borussia Mönchengladbach and Tigres. UEFA Europa League winner. He leads talent identification across the USA and Mexico.'
+        'Spent over 15 years as a professional defender across Europe and Mexico, playing for Lyon, Nice, Saint-Étienne, Sevilla, Borussia Mönchengladbach and Tigres UANL, and won the UEFA Europa League with Sevilla. Having competed at the top level in Ligue 1, La Liga, the Bundesliga and Liga MX, he now leads talent identification and player assessment for Clearway across the USA and Mexico.'
     },
     proof: {
       eyebrow: 'The record',
@@ -125,7 +137,9 @@ const COPY = {
     hero: {
       tagline: 'Identificación internacional de talento',
       pg: 'Performance Group',
-      sub: 'Identificamos talento y abrimos la puerta a clubes en Inglaterra y Europa.',
+      subA: '',
+      subIt: 'Identificamos talento',
+      subB: ' y abrimos las puertas a clubes en Inglaterra, Europa, Estados Unidos y México.',
       clubT: 'Clubes',
       playerT: 'Jugadores',
       cue: 'Quiénes somos'
@@ -135,12 +149,15 @@ const COPY = {
       opening: 'Muchos prometen el sueño. Nosotros lo medimos.',
       bold: 'Clearway es una empresa internacional de identificación de talento futbolístico. El estándar es el que los clubes profesionales usan de verdad. La puerta se abre a más de 100 clubes en Inglaterra y Europa.'
     },
+    story: {
+      p: 'Nacimos para crear **oportunidades reales para futbolistas con talento**, y a la vez darles a los clubes ojos de confianza sobre el terreno en mercados emergentes. Combinamos experiencia como jugadores de élite, scouting profesional y representación FIFA con licencia en **un camino completo que construye carreras a largo plazo, no solo pruebas.** **Las relaciones, la integridad y la profesionalidad** están en el centro de todo: **crear oportunidades claras y cumplir siempre lo que prometemos.**'
+    },
     doors: {
       clubs: {
         dlabel: 'Clubes',
         thin: 'Te traemos',
         bold: 'al jugador correcto.',
-        p: 'Identificado, verificado y listo. Con el permiso de trabajo y el papeleo GBE para Inglaterra ya resueltos.',
+        p: 'Te traemos al jugador correcto. Identificado, verificado y listo.',
         enter: 'Vamos allá'
       },
       players: {
@@ -158,7 +175,7 @@ const COPY = {
       it: 'Pueden hacerlo posible.',
       jamesRole: 'Fundador y CEO',
       jamesDesc:
-        'Registrado en la FA en Identificación de Talento, con acceso a más de 100 clubes en Inglaterra y Europa.',
+        'Ha pasado treinta años en el deporte de élite en 66 países como atleta profesional, entrenador y mánager, trabajando junto a medallistas de oro olímpicos, campeones de Wimbledon y números uno del mundo. Graduado de la Universidad de Liverpool, llevó esa experiencia global al fútbol y hoy está registrado en The Football Association en Identificación de Talento, la base sobre la que se construye Clearway.',
       jamesCreds: [
         'Más de **30 años en el deporte profesional**, como atleta, entrenador y mánager. Junto a medallistas de oro olímpicos, campeones de Wimbledon, números uno del mundo y futbolistas de la EFL.',
         '**Registrado en The Football Association en Identificación de Talento.**',
@@ -167,7 +184,7 @@ const COPY = {
       ],
       cyrilRole: 'Director de Fútbol Europeo',
       cyrilDesc:
-        'Más de 15 años en la Ligue 1 — Lens, Burdeos, Niza y Marsella. Internacional sub-21 con Francia.',
+        'Pasó más de 15 años como futbolista profesional en la Ligue 1, jugando para el RC Lens, Girondins de Burdeos, OGC Nice y Olympique de Marsella, y fue internacional con la selección Sub-21 de Francia. Esa carrera como jugador dio paso a una segunda fuera del campo: ha representado y colocado jugadores en Europa y México, y ahora aporta esa red y experiencia a Clearway.',
       cyrilCreds: [
         'Más de **15 años en la Ligue 1** con RC Lens, Burdeos, OGC Nice y Olympique de Marsella.',
         '**Internacional con la Francia Sub-21.**',
@@ -175,7 +192,7 @@ const COPY = {
       ],
       timoRole: 'Director de Fútbol de Estados Unidos y México',
       timoDesc:
-        'Exdefensa profesional francés con quince años en Lyon, Niza, Saint-Étienne, Sevilla, Borussia Mönchengladbach y Tigres. Campeón de la UEFA Europa League. Lidera la identificación de talento en Estados Unidos y México.'
+        'Pasó más de 15 años como defensa profesional en Europa y México, jugando para el Lyon, Niza, Saint-Étienne, Sevilla, Borussia Mönchengladbach y Tigres UANL, y ganó la UEFA Europa League con el Sevilla. Tras competir al máximo nivel en la Ligue 1, La Liga, la Bundesliga y la Liga MX, hoy lidera la identificación de talento y la evaluación de jugadores para Clearway en Estados Unidos y México.'
     },
     proof: {
       eyebrow: 'El historial',
@@ -888,7 +905,11 @@ export function LandingHome() {
 
         <div className={cx('heroInner')}>
           <div className={cx('tagline')}>{c.hero.tagline}</div>
-          <p className={cx('sub')}>{c.hero.sub}</p>
+          <p className={cx('sub')}>
+            {c.hero.subA}
+            <span className={cx('it')}>{c.hero.subIt}</span>
+            {c.hero.subB}
+          </p>
           <div className={cx('heroCta')}>
             <Link
               href="/for-clubs"
@@ -968,6 +989,21 @@ export function LandingHome() {
             <span className={cx('it')}>{c.what.opening}</span>{' '}
             <b>{c.what.bold}</b>
           </h2>
+        </div>
+      </section>
+
+      {/* OUR STORY — mirror of Who We Are: image (placeholder) left, text right */}
+      <section className={cx('story')}>
+        <div className={cx('wrap')}>
+          <div className={cx('storyGrid')}>
+            <div className={cx('storyImg', 'reveal')} data-d="1">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/clearway-whoeweare.webp" alt="" />
+            </div>
+            <div className={cx('storyText', 'reveal')} data-d="2">
+              <p>{rich(c.story.p)}</p>
+            </div>
+          </div>
         </div>
       </section>
 

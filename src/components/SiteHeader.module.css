@@ -103,7 +103,7 @@
   background: none;
   border: 0;
   cursor: pointer;
-  font-family: var(--font-archivo), Archivo, sans-serif;
+  font-family: var(--font-golos), 'Golos Text', sans-serif;
   font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -120,7 +120,7 @@
 .headerCta {
   border-radius: 999px;
   padding: 0.6em 1.25em;
-  font-family: var(--font-archivo), Archivo, sans-serif;
+  font-family: var(--font-golos), 'Golos Text', sans-serif;
   font-weight: 700;
   font-size: 0.82rem;
   white-space: nowrap;
@@ -247,7 +247,7 @@
   gap: clamp(14px, 2vw, 28px);
   text-decoration: none;
   color: #fcfcfc;
-  font-family: var(--font-archivo), Archivo, sans-serif;
+  font-family: var(--font-golos), 'Golos Text', sans-serif;
   font-weight: 800;
   font-size: clamp(2.4rem, 9vw, 6rem);
   line-height: 1.02;

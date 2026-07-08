@@ -15,8 +15,8 @@
      people cards and the stat boxes match the hero instead of using their own
      duller darks. */
   --hero-bg: radial-gradient(120% 90% at 50% 38%, #13284f 0%, #0c0c0c 70%);
-  --font: var(--font-archivo), Archivo, sans-serif;
-  --serif: var(--font-eb), 'EB Garamond', Georgia, serif;
+  --font: var(--font-golos), 'Golos Text', sans-serif;
+  --serif: var(--font-fraunces), 'Fraunces', Georgia, serif;
 
   position: relative;
   font-family: var(--font);
@@ -690,6 +690,88 @@
   color: var(--dew);
 }
 
+/* ===== OUR STORY — narrative continuation of Who We Are, mirrored (image on the
+   left, text on the right). Same page font, light weight and colour as the Who
+   We Are heading so the two sections read as one two-part block. ===== */
+.story {
+  position: relative;
+  background: transparent;
+  /* Sit close to Who We Are: no top padding, plus a negative pull up into that
+     section's large bottom padding, so the two read as one continuous block. */
+  margin-top: clamp(-130px, -11vh, -70px);
+  padding: 0 0 clamp(100px, 16vh, 200px);
+  overflow: hidden;
+}
+.storyGrid {
+  display: grid;
+  /* A larger image on the left, a compact text column on the right. */
+  grid-template-columns: clamp(300px, 38%, 460px) 1fr;
+  gap: clamp(36px, 5vw, 72px);
+  align-items: center;
+}
+/* Image placeholder (left) — a small dark navy card in the site palette. Replace
+   the inner label with the real image later. */
+.storyImg {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: clamp(16px, 2vw, 26px);
+  border: 1px solid rgba(208, 216, 226, 0.16);
+  background: radial-gradient(120% 90% at 50% 30%, #13284f 0%, #0c0c0c 72%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.storyImg img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+.storyImg span {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(208, 216, 226, 0.4);
+  text-align: center;
+  padding: 0 10px;
+}
+/* Text — a single left-aligned paragraph that starts right next to the image and
+   fills its column. Same page font, light base weight, bold highlights. */
+.storyText {
+  justify-self: stretch;
+}
+.storyText p {
+  font-weight: 300;
+  font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  text-align: left;
+  color: var(--white);
+  max-width: 62ch;
+}
+.storyText b {
+  font-weight: 800;
+}
+@media (max-width: 760px) {
+  .storyGrid {
+    grid-template-columns: 1fr;
+    gap: 26px;
+  }
+  .storyImg {
+    aspect-ratio: 4 / 5;
+    max-width: 240px;
+    margin: 0 auto;
+  }
+  .storyText p {
+    max-width: none;
+  }
+}
+
 /* ===== LAS DOS PUERTAS: split exclusivo de la home ===== */
 .doors {
   position: relative;
@@ -965,7 +1047,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 64%;
+  height: 48%;
   z-index: 2;
   overflow: hidden;
   background: linear-gradient(150deg, #0a3a86, #04193f);
@@ -1012,19 +1094,20 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 36%;
+  height: 52%;
   z-index: 1;
-  padding: 16px 20px;
+  padding: 14px 18px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   min-width: 0;
+  overflow: hidden;
 }
 .tname {
-  font-size: clamp(1.15rem, 1.7vw, 1.5rem);
+  font-size: clamp(1.02rem, 1.5vw, 1.32rem);
   font-weight: 900;
   color: #fff;
-  line-height: 1;
+  line-height: 1.05;
 }
 .tname span {
   font-weight: 300;
@@ -1035,13 +1118,13 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--dew);
-  margin-top: 9px;
+  margin-top: 6px;
 }
 .tdesc {
-  font-size: 0.8rem;
-  line-height: 1.4;
+  font-size: clamp(0.64rem, 0.85vw, 0.78rem);
+  line-height: 1.38;
   color: #aebac9;
-  margin-top: 9px;
+  margin-top: 7px;
 }
 
 /* ===== MARCADOR DE PARTIDO ===== */

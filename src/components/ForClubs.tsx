@@ -111,16 +111,16 @@ const COPY = {
       bold: 'It is three careers.',
       lede: 'When they put a player in front of you, it carries their name. That is the whole promise.',
       james: {
-        role: 'Founder and CEO',
-        desc: 'FA-registered in Talent Identification, with access to 100+ clubs across England and Europe.'
+        role: 'Founder & CEO',
+        desc: 'Has spent thirty years in elite sport across 66 countries as a professional athlete, coach and manager, working alongside Olympic Gold Medalists, Wimbledon champions and world number ones. A University of Liverpool graduate, he brought that global experience into football, and is now registered with The Football Association in Talent Identification, the foundation Clearway is built on.'
       },
       cyril: {
         role: 'Director of European Football',
-        desc: '15+ years in Ligue 1 — Lens, Bordeaux, Nice and Marseille. France U21 international.'
+        desc: 'Spent over 15 years as a professional footballer in Ligue 1, playing for RC Lens, Girondins de Bordeaux, OGC Nice and Olympique de Marseille, and earned France Under-21 honours. That playing career became a second one off the pitch: he has represented and placed players across Europe and Mexico, and now brings that network and experience to Clearway.'
       },
       timo: {
-        role: 'Director of USA and Mexico Football',
-        desc: 'Former French professional defender with fifteen years at Lyon, Nice, Saint-Étienne, Sevilla, Borussia Mönchengladbach and Tigres. UEFA Europa League winner. He leads talent identification across the USA and Mexico.'
+        role: 'Director of USA & Mexico Football',
+        desc: 'Spent over 15 years as a professional defender across Europe and Mexico, playing for Lyon, Nice, Saint-Étienne, Sevilla, Borussia Mönchengladbach and Tigres UANL, and won the UEFA Europa League with Sevilla. Having competed at the top level in Ligue 1, La Liga, the Bundesliga and Liga MX, he now leads talent identification and player assessment for Clearway across the USA and Mexico.'
       }
     },
     end: {
@@ -234,15 +234,15 @@ const COPY = {
       lede: 'Cuando ponen a un jugador frente a ti, lleva su nombre. Esa es toda la promesa.',
       james: {
         role: 'Fundador y CEO',
-        desc: 'Registrado en la FA en Identificación de Talento, con acceso a más de 100 clubes en Inglaterra y Europa.'
+        desc: 'Ha pasado treinta años en el deporte de élite en 66 países como atleta profesional, entrenador y mánager, trabajando junto a medallistas de oro olímpicos, campeones de Wimbledon y números uno del mundo. Graduado de la Universidad de Liverpool, llevó esa experiencia global al fútbol y hoy está registrado en The Football Association en Identificación de Talento, la base sobre la que se construye Clearway.'
       },
       cyril: {
         role: 'Director de Fútbol Europeo',
-        desc: 'Más de 15 años en la Ligue 1 — Lens, Burdeos, Niza y Marsella. Internacional sub-21 con Francia.'
+        desc: 'Pasó más de 15 años como futbolista profesional en la Ligue 1, jugando para el RC Lens, Girondins de Burdeos, OGC Nice y Olympique de Marsella, y fue internacional con la selección Sub-21 de Francia. Esa carrera como jugador dio paso a una segunda fuera del campo: ha representado y colocado jugadores en Europa y México, y ahora aporta esa red y experiencia a Clearway.'
       },
       timo: {
         role: 'Director de Fútbol de Estados Unidos y México',
-        desc: 'Exdefensa profesional francés con quince años en Lyon, Niza, Saint-Étienne, Sevilla, Borussia Mönchengladbach y Tigres. Campeón de la UEFA Europa League. Lidera la identificación de talento en Estados Unidos y México.'
+        desc: 'Pasó más de 15 años como defensa profesional en Europa y México, jugando para el Lyon, Niza, Saint-Étienne, Sevilla, Borussia Mönchengladbach y Tigres UANL, y ganó la UEFA Europa League con el Sevilla. Tras competir al máximo nivel en la Ligue 1, La Liga, la Bundesliga y la Liga MX, hoy lidera la identificación de talento y la evaluación de jugadores para Clearway en Estados Unidos y México.'
       }
     },
     end: {

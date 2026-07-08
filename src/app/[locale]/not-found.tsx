@@ -1,25 +1,25 @@
-import {Archivo, EB_Garamond} from 'next/font/google';
+import {Golos_Text, Fraunces} from 'next/font/google';
 
 import {NotFound} from '@/components/NotFound';
 
-const archivo = Archivo({
+const golos = Golos_Text({
   subsets: ['latin'],
-  weight: ['300', '400', '700', '800', '900'],
-  variable: '--font-archivo',
+  weight: ['400', '700', '800', '900'],
+  variable: '--font-golos',
   display: 'swap'
 });
 
-const ebGaramond = EB_Garamond({
+const fraunces = Fraunces({
   subsets: ['latin'],
-  weight: ['400'],
+  weight: ['400', '500', '600'],
   style: ['italic'],
-  variable: '--font-eb',
+  variable: '--font-fraunces',
   display: 'swap'
 });
 
 export default function NotFoundPage() {
   return (
-    <div className={`${archivo.variable} ${ebGaramond.variable}`}>
+    <div className={`${golos.variable} ${fraunces.variable}`}>
       <NotFound />
     </div>
   );
