@@ -3,7 +3,6 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {useLocale} from 'next-intl';
 
-import {Link} from '@/i18n/navigation';
 import {Ball3D} from './Ball3D';
 import {SiteHeader} from './SiteHeader';
 import {SiteFooter} from './SiteFooter';
