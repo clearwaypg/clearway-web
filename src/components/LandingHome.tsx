@@ -53,7 +53,7 @@ const COPY = {
     what: {
       eyebrow: 'Who we are',
       opening: 'Most promise the dream. We measure it.',
-      bold: 'Clearway is an international football talent identification company. The standard is the one professional clubs actually use. The door opens to over 100 clubs across England and Europe.'
+      bold: 'Clearway is an international football talent identification company. Our standard is the one professional clubs actually use. The door opens to over 100 clubs across England, Europe and the Americas.'
     },
     story: {
       p: 'Founded to create **genuine opportunities for talented footballers**, while giving clubs trusted eyes on the ground in emerging markets. We combine elite playing experience, professional scouting and licensed FIFA representation into **a complete pathway that builds long-term careers, not just trials.** **Relationships, integrity and professionalism** sit at the heart of it: **creating clear opportunities and always delivering what we promise.**'
@@ -79,14 +79,14 @@ const COPY = {
       thin: 'They have seen it before.',
       bold: 'They have seen it before. They know what it takes.',
       it: 'They can make it happen.',
+      promise: 'When they put a player in front of you, it carries their name and their promise.',
       jamesRole: 'Founder & CEO',
       jamesDesc:
-        'Has spent thirty years in elite sport across 66 countries as a professional athlete, coach and manager, working alongside Olympic Gold Medalists, Wimbledon champions and world number ones. A University of Liverpool graduate, he brought that global experience into football, and is now registered with The Football Association in Talent Identification, the foundation Clearway is built on.',
+        'Has spent 30 years in elite sport across 66 countries as a professional athlete, coach and manager. Working alongside Olympic Gold Medalists, Wimbledon champions and world number ones, he brings global experience understanding the demands, discipline and mindset required to help talented athletes become professionals.',
       jamesCreds: [
         'Over **30 years in professional sport**, as athlete, coach and manager. Alongside Olympic gold medallists, Wimbledon champions, world number ones and EFL footballers.',
         '**Registered with The Football Association in Talent Identification.**',
-        'More than **100 clubs** across England and Europe. FIFA licensed agents available.',
-        'The **work permit and GBE for England**, handled.'
+        'More than **100 clubs** across England and Europe. FIFA licensed agents available.'
       ],
       cyrilRole: 'Director of European Football',
       cyrilDesc:
@@ -147,7 +147,7 @@ const COPY = {
     what: {
       eyebrow: 'Quiénes somos',
       opening: 'Muchos prometen el sueño. Nosotros lo medimos.',
-      bold: 'Clearway es una empresa internacional de identificación de talento futbolístico. El estándar es el que los clubes profesionales usan de verdad. La puerta se abre a más de 100 clubes en Inglaterra y Europa.'
+      bold: 'Clearway es una empresa internacional de identificación de talento futbolístico. Nuestro estándar es el que los clubes profesionales usan de verdad. La puerta se abre a más de 100 clubes en Inglaterra, Europa y las Américas.'
     },
     story: {
       p: 'Nacimos para crear **oportunidades reales para futbolistas con talento**, y a la vez darles a los clubes ojos de confianza sobre el terreno en mercados emergentes. Combinamos experiencia como jugadores de élite, scouting profesional y representación FIFA con licencia en **un camino completo que construye carreras a largo plazo, no solo pruebas.** **Las relaciones, la integridad y la profesionalidad** están en el centro de todo: **crear oportunidades claras y cumplir siempre lo que prometemos.**'
@@ -173,14 +173,14 @@ const COPY = {
       thin: 'Ya lo han vivido.',
       bold: 'Ya lo han vivido. Saben lo que se necesita.',
       it: 'Pueden hacerlo posible.',
+      promise: 'Cuando ponen a un jugador frente a ti, lleva su nombre y su promesa.',
       jamesRole: 'Fundador y CEO',
       jamesDesc:
-        'Ha pasado treinta años en el deporte de élite en 66 países como atleta profesional, entrenador y mánager, trabajando junto a medallistas de oro olímpicos, campeones de Wimbledon y números uno del mundo. Graduado de la Universidad de Liverpool, llevó esa experiencia global al fútbol y hoy está registrado en The Football Association en Identificación de Talento, la base sobre la que se construye Clearway.',
+        'Ha pasado 30 años en el deporte de élite en 66 países como atleta profesional, entrenador y manager. Trabajando junto a medallistas de oro olímpicos, campeones de Wimbledon y números uno del mundo, aporta una experiencia global que le permite entender las exigencias, la disciplina y la mentalidad necesarias para ayudar a atletas talentosos a convertirse en profesionales.',
       jamesCreds: [
         'Más de **30 años en el deporte profesional**, como atleta, entrenador y mánager. Junto a medallistas de oro olímpicos, campeones de Wimbledon, números uno del mundo y futbolistas de la EFL.',
         '**Registrado en The Football Association en Identificación de Talento.**',
-        'Más de **100 clubes** en Inglaterra y Europa. Agentes con licencia FIFA disponibles.',
-        'El **permiso de trabajo y la GBE para Inglaterra**, resueltos.'
+        'Más de **100 clubes** en Inglaterra y Europa. Agentes con licencia FIFA disponibles.'
       ],
       cyrilRole: 'Director de Fútbol Europeo',
       cyrilDesc:
@@ -1063,6 +1063,9 @@ export function LandingHome() {
             <br />
             <span className={cx('it')}>{c.team.it}</span>
           </h2>
+          <p className={cx('teamPromise', 'reveal')} data-d="1">
+            {c.team.promise}
+          </p>
           <div className={cx('teamGrid')}>
             <div className={cx('tcard', 'reveal')} data-d="1">
               <div className={cx('tphoto')}>

@@ -34,81 +34,67 @@ const COPY = {
       sub: 'Every player already filtered, watched and cleared. You only meet the ones ready to walk onto your pitch.',
       cta: 'Start your search'
     },
-    cost: {
-      eyebrow: 'The cost of the old way',
-      thin: '93 trials',
-      bold: 'nobody needed.',
+    process: {
+      eyebrow: 'The Process',
+      thin: 'Six steps.',
+      bold: 'One clear path.',
       items: [
-        {
-          title: 'Wasted trials',
-          desc: 'Flights, hotels and staff time spent on players who were never close to your level.'
-        },
-        {
-          title: 'No eyes on the ground',
-          desc: 'Decisions made on edited highlight reels, with no one who has watched the player live.'
-        },
-        {
-          title: 'The paperwork wall',
-          desc: 'Work permits and GBE points that sink a signing months after you committed to it.'
-        }
+        'Upload your profile.',
+        'We will review it and contact you to have an open discussion.',
+        'If accepted, you will begin the Clearway player pathway.',
+        'Three month evaluation and preparation process.',
+        'If possible, we attend training sessions and matches.',
+        'Guaranteed trial.'
       ]
     },
     versus: {
       eyebrow: 'What you actually get',
-      thin: 'The old way',
-      bold: 'gets a red card.',
-      oldTag: 'The old way',
-      oldItems: [
-        'Hundreds of unfiltered CVs and reels',
-        'Trials booked on a hunch',
-        'No one watching live',
-        'Paperwork discovered too late',
-        'You carry all the risk'
-      ],
-      oldFoot: 'Off the pitch',
-      clearTag: 'The Clearway way',
-      clearItems: [
-        'Only the 7% that clear the filter',
-        'Three months of real evaluation first',
-        'Watched in person, on the ground',
-        'Work permit and GBE cleared up front',
-        'The trial is guaranteed, the signing is earned'
-      ],
-      clearFoot: 'Cleared to play'
+      thin: 'Every player,',
+      bold: 'already cleared.',
+      stats: [
+        {big: '7%', line: 'clear the filter before we put them in front of you'},
+        {big: '3 months', line: 'of real evaluation before any trial'},
+        {big: 'In person', line: 'watched live, on the ground'},
+        {big: 'Guaranteed', line: 'the trial is guaranteed, the signing is earned'}
+      ]
     },
     map: {
       eyebrow: 'Two ways we work with clubs',
       thin: 'One network.',
       bold: 'Two pathways.',
-      ukNode: 'England and Europe',
-      mxNode: 'Mexico and Texas',
+      nodes: [
+        {id: 'us', label: 'USA'},
+        {id: 'mx', label: 'Mexico'},
+        {id: 'uk', label: 'United Kingdom'},
+        {id: 'eu', label: 'Europe'}
+      ],
+      note: 'And the network keeps expanding to more countries.',
       card1: {
         tag: 'Clubs in the UK and Europe',
         thin: 'Recruitment you can',
-        bold: 'actually trust.',
-        p: 'Fully filtered talent, watched in person, ready to trial. We do the first 93 rejections so your staff only meet the seven.',
+        bold: 'trust.',
+        p: 'Fully filtered talent, watched in person, ready to trial. We work with clubs across Mexico, USA and to pretty much all of Europe and the UK, with the network expanding to more countries.',
         pts: [
           'Players measured against your level before they reach you',
-          'Eyes on the ground, not just highlight reels',
-          'Work permit and GBE handled end to end'
+          'Eyes on the ground, not just highlight reels'
         ]
       },
       card2: {
-        tag: 'Clubs in Mexico and Texas',
-        thin: 'Your door into',
-        bold: 'European football.',
-        p: 'A direct bridge to clubs across England and Europe, and the partnerships that come with being inside the network rather than outside it.',
+        tag: 'Clubs registering to see players',
+        thin: 'A window into',
+        bold: 'our talent.',
+        p: 'Any club in the world can create a profile and register to see our players. Especially valuable for European clubs looking for filtered, ready talent.',
         pts: [
-          'A real pathway for your players into Europe',
-          'Partnerships with clubs already in the network',
-          'The same filter, working in your favour'
+          'A free profile for any club in the world',
+          'Register to see our filtered, trial-ready players',
+          'Built for European clubs seeking ready talent'
         ]
       }
     },
     people: {
       eyebrow: 'The people behind it',
-      thin: 'Clearway is not a directory.',
-      bold: 'It is three careers.',
+      thin: 'Three careers',
+      bold: 'behind every player.',
       lede: 'When they put a player in front of you, it carries their name. That is the whole promise.',
       james: {
         role: 'Founder & CEO',
@@ -156,81 +142,67 @@ const COPY = {
       sub: 'Cada jugador ya filtrado, observado y verificado. Solo conoces a los que están listos para saltar a tu campo.',
       cta: 'Inicia tu búsqueda'
     },
-    cost: {
-      eyebrow: 'El coste del método antiguo',
-      thin: '93 pruebas',
-      bold: 'que nadie necesitaba.',
+    process: {
+      eyebrow: 'El Proceso',
+      thin: 'Seis pasos.',
+      bold: 'Un camino claro.',
       items: [
-        {
-          title: 'Pruebas desperdiciadas',
-          desc: 'Vuelos, hoteles y horas de tu staff invertidos en jugadores que nunca estuvieron cerca de tu nivel.'
-        },
-        {
-          title: 'Sin ojos sobre el terreno',
-          desc: 'Decisiones tomadas sobre vídeos de resúmenes editados, sin nadie que haya visto al jugador en directo.'
-        },
-        {
-          title: 'El muro burocrático',
-          desc: 'Permisos de trabajo y puntos GBE que hunden un fichaje meses después de haberte comprometido.'
-        }
+        'Sube tu perfil.',
+        'Lo revisamos y te contactamos para una conversación abierta.',
+        'Si eres aceptado, comienzas el Clearway player pathway.',
+        'Proceso de evaluación y preparación de tres meses.',
+        'Si es posible, asistimos a tus entrenamientos y partidos.',
+        'Trial garantizado.'
       ]
     },
     versus: {
       eyebrow: 'Lo que realmente obtienes',
-      thin: 'El método antiguo',
-      bold: 've la tarjeta roja.',
-      oldTag: 'El método antiguo',
-      oldItems: [
-        'Cientos de CVs y vídeos sin filtrar',
-        'Pruebas reservadas por corazonada',
-        'Nadie viendo en directo',
-        'Papeleo descubierto demasiado tarde',
-        'Tú cargas con todo el riesgo'
-      ],
-      oldFoot: 'Fuera del campo',
-      clearTag: 'El método Clearway',
-      clearItems: [
-        'Solo el 7% que supera el filtro',
-        'Tres meses de evaluación real primero',
-        'Observados en persona, sobre el terreno',
-        'Permiso de trabajo y GBE resueltos de antemano',
-        'La prueba está garantizada, el fichaje se gana'
-      ],
-      clearFoot: 'Listos para jugar'
+      thin: 'Cada jugador,',
+      bold: 'ya verificado.',
+      stats: [
+        {big: '7%', line: 'superan el filtro antes de ponerlos frente a ti'},
+        {big: '3 meses', line: 'de evaluación real antes de cualquier prueba'},
+        {big: 'En persona', line: 'observados en directo, sobre el terreno'},
+        {big: 'Garantizado', line: 'la prueba está garantizada, el fichaje se gana'}
+      ]
     },
     map: {
       eyebrow: 'Dos formas de trabajar con clubes',
       thin: 'Una red.',
       bold: 'Dos caminos.',
-      ukNode: 'Inglaterra y Europa',
-      mxNode: 'México y Texas',
+      nodes: [
+        {id: 'us', label: 'USA'},
+        {id: 'mx', label: 'México'},
+        {id: 'uk', label: 'Reino Unido'},
+        {id: 'eu', label: 'Europa'}
+      ],
+      note: 'Y la red sigue expandiéndose a más países.',
       card1: {
         tag: 'Clubes en Reino Unido y Europa',
         thin: 'Un reclutamiento en el que',
-        bold: 'sí puedes confiar.',
-        p: 'Talento totalmente filtrado, observado en persona, listo para la prueba. Nosotros hacemos los primeros 93 descartes para que tu staff solo conozca a los siete.',
+        bold: 'puedes confiar.',
+        p: 'Talento totalmente filtrado, observado en persona, listo para la prueba. Trabajamos con clubes en México, USA y prácticamente toda Europa y el Reino Unido, con la red expandiéndose a más países.',
         pts: [
           'Jugadores medidos contra tu nivel antes de llegar a ti',
-          'Ojos sobre el terreno, no solo vídeos de resúmenes',
-          'Permiso de trabajo y GBE gestionados de principio a fin'
+          'Ojos sobre el terreno, no solo vídeos de resúmenes'
         ]
       },
       card2: {
-        tag: 'Clubes en México y Texas',
-        thin: 'Tu puerta al',
-        bold: 'fútbol europeo.',
-        p: 'Un puente directo a clubes en Inglaterra y Europa, y las alianzas que solo llegan cuando estás dentro de la red y no fuera de ella.',
+        tag: 'Clubes que se registran para ver jugadores',
+        thin: 'Una ventana a',
+        bold: 'nuestro talento.',
+        p: 'Cualquier club del mundo puede crear un perfil y registrarse para ver a nuestros jugadores. Especialmente valioso para clubes europeos que buscan talento filtrado y listo.',
         pts: [
-          'Un camino real para tus jugadores hacia Europa',
-          'Alianzas con clubes que ya están en la red',
-          'El mismo filtro, trabajando a tu favor'
+          'Un perfil gratuito para cualquier club del mundo',
+          'Regístrate para ver a nuestros jugadores filtrados y listos',
+          'Pensado para clubes europeos que buscan talento listo'
         ]
       }
     },
     people: {
       eyebrow: 'Las personas detrás',
-      thin: 'Clearway no es un directorio.',
-      bold: 'Son tres carreras.',
+      thin: 'Tres carreras',
+      bold: 'detrás de cada jugador.',
       lede: 'Cuando ponen a un jugador frente a ti, lleva su nombre. Esa es toda la promesa.',
       james: {
         role: 'Fundador y CEO',
@@ -273,6 +245,30 @@ const COPY = {
 };
 
 const TOTAL = 5;
+
+/* ===== Network map: markets where Clearway has clubs, drawn as a distributed
+   web rather than a single route. Positions are normalised (0–1) to the world
+   map background; the same coordinates drive both the HTML markers and the
+   canvas links. ===== */
+type MapPoint = {x: number; y: number};
+const MAP_POS: Record<string, MapPoint> = {
+  us: {x: 0.215, y: 0.43},
+  mx: {x: 0.216, y: 0.567},
+  uk: {x: 0.498, y: 0.327},
+  eu: {x: 0.54, y: 0.39}
+};
+/* Every link is drawn faintly (the web); the transatlantic links also carry
+   travelling pulses (the flow). */
+const MAP_EDGES: Array<[string, string]> = [
+  ['us', 'mx'],
+  ['uk', 'eu'],
+  ['mx', 'uk'],
+  ['us', 'eu']
+];
+const MAP_FLOW: Array<[string, string]> = [
+  ['mx', 'uk'],
+  ['us', 'eu']
+];
 
 type EnqData = {
   club: string;
@@ -543,8 +539,6 @@ export function ForClubs() {
     let raf = 0;
     let t = 0;
     let started = false;
-    const MX = {x: 0.216, y: 0.567};
-    const UK = {x: 0.498, y: 0.327};
     function resize() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       W = canvas!.clientWidth;
@@ -553,46 +547,60 @@ export function ForClubs() {
       canvas!.height = H * dpr;
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
-    function arcPoint(p: number) {
-      const cx2 = (MX.x + UK.x) / 2;
-      const cy = Math.min(MX.y, UK.y) - 0.28;
+    function arcPoint(a: MapPoint, b: MapPoint, p: number) {
+      const cx2 = (a.x + b.x) / 2;
+      // Lift the control point with edge length, so long transatlantic links
+      // arc higher than the short intra-region ones.
+      const lift = 0.1 + 0.34 * Math.hypot(b.x - a.x, b.y - a.y);
+      const cy = Math.min(a.y, b.y) - lift;
       const mt = 1 - p;
       return {
-        x: (mt * mt * MX.x + 2 * mt * p * cx2 + p * p * UK.x) * W,
-        y: (mt * mt * MX.y + 2 * mt * p * cy + p * p * UK.y) * H
+        x: (mt * mt * a.x + 2 * mt * p * cx2 + p * p * b.x) * W,
+        y: (mt * mt * a.y + 2 * mt * p * cy + p * p * b.y) * H
       };
     }
     function loop() {
       ctx!.clearRect(0, 0, W, H);
       t += 0.006;
-      ctx!.beginPath();
-      for (let p = 0; p <= 1; p += 0.02) {
-        const pt = arcPoint(p);
-        if (p === 0) ctx!.moveTo(pt.x, pt.y);
-        else ctx!.lineTo(pt.x, pt.y);
-      }
-      ctx!.strokeStyle = 'rgba(208,216,226,0.2)';
-      ctx!.lineWidth = 1.5;
-      ctx!.stroke();
-      for (let k = 0; k < 3; k++) {
-        const p = (t + k / 3) % 1;
-        const pt = arcPoint(p);
-        for (let s = 0; s < 6; s++) {
-          const ps = Math.max(0, p - s * 0.018);
-          const sp = arcPoint(ps);
-          ctx!.beginPath();
-          ctx!.arc(sp.x, sp.y, 3 - s * 0.4, 0, 6.28);
-          ctx!.fillStyle = `rgba(208,216,226,${0.5 - s * 0.08})`;
-          ctx!.fill();
-        }
+      // The whole web, drawn faint: the map reads as a distributed network of
+      // markets rather than a single route.
+      ctx!.strokeStyle = 'rgba(208,216,226,0.16)';
+      ctx!.lineWidth = 1.2;
+      for (const [aK, bK] of MAP_EDGES) {
+        const a = MAP_POS[aK];
+        const b = MAP_POS[bK];
         ctx!.beginPath();
-        ctx!.arc(pt.x, pt.y, 3.5, 0, 6.28);
-        ctx!.fillStyle = '#fff';
-        ctx!.shadowColor = 'rgba(208,216,226,0.9)';
-        ctx!.shadowBlur = 12;
-        ctx!.fill();
-        ctx!.shadowBlur = 0;
+        for (let p = 0; p <= 1; p += 0.02) {
+          const pt = arcPoint(a, b, p);
+          if (p === 0) ctx!.moveTo(pt.x, pt.y);
+          else ctx!.lineTo(pt.x, pt.y);
+        }
+        ctx!.stroke();
       }
+      // Pulses flow along the transatlantic links to keep the network alive.
+      MAP_FLOW.forEach(([aK, bK], ei) => {
+        const a = MAP_POS[aK];
+        const b = MAP_POS[bK];
+        for (let k = 0; k < 2; k++) {
+          const p = (t + k / 2 + ei * 0.25) % 1;
+          for (let s = 0; s < 6; s++) {
+            const ps = Math.max(0, p - s * 0.02);
+            const sp = arcPoint(a, b, ps);
+            ctx!.beginPath();
+            ctx!.arc(sp.x, sp.y, 3 - s * 0.4, 0, 6.28);
+            ctx!.fillStyle = `rgba(208,216,226,${0.5 - s * 0.08})`;
+            ctx!.fill();
+          }
+          const pt = arcPoint(a, b, p);
+          ctx!.beginPath();
+          ctx!.arc(pt.x, pt.y, 3.2, 0, 6.28);
+          ctx!.fillStyle = '#fff';
+          ctx!.shadowColor = 'rgba(208,216,226,0.9)';
+          ctx!.shadowBlur = 12;
+          ctx!.fill();
+          ctx!.shadowBlur = 0;
+        }
+      });
       raf = requestAnimationFrame(loop);
     }
     const mio = new IntersectionObserver(
@@ -802,50 +810,35 @@ export function ForClubs() {
         </div>
       </section>
 
-      {/* THE COST */}
-      <section className={cx('cost')}>
+      {/* THE PROCESS */}
+      <section className={cx('process')}>
         <div className={cx('wrap')}>
-          <div className={cx('costHead', 'reveal')}>
-            <div className={cx('eyebrow')}>{c.cost.eyebrow}</div>
+          <div className={cx('processHead', 'reveal')}>
+            <div className={cx('eyebrow')}>{c.process.eyebrow}</div>
             <h2>
-              <span className={cx('thin')}>{c.cost.thin}</span>
+              <span className={cx('thin')}>{c.process.thin}</span>
               <br />
-              <b>{c.cost.bold}</b>
+              <b>{c.process.bold}</b>
             </h2>
           </div>
-          <div className={cx('costList')}>
-            <div className={cx('costRow', 'reveal')} data-d="1">
-              <div className={cx('costBig')} aria-hidden="true">
-                <span className={cx('costIcon', 'costIconMoney')} />
-              </div>
-              <div className={cx('costTxt')}>
-                <h3>{c.cost.items[0].title}</h3>
-                <p>{c.cost.items[0].desc}</p>
-              </div>
-            </div>
-            <div className={cx('costRow', 'reveal')} data-d="2">
-              <div className={cx('costBig')} aria-hidden="true">
-                <span className={cx('costIcon', 'costIconVisual')} />
-              </div>
-              <div className={cx('costTxt')}>
-                <h3>{c.cost.items[1].title}</h3>
-                <p>{c.cost.items[1].desc}</p>
-              </div>
-            </div>
-            <div className={cx('costRow', 'reveal')} data-d="3">
-              <div className={cx('costBig')} aria-hidden="true">
-                <span className={cx('costIcon', 'costIconSign')} />
-              </div>
-              <div className={cx('costTxt')}>
-                <h3>{c.cost.items[2].title}</h3>
-                <p>{c.cost.items[2].desc}</p>
-              </div>
-            </div>
-          </div>
+          <ol className={cx('processList')}>
+            {c.process.items.map((item, i) => (
+              <li
+                key={i}
+                className={cx('processStep', 'reveal')}
+                data-d={String((i % 3) + 1)}
+              >
+                <span className={cx('processNum')} aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <p>{item}</p>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 
-      {/* OLD VS CLEARWAY */}
+      {/* WHAT YOU GET — positive stat + statement blocks */}
       <section className={cx('versus')} id="how">
         <div className={cx('wrap')}>
           <div className={cx('versusHead', 'reveal')}>
@@ -855,31 +848,17 @@ export function ForClubs() {
               <b>{c.versus.bold}</b>
             </h2>
           </div>
-          <div className={cx('cardsBoard', 'reveal')} data-d="1">
-            <div className={cx('refCard', 'refRed')}>
-              <div className={cx('refCardTop')}>
-                <span className={cx('refTag')}>{c.versus.oldTag}</span>
-                <span className={cx('refMark')}>✕</span>
+          <div className={cx('statBoard')}>
+            {c.versus.stats.map((s, i) => (
+              <div
+                key={i}
+                className={cx('statBlock', 'reveal')}
+                data-d={String((i % 3) + 1)}
+              >
+                <div className={cx('statBig')}>{s.big}</div>
+                <p className={cx('statLine')}>{s.line}</p>
               </div>
-              <ul>
-                {c.versus.oldItems.map((item, i) => (
-                  <li key={i}>{item}</li>
-                ))}
-              </ul>
-              <div className={cx('refFoot')}>{c.versus.oldFoot}</div>
-            </div>
-            <div className={cx('refCard', 'refGreen')}>
-              <div className={cx('refCardTop')}>
-                <span className={cx('refTag')}>{c.versus.clearTag}</span>
-                <span className={cx('refMark')}>✓</span>
-              </div>
-              <ul>
-                {c.versus.clearItems.map((item, i) => (
-                  <li key={i}>{item}</li>
-                ))}
-              </ul>
-              <div className={cx('refFoot')}>{c.versus.clearFoot}</div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -895,15 +874,21 @@ export function ForClubs() {
           </div>
           <div className={cx('mapStage', 'reveal')} data-d="1">
             <canvas ref={mapCanvasRef} className={cx('mapCanvas')} aria-hidden />
-            <div className={cx('mapNode', 'mapNodeUk')}>
-              <span className={cx('mnDot')} />
-              <span className={cx('mnLabel')}>{c.map.ukNode}</span>
-            </div>
-            <div className={cx('mapNode', 'mapNodeMx')}>
-              <span className={cx('mnDot')} />
-              <span className={cx('mnLabel')}>{c.map.mxNode}</span>
-            </div>
+            {c.map.nodes.map((n) => {
+              const pos = MAP_POS[n.id];
+              return (
+                <div
+                  key={n.id}
+                  className={cx('mapNode', pos.x > 0.42 && 'mapNodeRight')}
+                  style={{left: `${pos.x * 100}%`, top: `${pos.y * 100}%`}}
+                >
+                  <span className={cx('mnDot')} />
+                  <span className={cx('mnLabel')}>{n.label}</span>
+                </div>
+              );
+            })}
           </div>
+          <p className={cx('mapNote', 'reveal')} data-d="2">{c.map.note}</p>
           <div className={cx('mapCards')}>
             <div className={cx('mapCard', 'reveal')} data-d="1">
               <div className={cx('mcTop')}>

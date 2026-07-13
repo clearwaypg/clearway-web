@@ -1050,6 +1050,31 @@
   color: #fff;
   font-weight: 600;
 }
+.tlist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.tlist li {
+  position: relative;
+  padding-left: 20px;
+  color: #9aa6b6;
+  font-size: 0.96rem;
+  line-height: 1.5;
+}
+.tlist li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--dew, #d0d8e2);
+}
 
 /* =================== CAP 03 · filter =================== */
 .filter {

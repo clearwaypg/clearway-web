@@ -23,14 +23,12 @@ type Copy = (typeof COPY)['en'];
 const COPY = {
   en: {
     hero: {
-      chapter: 'The invisible player',
-      hl1a: 'You can be ',
-      hl1b: 'good',
-      hl2: 'and still',
-      hl3: 'never get seen.',
-      leadA: 'Measured against the same standard a professional club uses. ',
-      leadB: 'Most do not meet it yet.',
-      stat1: 'past the filter',
+      chapter: 'Your journey starts here',
+      hl1a: 'You have the ',
+      hl1b: 'talent.',
+      hl2: 'We open',
+      hl3: 'the door.',
+      leadA: 'Measured against the same standard a professional club uses.',
       stat2: 'clubs in Europe',
       cue: 'The story begins'
     },
@@ -46,24 +44,26 @@ const COPY = {
       note: 'Free to build · Players from Mexico and the world'
     },
     truth: {
-      headA: 'The bit ',
-      headB: 'others skip.',
-      c1t: 'Your trial is real',
-      c1a: 'Some charge you to stand on a pitch and hope someone watches. ',
-      c1b: 'Yours is with a club that already said they want to see you.',
+      headA: 'Real Opportunities, Real Clubs, ',
+      headB: 'Real Pathways',
+      c1t: 'Your trial',
+      c1a: 'The club has already requested to see you. ',
+      c1b: 'We identify the right club, with the right fit at that stage of your career.',
       c2t: 'What it costs, plainly',
-      c2a: 'Building your profile is free. ',
-      c2b: 'The three month evaluation has a cost',
-      c2c: ', written into a Clearway contract. You cover your video and travel.',
+      c2items: [
+        'Building your profile is free.',
+        'The first assessment meeting is free.',
+        'The three month preparation pathway has a cost.',
+        'Player video and travel expenses are covered by the player.'
+      ],
       c3t: 'What we promise',
-      c3a: 'We guarantee the ',
-      c3b: 'trial, not the signing',
-      c3c: '. Nobody can guarantee a signing. What we promise is the door, and the work permit and GBE paperwork for England.'
+      c3a: 'We guarantee a trial with a club who has requested to see you, ',
+      c3b: 'where you are the right fit',
+      c3c: ' and with the best possibility of signing a professional contract.'
     },
     guides: {
-      headA: 'Not a ',
-      headThin: 'form in a folder.',
-      headIt: 'People who have done this.',
+      headA: 'The team who have ',
+      headThin: 'been there and done it',
       jamesRole: 'Founder & CEO',
       jamesDesc:
         'Has spent thirty years in elite sport across 66 countries as a professional athlete, coach and manager, working alongside Olympic Gold Medalists, Wimbledon champions and world number ones. A University of Liverpool graduate, he brought that global experience into football, and is now registered with The Football Association in Talent Identification, the foundation Clearway is built on.',
@@ -74,20 +74,12 @@ const COPY = {
       timoDesc:
         'Spent over 15 years as a professional defender across Europe and Mexico, playing for Lyon, Nice, Saint-Étienne, Sevilla, Borussia Mönchengladbach and Tigres UANL, and won the UEFA Europa League with Sevilla. Having competed at the top level in Ligue 1, La Liga, the Bundesliga and Liga MX, he now leads talent identification and player assessment for Clearway across the USA and Mexico.'
     },
-    filter: {
-      h2a: 'Seven of ',
-      h2thin: 'every hundred',
-      h2it: 'go through.',
-      p: 'That number is low on purpose. It is not us being difficult, it is us being transparent about what professional football actually asks for. We would rather tell you the truth early than waste your summer.',
-      ctaA: 'Think you are one of the seven? ',
-      ctaB: 'Show us →'
-    },
     ribbon:
       'Access to 100+ clubs · England · Spain · France · Italy · Germany · Austria · Belgium · Hungary',
     close: {
-      h2a: 'From invisible ',
-      h2it: 'to seen.',
-      p: 'Build your profile. If it fits, you will hear from the Clearway team. If it does not, you will hear that too. Either way, no guessing.',
+      h2a: 'From Potential ',
+      h2it: 'to Opportunity',
+      p: 'Build your profile here, if it fits, you will hear from the Clearway team shortly.',
       cta: 'Build my profile'
     },
     modal: {
@@ -156,14 +148,12 @@ const COPY = {
   },
   es: {
     hero: {
-      chapter: 'El jugador invisible',
-      hl1a: 'Puedes ser ',
-      hl1b: 'bueno',
-      hl2: 'y aun así',
-      hl3: 'nunca ser visto.',
-      leadA: 'Medido con el mismo estándar que usa un club profesional. ',
-      leadB: 'La mayoría todavía no lo alcanza.',
-      stat1: 'superan el filtro',
+      chapter: 'Tu camino empieza aquí',
+      hl1a: 'Tienes el ',
+      hl1b: 'talento.',
+      hl2: 'Nosotros',
+      hl3: 'abrimos la puerta.',
+      leadA: 'Medido con el mismo estándar que usa un club profesional.',
       stat2: 'clubes en Europa',
       cue: 'Aquí empieza la historia'
     },
@@ -179,24 +169,26 @@ const COPY = {
       note: 'Gratis de crear · Jugadores de México y del mundo'
     },
     truth: {
-      headA: 'La parte ',
-      headB: 'que otros omiten.',
-      c1t: 'Tu prueba es real',
-      c1a: 'Algunos te cobran por pisar un campo y esperar que alguien te mire. ',
-      c1b: 'La tuya es con un club que ya dijo que quiere verte.',
+      headA: 'Oportunidades reales, clubes reales, ',
+      headB: 'caminos reales',
+      c1t: 'Tu prueba',
+      c1a: 'El club ya ha solicitado verte. ',
+      c1b: 'Identificamos el club correcto, con el fit adecuado para esa etapa de tu carrera.',
       c2t: 'Lo que cuesta, sin rodeos',
-      c2a: 'Crear tu perfil es gratis. ',
-      c2b: 'La evaluación de tres meses tiene un costo',
-      c2c: ', fijado en un contrato de Clearway. Tú cubres tu video y tus viajes.',
+      c2items: [
+        'Construir tu perfil es gratuito.',
+        'La primera reunión de evaluación es gratuita.',
+        'El pathway de preparación de tres meses tiene un costo.',
+        'El video del jugador y los gastos de viaje corren por cuenta del jugador.'
+      ],
       c3t: 'Lo que prometemos',
-      c3a: 'Garantizamos la ',
-      c3b: 'prueba, no el fichaje',
-      c3c: '. Nadie puede garantizar un fichaje. Lo que prometemos es la puerta, y los trámites del permiso de trabajo y la GBE para Inglaterra.'
+      c3a: 'Garantizamos un trial con un club que ha solicitado verte, ',
+      c3b: 'donde eres el fit adecuado',
+      c3c: ' y con la mejor posibilidad de firmar un contrato profesional.'
     },
     guides: {
-      headA: 'No es un ',
-      headThin: 'formulario en un cajón.',
-      headIt: 'Gente que ya lo ha hecho.',
+      headA: 'El equipo que ',
+      headThin: 'ya lo ha vivido',
       jamesRole: 'Fundador y CEO',
       jamesDesc:
         'Ha pasado treinta años en el deporte de élite en 66 países como atleta profesional, entrenador y mánager, trabajando junto a medallistas de oro olímpicos, campeones de Wimbledon y números uno del mundo. Graduado de la Universidad de Liverpool, llevó esa experiencia global al fútbol y hoy está registrado en The Football Association en Identificación de Talento, la base sobre la que se construye Clearway.',
@@ -207,20 +199,12 @@ const COPY = {
       timoDesc:
         'Pasó más de 15 años como defensa profesional en Europa y México, jugando para el Lyon, Niza, Saint-Étienne, Sevilla, Borussia Mönchengladbach y Tigres UANL, y ganó la UEFA Europa League con el Sevilla. Tras competir al máximo nivel en la Ligue 1, La Liga, la Bundesliga y la Liga MX, hoy lidera la identificación de talento y la evaluación de jugadores para Clearway en Estados Unidos y México.'
     },
-    filter: {
-      h2a: 'Siete de ',
-      h2thin: 'cada cien',
-      h2it: 'pasan.',
-      p: 'Ese número es bajo a propósito. No es que seamos difíciles, es que somos transparentes sobre lo que el fútbol profesional realmente exige. Preferimos decirte la verdad pronto antes que desperdiciar tu verano.',
-      ctaA: '¿Crees que eres uno de los siete? ',
-      ctaB: 'Demuéstralo →'
-    },
     ribbon:
       'Acceso a más de 100 clubes · Inglaterra · España · Francia · Italia · Alemania · Austria · Bélgica · Hungría',
     close: {
-      h2a: 'De invisible ',
-      h2it: 'a visto.',
-      p: 'Crea tu perfil. Si encaja, el equipo de Clearway te contactará. Si no, también lo sabrás. En cualquier caso, sin adivinanzas.',
+      h2a: 'Del potencial ',
+      h2it: 'a la oportunidad',
+      p: 'Construye tu perfil aquí, si encaja, sabrás del equipo Clearway pronto.',
       cta: 'Crear mi perfil'
     },
     modal: {
@@ -662,15 +646,8 @@ export function ForPlayers() {
             <span className={cx('hl', 'hl3', 'anim', 'd4')}>{c.hero.hl3}</span>
           </div>
           <div className={cx('undertext', 'anim', 'd5')}>
-            <p className={cx('lead')}>
-              {c.hero.leadA}
-              <b>{c.hero.leadB}</b>
-            </p>
+            <p className={cx('lead')}>{c.hero.leadA}</p>
             <div className={cx('stats')}>
-              <div className={cx('stat')}>
-                <div className={cx('n')}>7/100</div>
-                <div className={cx('l')}>{c.hero.stat1}</div>
-              </div>
               <div className={cx('stat')}>
                 <div className={cx('n')}>100+</div>
                 <div className={cx('l')}>{c.hero.stat2}</div>
@@ -782,10 +759,11 @@ export function ForPlayers() {
               </div>
               <div className={cx('tcard', 'reveal')} data-d="2">
                 <h3>{c.truth.c2t}</h3>
-                <p>
-                  {c.truth.c2a}
-                  <strong>{c.truth.c2b}</strong>{c.truth.c2c}
-                </p>
+                <ul className={cx('tlist')}>
+                  {c.truth.c2items.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
               </div>
               <div className={cx('tcard', 'reveal')} data-d="3">
                 <h3>{c.truth.c3t}</h3>
@@ -804,8 +782,6 @@ export function ForPlayers() {
           <div className={cx('head', 'reveal')}>
             <h2 className={cx('disp')}>
               {c.guides.headA}<span className={cx('thin')}>{c.guides.headThin}</span>
-              <br />
-              <span className={cx('it')}>{c.guides.headIt}</span>
             </h2>
           </div>
           <div className={cx('teamGrid')}>
@@ -849,35 +825,6 @@ export function ForPlayers() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* ===== CAP 03 · FILTER ===== */}
-      <section className={cx('filter')}>
-        <div className={cx('wrap')}>
-          <div className={cx('big', 'reveal')}>
-            <svg className={cx('bigSvg')} viewBox="0 0 660 300" aria-hidden="true">
-              <text x="330" y="226" textAnchor="middle" className={cx('bigText')}>
-                7
-                <tspan className={cx('bigSlash')} dx="-6">
-                  /
-                </tspan>
-                <tspan dx="50">100</tspan>
-              </text>
-            </svg>
-          </div>
-          <h2 className={cx('disp', 'reveal')}>
-            {c.filter.h2a}<span className={cx('thin')}>{c.filter.h2thin}</span>{' '}
-            <span className={cx('it')}>{c.filter.h2it}</span>
-          </h2>
-          <p className={cx('reveal')}>{c.filter.p}</p>
-          <button
-            type="button"
-            className={cx('inline-cta', 'reveal')}
-            onClick={openModal}
-          >
-            {c.filter.ctaA}<b>{c.filter.ctaB}</b>
-          </button>
         </div>
       </section>
 
