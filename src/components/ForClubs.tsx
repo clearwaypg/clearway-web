@@ -33,19 +33,6 @@ const COPY = {
       sub: 'Every player already filtered, watched and cleared. You only meet the ones ready to walk onto your pitch.',
       cta: 'Start your search'
     },
-    process: {
-      eyebrow: 'The Process',
-      thin: 'Six steps.',
-      bold: 'One clear path.',
-      items: [
-        'Upload your profile.',
-        'We will review it and contact you to have an open discussion.',
-        'If accepted, you will begin the Clearway player pathway.',
-        'Three month evaluation and preparation process.',
-        'If possible, we attend training sessions and matches.',
-        'Guaranteed trial.'
-      ]
-    },
     versus: {
       eyebrow: 'What you actually get',
       thin: 'Every player,',
@@ -97,7 +84,7 @@ const COPY = {
       lede: 'When they put a player in front of you, it carries their name. That is the whole promise.',
       james: {
         role: 'Founder & CEO',
-        desc: 'Has spent thirty years in elite sport across 66 countries as a professional athlete, coach and manager, working alongside Olympic Gold Medalists, Wimbledon champions and world number ones. A University of Liverpool graduate, he brought that global experience into football, and is now registered with The Football Association in Talent Identification, the foundation Clearway is built on.'
+        desc: 'Has spent 30 years in elite sport across 66 countries as a professional athlete, coach and manager. Working alongside Olympic Gold Medalists, Wimbledon champions and world number ones, he brings global experience understanding the demands, discipline and mindset required to help talented athletes become professionals.'
       },
       cyril: {
         role: 'Director of European Football',
@@ -140,19 +127,6 @@ const COPY = {
       bold: 'No el ruido.',
       sub: 'Cada jugador ya filtrado, observado y verificado. Solo conoces a los que están listos para saltar a tu campo.',
       cta: 'Inicia tu búsqueda'
-    },
-    process: {
-      eyebrow: 'El Proceso',
-      thin: 'Seis pasos.',
-      bold: 'Un camino claro.',
-      items: [
-        'Sube tu perfil.',
-        'Lo revisamos y te contactamos para una conversación abierta.',
-        'Si eres aceptado, comienzas el Clearway player pathway.',
-        'Proceso de evaluación y preparación de tres meses.',
-        'Si es posible, asistimos a tus entrenamientos y partidos.',
-        'Trial garantizado.'
-      ]
     },
     versus: {
       eyebrow: 'Lo que realmente obtienes',
@@ -205,7 +179,7 @@ const COPY = {
       lede: 'Cuando ponen a un jugador frente a ti, lleva su nombre. Esa es toda la promesa.',
       james: {
         role: 'Fundador y CEO',
-        desc: 'Ha pasado treinta años en el deporte de élite en 66 países como atleta profesional, entrenador y mánager, trabajando junto a medallistas de oro olímpicos, campeones de Wimbledon y números uno del mundo. Graduado de la Universidad de Liverpool, llevó esa experiencia global al fútbol y hoy está registrado en The Football Association en Identificación de Talento, la base sobre la que se construye Clearway.'
+        desc: 'Ha pasado 30 años en el deporte de élite en 66 países como atleta profesional, entrenador y manager. Trabajando junto a medallistas de oro olímpicos, campeones de Wimbledon y números uno del mundo, aporta una experiencia global que le permite entender las exigencias, la disciplina y la mentalidad necesarias para ayudar a atletas talentosos a convertirse en profesionales.'
       },
       cyril: {
         role: 'Director de Fútbol Europeo',
@@ -809,34 +783,6 @@ export function ForClubs() {
         </div>
       </section>
 
-      {/* THE PROCESS */}
-      <section className={cx('process')}>
-        <div className={cx('wrap')}>
-          <div className={cx('processHead', 'reveal')}>
-            <div className={cx('eyebrow')}>{c.process.eyebrow}</div>
-            <h2>
-              <span className={cx('thin')}>{c.process.thin}</span>
-              <br />
-              <b>{c.process.bold}</b>
-            </h2>
-          </div>
-          <ol className={cx('processList')}>
-            {c.process.items.map((item, i) => (
-              <li
-                key={i}
-                className={cx('processStep', 'reveal')}
-                data-d={String((i % 3) + 1)}
-              >
-                <span className={cx('processNum')} aria-hidden="true">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <p>{item}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
       {/* WHAT YOU GET — positive stat + statement blocks */}
       <section className={cx('versus')} id="how">
         <div className={cx('wrap')}>
@@ -941,19 +887,6 @@ export function ForClubs() {
             <div className={cx('tcard', 'reveal')} data-d="1">
               <div className={cx('tphoto')}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/james.webp" alt="James Fox" />
-              </div>
-              <div className={cx('tinfo')}>
-                <div className={cx('tname')}>
-                  <span>James</span> Fox
-                </div>
-                <div className={cx('trole')}>{c.people.james.role}</div>
-                <p className={cx('tdesc')}>{c.people.james.desc}</p>
-              </div>
-            </div>
-            <div className={cx('tcard', 'reveal')} data-d="2">
-              <div className={cx('tphoto')}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/cyril.webp" alt="Cyril Rool" />
               </div>
               <div className={cx('tinfo')}>
@@ -962,6 +895,19 @@ export function ForClubs() {
                 </div>
                 <div className={cx('trole')}>{c.people.cyril.role}</div>
                 <p className={cx('tdesc')}>{c.people.cyril.desc}</p>
+              </div>
+            </div>
+            <div className={cx('tcard', 'reveal')} data-d="2">
+              <div className={cx('tphoto')}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/james.webp" alt="James Fox" />
+              </div>
+              <div className={cx('tinfo')}>
+                <div className={cx('tname')}>
+                  <span>James</span> Fox
+                </div>
+                <div className={cx('trole')}>{c.people.james.role}</div>
+                <p className={cx('tdesc')}>{c.people.james.desc}</p>
               </div>
             </div>
             <div className={cx('tcard', 'reveal')} data-d="3">

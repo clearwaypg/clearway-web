@@ -61,12 +61,25 @@ const COPY = {
       c3b: 'where you are the right fit',
       c3c: ' and with the best possibility of signing a professional contract.'
     },
+    process: {
+      eyebrow: 'The Process',
+      thin: 'Six steps.',
+      bold: 'One clear path.',
+      items: [
+        'Upload your profile.',
+        'We will review it and contact you to have an open discussion.',
+        'If accepted, you will begin the Clearway player pathway.',
+        'Three month evaluation and preparation process.',
+        'If possible, we attend training sessions and matches.',
+        'Guaranteed trial.'
+      ]
+    },
     guides: {
       headA: 'The team who have ',
       headThin: 'been there and done it',
       jamesRole: 'Founder & CEO',
       jamesDesc:
-        'Has spent thirty years in elite sport across 66 countries as a professional athlete, coach and manager, working alongside Olympic Gold Medalists, Wimbledon champions and world number ones. A University of Liverpool graduate, he brought that global experience into football, and is now registered with The Football Association in Talent Identification, the foundation Clearway is built on.',
+        'Has spent 30 years in elite sport across 66 countries as a professional athlete, coach and manager. Working alongside Olympic Gold Medalists, Wimbledon champions and world number ones, he brings global experience understanding the demands, discipline and mindset required to help talented athletes become professionals.',
       cyrilRole: 'Director of European Football',
       cyrilDesc:
         'Spent over 15 years as a professional footballer in Ligue 1, playing for RC Lens, Girondins de Bordeaux, OGC Nice and Olympique de Marseille, and earned France Under-21 honours. That playing career became a second one off the pitch: he has represented and placed players across Europe and Mexico, and now brings that network and experience to Clearway.',
@@ -186,12 +199,25 @@ const COPY = {
       c3b: 'donde eres el fit adecuado',
       c3c: ' y con la mejor posibilidad de firmar un contrato profesional.'
     },
+    process: {
+      eyebrow: 'El Proceso',
+      thin: 'Seis pasos.',
+      bold: 'Un camino claro.',
+      items: [
+        'Sube tu perfil.',
+        'Lo revisamos y te contactamos para una conversación abierta.',
+        'Si eres aceptado, comienzas el Clearway player pathway.',
+        'Proceso de evaluación y preparación de tres meses.',
+        'Si es posible, asistimos a tus entrenamientos y partidos.',
+        'Trial garantizado.'
+      ]
+    },
     guides: {
       headA: 'El equipo que ',
       headThin: 'ya lo ha vivido',
       jamesRole: 'Fundador y CEO',
       jamesDesc:
-        'Ha pasado treinta años en el deporte de élite en 66 países como atleta profesional, entrenador y mánager, trabajando junto a medallistas de oro olímpicos, campeones de Wimbledon y números uno del mundo. Graduado de la Universidad de Liverpool, llevó esa experiencia global al fútbol y hoy está registrado en The Football Association en Identificación de Talento, la base sobre la que se construye Clearway.',
+        'Ha pasado 30 años en el deporte de élite en 66 países como atleta profesional, entrenador y manager. Trabajando junto a medallistas de oro olímpicos, campeones de Wimbledon y números uno del mundo, aporta una experiencia global que le permite entender las exigencias, la disciplina y la mentalidad necesarias para ayudar a atletas talentosos a convertirse en profesionales.',
       cyrilRole: 'Director de Fútbol Europeo',
       cyrilDesc:
         'Pasó más de 15 años como futbolista profesional en la Ligue 1, jugando para el RC Lens, Girondins de Burdeos, OGC Nice y Olympique de Marsella, y fue internacional con la selección Sub-21 de Francia. Esa carrera como jugador dio paso a una segunda fuera del campo: ha representado y colocado jugadores en Europa y México, y ahora aporta esa red y experiencia a Clearway.',
@@ -776,6 +802,34 @@ export function ForPlayers() {
         </div>
       </section>
 
+      {/* ===== CAP 03 · PROCESS ===== */}
+      <section className={cx('process')}>
+        <div className={cx('wrap')}>
+          <div className={cx('processHead', 'reveal')}>
+            <div className={cx('eyebrow')}>{c.process.eyebrow}</div>
+            <h2>
+              <span className={cx('thin')}>{c.process.thin}</span>
+              <br />
+              <b>{c.process.bold}</b>
+            </h2>
+          </div>
+          <ol className={cx('processList')}>
+            {c.process.items.map((item, i) => (
+              <li
+                key={i}
+                className={cx('processStep', 'reveal')}
+                data-d={String((i % 3) + 1)}
+              >
+                <span className={cx('processNum')} aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <p>{item}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
       {/* ===== CAP 04 · GUIDES ===== */}
       <section className={cx('guides')}>
         <div className={cx('wrap')}>
@@ -788,19 +842,6 @@ export function ForPlayers() {
             <div className={cx('tmcard', 'reveal')} data-d="1">
               <div className={cx('tphoto')}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/james.webp" alt="James Fox" />
-              </div>
-              <div className={cx('tinfo')}>
-                <div className={cx('tname')}>
-                  <span>James</span> Fox
-                </div>
-                <div className={cx('trole')}>{c.guides.jamesRole}</div>
-                <p className={cx('tdesc')}>{c.guides.jamesDesc}</p>
-              </div>
-            </div>
-            <div className={cx('tmcard', 'reveal')} data-d="2">
-              <div className={cx('tphoto')}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/cyril.webp" alt="Cyril Rool" />
               </div>
               <div className={cx('tinfo')}>
@@ -809,6 +850,19 @@ export function ForPlayers() {
                 </div>
                 <div className={cx('trole')}>{c.guides.cyrilRole}</div>
                 <p className={cx('tdesc')}>{c.guides.cyrilDesc}</p>
+              </div>
+            </div>
+            <div className={cx('tmcard', 'reveal')} data-d="2">
+              <div className={cx('tphoto')}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/james.webp" alt="James Fox" />
+              </div>
+              <div className={cx('tinfo')}>
+                <div className={cx('tname')}>
+                  <span>James</span> Fox
+                </div>
+                <div className={cx('trole')}>{c.guides.jamesRole}</div>
+                <p className={cx('tdesc')}>{c.guides.jamesDesc}</p>
               </div>
             </div>
             <div className={cx('tmcard', 'reveal')} data-d="3">
