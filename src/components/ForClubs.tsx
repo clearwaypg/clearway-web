@@ -117,6 +117,9 @@ const COPY = {
       doneStep: {qa: 'Clearway', qbold: 'is on it.', p: 'Every enquiry goes straight to Clearway. We reply in person, in confidence. The search starts now.'},
       back: '← Back',
       send: 'Send to Clearway',
+      sending: 'Sending…',
+      sendError:
+        'We could not send your enquiry just now. Please try again in a moment.',
       continue: 'Continue'
     }
   },
@@ -212,6 +215,9 @@ const COPY = {
       doneStep: {qa: 'Clearway', qbold: 'se encarga.', p: 'Cada consulta llega directo a Clearway. Respondemos en persona y con confidencialidad. La búsqueda empieza ahora.'},
       back: '← Atrás',
       send: 'Enviar a Clearway',
+      sending: 'Enviando…',
+      sendError:
+        'No pudimos enviar tu consulta ahora mismo. Inténtalo de nuevo en un momento.',
       continue: 'Continuar'
     }
   }
@@ -277,6 +283,9 @@ export function ForClubs() {
   const [data, setData] = useState<EnqData>(EMPTY_DATA);
   const [errors, setErrors] = useState<Record<string, boolean>>({});
   const [flagged, setFlagged] = useState<Set<string>>(new Set());
+  /* Submission of the last step: in flight, and whether it failed. */
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState(false);
 
   const openEnq = useCallback(() => {
     setCur(0);
@@ -284,6 +293,8 @@ export function ForClubs() {
     setData(EMPTY_DATA);
     setErrors({});
     setFlagged(new Set());
+    setSending(false);
+    setSendError(false);
     setEnqOpen(true);
   }, []);
 
@@ -443,6 +454,9 @@ export function ForClubs() {
 
   function setField(name: keyof EnqData, value: string) {
     setData((d) => ({...d, [name]: value}));
+    /* Any edit clears a previous send failure, so the message doesn't linger
+       while the club is fixing their details. */
+    if (sendError) setSendError(false);
     if (flagged.has(name)) {
       setFlagged((f) => {
         const next = new Set(f);
@@ -457,7 +471,33 @@ export function ForClubs() {
     setErrors((e) => ({...e, timeline: false}));
   }
 
+  /* Last step: hand the five answers to our own server route, which owns the
+     Resend key. The modal stays open and usable whatever happens — success
+     advances to the confirmation step, failure surfaces a friendly message and
+     leaves the answers in place so it can be retried. */
+  async function submitEnquiry() {
+    setSending(true);
+    setSendError(false);
+    try {
+      const res = await fetch('/api/enquiry', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({...data, locale})
+      });
+      if (!res.ok) {
+        throw new Error(`Enquiry request failed with status ${res.status}`);
+      }
+      goTo(TOTAL);
+    } catch (err) {
+      console.error('[enquiry] Could not send the enquiry:', err);
+      setSendError(true);
+    } finally {
+      setSending(false);
+    }
+  }
+
   function validateAndNext() {
+    if (sending) return;
     const next: Record<string, boolean> = {};
     const flag = new Set<string>();
     if (cur === 0 && !data.club.trim()) {
@@ -483,7 +523,11 @@ export function ForClubs() {
       return;
     }
     setErrors({});
-    goTo(cur === TOTAL - 1 ? TOTAL : cur + 1);
+    if (cur === TOTAL - 1) {
+      void submitEnquiry();
+      return;
+    }
+    goTo(cur + 1);
   }
 
   function onEnqKeyDown(e: React.KeyboardEvent) {
@@ -1098,6 +1142,15 @@ export function ForClubs() {
               <div className={cx('enqErr', errors.contact && 'show')}>
                 {c.enq.s5.err}
               </div>
+              {/* Send failure (unverified domain, missing key, network…). The
+                  detail stays in the server logs; the club sees this. */}
+              <div
+                className={cx('enqErr', sendError && 'show')}
+                role="status"
+                aria-live="polite"
+              >
+                {c.enq.sendError}
+              </div>
             </div>
             {/* done */}
             <div className={`${stepCls(5)} ${cx('enqDone')}`}>
@@ -1125,8 +1178,18 @@ export function ForClubs() {
               >
                 {c.enq.back}
               </button>
-              <button type="button" className={cx('enqNext')} onClick={validateAndNext}>
-                {cur === TOTAL - 1 ? c.enq.send : c.enq.continue}{' '}
+              <button
+                type="button"
+                className={cx('enqNext')}
+                onClick={validateAndNext}
+                disabled={sending}
+                aria-busy={sending}
+              >
+                {cur === TOTAL - 1
+                  ? sending
+                    ? c.enq.sending
+                    : c.enq.send
+                  : c.enq.continue}{' '}
                 <span className={cx('arr')}>→</span>
               </button>
             </div>

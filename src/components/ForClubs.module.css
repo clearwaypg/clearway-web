@@ -1028,12 +1028,18 @@
 .enqNext .arr {
   transition: transform 0.3s;
 }
-.enqNext:hover {
+.enqNext:hover:not(:disabled) {
   background: var(--dew);
   transform: translateY(-2px);
 }
-.enqNext:hover .arr {
+.enqNext:hover:not(:disabled) .arr {
   transform: translateX(4px);
+}
+/* While the enquiry is being sent: no second click, and it reads as busy. */
+.enqNext:disabled {
+  cursor: default;
+  opacity: 0.55;
+  transform: none;
 }
 .enqDone {
   text-align: center;
