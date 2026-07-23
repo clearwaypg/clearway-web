@@ -1769,6 +1769,18 @@
   .processList {
     grid-template-columns: 1fr;
   }
+  /* The empty block above "The Process" was this section's own padding-top:
+     clamp(110px, 16vh, 200px) is by far the largest top padding on the page
+     (truth 11vh, close 11vh, guides 7vh), and being vh-driven it stays huge on
+     phones — ~135px on a 390×844 screen, on top of the truth section's own
+     ~93px bottom padding. Nothing else contributes: no min-height, no hidden
+     decorative element (the section only holds .processHead + .processList),
+     and .reveal animates with transform/opacity, which reserves no space.
+     Bring the top padding into the same rhythm as the neighbouring sections.
+     Desktop (> 980px) keeps the original value. */
+  .process {
+    padding-top: clamp(56px, 8vh, 110px);
+  }
   .hero {
     /* Stacked content can exceed the viewport here — top-align so the top is
        never clipped under the nav (the section grows and scrolls instead). */
@@ -1856,6 +1868,35 @@
   .ribbon-item {
     font-size: clamp(0.8rem, 3vw, 0.9rem);
     letter-spacing: 0.1em;
+  }
+  /* ── Close section ──
+     The min-height was reserving more height than the stacked content needs, so
+     the leftover piled up as dead space under the CTA on top of the padding.
+     Let the content set the height here and bring the padding into the same
+     rhythm as the other sections on mobile. */
+  .close {
+    min-height: 0;
+    padding: clamp(56px, 8vh, 110px) 0 clamp(44px, 6vh, 84px);
+  }
+  /* The crowd art is sized to the VIEWPORT WIDTH on desktop (width:100% +
+     height:auto). On a phone that collapses the 16:9 artwork to ~220px tall
+     inside a ~500px section, and since the drawing only occupies the bottom
+     half of the PNG — shifted further up by margin-top:-15vw — the crowd ended
+     up as a sliver in the upper third, invisible at 5% opacity. Size it to the
+     SECTION instead: cover scales the artwork to fill the box without ever
+     deforming it, and anchoring the bottom keeps the crowd along the lower
+     edge, behind the copy and the CTA, with the sides cropped. */
+  .crowd-close {
+    opacity: 0.08;
+  }
+  .crowd-close img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center bottom;
+    margin-top: 0;
   }
 }
 
