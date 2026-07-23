@@ -973,8 +973,13 @@ export function ForClubs() {
           </button>
           <div className={cx('enqHead')}>
             <span className={cx('enqLogo')}>
-              <span className={cx('c')}>CLEAR</span>
-              <span className={cx('w')}>WAY</span>
+              {/* Same asset as the site header, white version for the dark
+                  modal. Sits in the head, so all five steps share it. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/Logotipos/clearway-white.svg"
+                alt="Clearway Performance Group"
+              />
             </span>
             <div className={cx('enqProg')}>
               <span style={{width: `${progressPct}%`}} />

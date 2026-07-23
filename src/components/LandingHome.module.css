@@ -758,14 +758,27 @@
   font-weight: 800;
 }
 @media (max-width: 760px) {
+  /* Single column: the photo stacks between the two blocks of copy — the
+     "Most promise the dream" heading above (its own section) and the "Founded
+     to create genuine opportunities" paragraph below. */
   .storyGrid {
     grid-template-columns: 1fr;
     gap: 26px;
   }
+  /* Full content width, and the frame follows the image instead of imposing a
+     ratio on it: no cropping and no distortion whatever the asset's shape. */
   .storyImg {
-    aspect-ratio: 4 / 5;
-    max-width: 240px;
-    margin: 0 auto;
+    aspect-ratio: auto;
+    max-width: none;
+    margin: 0;
+    display: block;
+  }
+  .storyImg img {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
   }
   .storyText p {
     max-width: none;
@@ -1032,11 +1045,12 @@
   grid-template-columns: repeat(3, 1fr);
   gap: clamp(20px, 2.4vw, 32px);
 }
-/* Vertical portrait card (same as for-players): photo on top, name/role/desc
-   below; on hover the photo zooms and expands to fill the whole card. */
+/* Vertical portrait card (same on every page): one single stacked layout —
+   photo on top, name/role/bio below, in normal flow. No alternate variants. */
 .tcard {
   position: relative;
-  aspect-ratio: 3 / 4;
+  display: flex;
+  flex-direction: column;
   border-radius: 14px;
   overflow: hidden;
   background: var(--hero-bg);
@@ -1044,22 +1058,14 @@
   transition:
     border-color 0.35s ease,
     box-shadow 0.35s ease;
-  cursor: pointer;
-}
-.tcard:hover {
-  border-color: rgba(140, 185, 255, 0.75);
-  box-shadow: 0 0 16px rgba(90, 150, 255, 0.28);
 }
 .tphoto {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 48%;
-  z-index: 2;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  flex: none;
   overflow: hidden;
   background: linear-gradient(150deg, #0a3a86, #04193f);
-  transition: height 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .tphoto img {
   position: absolute;
@@ -1078,11 +1084,19 @@
   pointer-events: none;
   background: linear-gradient(to top, rgba(4, 18, 46, 0.5) 0%, transparent 32%);
 }
-.tcard:hover .tphoto {
-  height: 100%;
-}
-.tcard:hover .tphoto img {
-  transform: scale(1.08);
+/* Hover is opt-in for devices that actually have a pointer that can hover.
+   On touch screens a tap would otherwise stick in the hover state. */
+@media (hover: hover) and (pointer: fine) {
+  .tcard {
+    cursor: pointer;
+  }
+  .tcard:hover {
+    border-color: rgba(140, 185, 255, 0.75);
+    box-shadow: 0 0 16px rgba(90, 150, 255, 0.28);
+  }
+  .tcard:hover .tphoto img {
+    transform: scale(1.08);
+  }
 }
 /* Placeholder (Tom): no photo. */
 .tph {
@@ -1097,42 +1111,38 @@
   width: 32%;
   height: auto;
 }
+/* Text block under the photo. No fixed height and no clipping, so the bio can
+   be set at a readable size and still fit. */
 .tinfo {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 52%;
-  z-index: 1;
-  padding: 14px 18px;
+  position: relative;
+  padding: 18px 20px 22px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   min-width: 0;
-  overflow: hidden;
 }
+/* Hierarchy: name (heaviest, largest) > role (small caps label) > bio. */
 .tname {
-  font-size: clamp(1.02rem, 1.5vw, 1.32rem);
+  font-size: clamp(1.25rem, 1.6vw, 1.5rem);
   font-weight: 900;
   color: #fff;
-  line-height: 1.05;
+  line-height: 1.08;
 }
 .tname span {
   font-weight: 300;
 }
 .trole {
-  font-size: 0.64rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--dew);
-  margin-top: 6px;
+  margin-top: 8px;
 }
 .tdesc {
-  font-size: clamp(0.64rem, 0.85vw, 0.78rem);
-  line-height: 1.38;
+  font-size: clamp(0.92rem, 1vw, 1.02rem);
+  line-height: 1.6;
   color: #aebac9;
-  margin-top: 7px;
+  margin-top: 12px;
 }
 
 /* ===== MARCADOR DE PARTIDO ===== */
@@ -1654,15 +1664,13 @@
   .doors {
     grid-template-columns: 1fr;
   }
+  /* One card per row, capped like the other pages so the portrait doesn't
+     take over the screen. The card keeps its photo-over-text layout. */
   .teamGrid {
     grid-template-columns: 1fr;
-  }
-  .tcard {
-    grid-template-columns: 1fr;
     gap: 22px;
-  }
-  .tphoto {
-    max-width: 280px;
+    max-width: 340px;
+    margin: 0 auto;
   }
   .scoreboard {
     flex-wrap: wrap;

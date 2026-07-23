@@ -958,8 +958,12 @@
   opacity: 0;
   transition: opacity 0.7s ease;
 }
-.truthLeft:hover .truthGlow {
-  opacity: 1;
+/* Only on devices with a real pointer: on touch there is no meaningful hover
+   (a tap would latch the glow on), so the background stays static there. */
+@media (hover: hover) and (pointer: fine) {
+  .truthLeft:hover .truthGlow {
+    opacity: 1;
+  }
 }
 /* Decorative silhouette, perfectly centered behind the title and a bit larger.
    A symmetric vertical fade softens the top and bottom edges (so its mass stays
@@ -1022,11 +1026,14 @@
     border-color 0.35s ease,
     box-shadow 0.35s ease;
 }
-.tcard:hover {
-  transform: scale(1.03);
-  background: #161b22;
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.45);
+/* Same criterion as the glow above and the team cards: pointer devices only. */
+@media (hover: hover) and (pointer: fine) {
+  .tcard:hover {
+    transform: scale(1.03);
+    background: #161b22;
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 22px 50px rgba(0, 0, 0, 0.45);
+  }
 }
 .tcard .tn {
   font-family: var(--serif);
@@ -1110,11 +1117,14 @@
   grid-template-columns: repeat(3, 1fr);
   gap: clamp(20px, 2.4vw, 32px);
 }
+/* One single stacked layout — photo on top, name/role/bio below, in normal
+   flow. Same card as on the home and for-clubs pages. */
 .tmcard {
   position: relative;
   /* Sits above the drifting tactical ball so it passes behind the cards. */
   z-index: 45;
-  aspect-ratio: 3 / 4;
+  display: flex;
+  flex-direction: column;
   border-radius: 14px;
   overflow: hidden;
   /* home's --hero-bg, inlined. */
@@ -1123,22 +1133,14 @@
   transition:
     border-color 0.35s ease,
     box-shadow 0.35s ease;
-  cursor: pointer;
-}
-.tmcard:hover {
-  border-color: rgba(140, 185, 255, 0.75);
-  box-shadow: 0 0 16px rgba(90, 150, 255, 0.28);
 }
 .tphoto {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 48%;
-  z-index: 2;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  flex: none;
   overflow: hidden;
   background: linear-gradient(150deg, #0a3a86, #04193f);
-  transition: height 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .tphoto img {
   position: absolute;
@@ -1157,48 +1159,64 @@
   pointer-events: none;
   background: linear-gradient(to top, rgba(4, 18, 46, 0.5) 0%, transparent 32%);
 }
-.tmcard:hover .tphoto {
-  height: 100%;
+/* Hover is opt-in for devices that actually have a pointer that can hover.
+   On touch screens a tap would otherwise stick in the hover state. */
+@media (hover: hover) and (pointer: fine) {
+  .tmcard {
+    cursor: pointer;
+  }
+  .tmcard:hover {
+    border-color: rgba(140, 185, 255, 0.75);
+    box-shadow: 0 0 16px rgba(90, 150, 255, 0.28);
+  }
+  .tmcard:hover .tphoto img {
+    transform: scale(1.08);
+  }
 }
-.tmcard:hover .tphoto img {
-  transform: scale(1.08);
-}
+/* Text block under the photo. No fixed height and no clipping, so the bio can
+   be set at a readable size and still fit. */
 .tinfo {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 52%;
-  z-index: 1;
-  padding: 14px 18px;
+  position: relative;
+  padding: 18px 20px 22px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   min-width: 0;
-  overflow: hidden;
 }
+/* Hierarchy: name (heaviest, largest) > role (small caps label) > bio. */
 .tname {
-  font-size: clamp(1.02rem, 1.5vw, 1.32rem);
+  font-size: clamp(1.25rem, 1.6vw, 1.5rem);
   font-weight: 900;
   color: #fff;
-  line-height: 1.05;
+  line-height: 1.08;
 }
 .tname span {
   font-weight: 300;
 }
 .trole {
-  font-size: 0.64rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--dew);
-  margin-top: 6px;
+  margin-top: 8px;
 }
 .tdesc {
-  font-size: clamp(0.64rem, 0.85vw, 0.78rem);
-  line-height: 1.38;
+  font-size: clamp(0.92rem, 1vw, 1.02rem);
+  line-height: 1.6;
   color: #aebac9;
-  margin-top: 7px;
+  margin-top: 12px;
+}
+/* Stacked layout, kept identical to the home team section (same breakpoint,
+   same gap and same 340px cap) so both pages behave the same on mobile: one
+   card per row, capped so the portrait doesn't take over the screen. This lives
+   at 900px — not this file's general 980px breakpoint — precisely to match home. */
+@media (max-width: 900px) {
+  .teamGrid {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    max-width: 340px;
+    margin: 0 auto;
+  }
 }
 
 /* =================== RIBBON (clubs/countries marquee) ===================
@@ -1760,12 +1778,6 @@
     grid-template-columns: 1fr;
     gap: 30px;
   }
-  .teamGrid {
-    grid-template-columns: 1fr;
-    gap: 22px;
-    max-width: 340px;
-    margin: 0 auto;
-  }
   .truthLayout {
     grid-template-columns: 1fr;
     gap: 34px;
@@ -1779,6 +1791,9 @@
     min-height: 0;
     display: flex;
     flex-direction: column;
+    /* Stacked hero: eyebrow, headline, lead and stats all centre horizontally.
+       Desktop (two-column grid) keeps the left-aligned text. */
+    text-align: center;
   }
   .bgword {
     display: none;
@@ -1800,19 +1815,47 @@
     margin-bottom: 6px;
   }
   .hl3 {
-    text-align: left;
+    text-align: center;
   }
   .undertext {
     position: static;
     order: 3;
-    margin-top: 14px;
+    /* auto side margins keep the 38ch measure but centre the block itself. */
+    margin: 14px auto 0;
+  }
+  .stats {
+    justify-content: center;
   }
   .play .player-slot {
     transform: none;
   }
-  .tgrid,
-  .teamGrid {
+  .tgrid {
     grid-template-columns: 1fr;
+  }
+  /* ── Ribbon band ──
+     The band is a colour transition, not just padding: its vertical padding is
+     driven by vh, so on short/narrow screens it collapsed to the 54px floor and
+     squeezed the whole navy → dew hand-off into ~150px, which reads as a hard
+     stripe instead of a fade. Scale the band with the viewport WIDTH here so it
+     keeps the same proportions as on desktop, and open with a short fade from
+     the near-black the guides section ends on so the top edge stops reading as
+     a cut. Desktop (> 980px) keeps the original rule untouched. */
+  .ribbon-band {
+    background: linear-gradient(
+      180deg,
+      #0c0c0c 0%,
+      var(--navy) 16%,
+      var(--navy) 46%,
+      var(--dew) 100%
+    );
+    padding: clamp(56px, 18vw, 96px) 0;
+  }
+  /* Type scaled to the narrower strip; the marquee itself is already seamless
+     at any width (six identical copies, translateX(-50%) lands copy 4 on copy
+     1), so only the size and tracking need to come down. */
+  .ribbon-item {
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    letter-spacing: 0.1em;
   }
 }
 

@@ -295,9 +295,50 @@ export function LandingHome() {
       cool: 0
     };
 
+    /* Pitch geometry. On desktop the field is drawn lengthwise (goals left and
+       right) in the original 88% x 80% frame. Below the mobile breakpoint it
+       turns 90deg — goals top and bottom — and is locked to a real pitch ratio
+       (105 x 68 m) so a narrow viewport can no longer squash it. Switching is
+       purely by breakpoint; there is no animated transition. */
+    const VERTICAL_MQ = '(max-width: 760px)';
+    const RATIO = 105 / 68;
+    let vertical = false;
+    const pitch = {x: 0, y: 0, w: 0, h: 0};
+    /* Length and width of the field in canvas px, whatever the orientation. */
+    const pLen = () => (vertical ? pitch.h : pitch.w);
+    const pWid = () => (vertical ? pitch.w : pitch.h);
+    /* (u, v) = normalised position along the field's length / across its width.
+       Team A always defends u = 0 and team B u = 1, in both orientations, so
+       the formations rotate with the pitch instead of stretching over it. */
+    const mapX = (u: number, v: number) =>
+      pitch.x + (vertical ? v : u) * pitch.w;
+    const mapY = (u: number, v: number) =>
+      pitch.y + (vertical ? u : v) * pitch.h;
+    /* Canvas coordinate along the length axis — the axis a team attacks down. */
+    const along = (p: {x: number; y: number}) => (vertical ? p.y : p.x);
+    /* Distances and speeds below are tuned in px for the desktop pitch; scale
+       them with its length so the play reads the same on the smaller one. */
+    const scale = () => Math.min(1.15, Math.max(0.45, pLen() / 1250));
+
+    function layout() {
+      vertical = window.matchMedia(VERTICAL_MQ).matches;
+      if (vertical) {
+        // Fit with no distortion. On phone aspect ratios the width binds, so
+        // the field spans the screen and its length follows from the ratio.
+        pitch.w = Math.min(W * 0.94, (H * 0.9) / RATIO);
+        pitch.h = pitch.w * RATIO;
+      } else {
+        pitch.w = W * 0.88;
+        pitch.h = H * 0.8;
+      }
+      pitch.x = (W - pitch.w) / 2;
+      pitch.y = (H - pitch.h) / 2;
+    }
+
     function resize() {
       W = canvas!.width = canvas!.offsetWidth;
       H = canvas!.height = canvas!.offsetHeight;
+      layout();
     }
     function seed() {
       players.length = 0;
@@ -316,17 +357,18 @@ export function LandingHome() {
         [0.7, 0.2],
         [0.7, 0.8]
       ];
+      const rs = scale();
       teamA.forEach(([fx, fy]) =>
         players.push({
           team: 'A',
           hx: fx,
           hy: fy,
-          x: fx * W,
-          y: fy * H,
+          x: mapX(fx, fy),
+          y: mapY(fx, fy),
           vx: 0,
           vy: 0,
           phase: (fx + fy) * 6.28,
-          roam: 20 + fy * 16
+          roam: (20 + fy * 16) * rs
         })
       );
       teamB.forEach(([fx, fy]) =>
@@ -334,12 +376,12 @@ export function LandingHome() {
           team: 'B',
           hx: fx,
           hy: fy,
-          x: fx * W,
-          y: fy * H,
+          x: mapX(fx, fy),
+          y: mapY(fx, fy),
           vx: 0,
           vy: 0,
           phase: (fx + fy) * 6.28,
-          roam: 20 + fy * 16
+          roam: (20 + fy * 16) * rs
         })
       );
       const s = players[2];
@@ -354,14 +396,19 @@ export function LandingHome() {
       let best: P | null = null;
       let score = -1;
       let tick = 0;
+      // Forward is measured along the pitch's length axis, which is vertical
+      // once the field rotates.
+      const len = pLen();
       for (const p of players) {
         if (p === from || p.team !== from.team) continue;
         const d = Math.hypot(p.x - from.x, p.y - from.y);
-        if (d < 40) continue;
+        if (d < 36 * scale()) continue;
         const fwd =
-          from.team === 'A' ? (p.x - from.x) / W : (from.x - p.x) / W;
+          from.team === 'A'
+            ? (along(p) - along(from)) / len
+            : (along(from) - along(p)) / len;
         tick += 0.37;
-        const s = fwd * 1.2 + (tick % 1) * 1.2 - Math.abs(d - W * 0.3) / W;
+        const s = fwd * 1.2 + (tick % 1) * 1.2 - Math.abs(d - len * 0.34) / len;
         if (s > score) {
           score = s;
           best = p;
@@ -374,60 +421,69 @@ export function LandingHome() {
       const dx = best.x - ball.x;
       const dy = best.y - ball.y;
       const d = Math.hypot(dx, dy) || 1;
-      const sp = Math.min(17, 9 + d * 0.02);
+      const sp = Math.min(17, 9 + d * 0.02) * scale();
       ball.vx = (dx / d) * sp;
       ball.vy = (dy / d) * sp;
     }
     function draw() {
       ctx!.clearRect(0, 0, W, H);
-      // cancha HORIZONTAL con porterías izquierda y derecha
+      // Field lines, drawn in pitch-local coordinates (x = length, y = width).
+      // The transform below places them: identity on desktop (goals left and
+      // right) or swapped axes on mobile, which stands the pitch up with the
+      // goals top and bottom. Both branches are unit-scaled, so line widths
+      // stay identical.
+      const L = pLen();
+      const Wd = pWid();
       ctx!.save();
+      if (vertical) ctx!.setTransform(0, 1, 1, 0, pitch.x, pitch.y);
+      else ctx!.setTransform(1, 0, 0, 1, pitch.x, pitch.y);
       ctx!.strokeStyle = 'rgba(208,216,226,0.055)';
       ctx!.lineWidth = 1;
-      const mx = W * 0.06;
-      const my = H * 0.1;
-      const mw = W * 0.88;
-      const mh = H * 0.8;
-      ctx!.strokeRect(mx, my, mw, mh);
+      ctx!.strokeRect(0, 0, L, Wd);
       ctx!.beginPath();
-      ctx!.moveTo(W * 0.5, my);
-      ctx!.lineTo(W * 0.5, my + mh);
+      ctx!.moveTo(L * 0.5, 0);
+      ctx!.lineTo(L * 0.5, Wd);
       ctx!.stroke();
-      const cr = Math.min(mw, mh) * 0.16;
+      const cr = Math.min(L, Wd) * 0.16;
       ctx!.beginPath();
-      ctx!.arc(W * 0.5, my + mh * 0.5, cr, 0, 6.28);
+      ctx!.arc(L * 0.5, Wd * 0.5, cr, 0, 6.28);
       ctx!.stroke();
       ctx!.beginPath();
-      ctx!.arc(W * 0.5, my + mh * 0.5, 2.5, 0, 6.28);
+      ctx!.arc(L * 0.5, Wd * 0.5, 2.5, 0, 6.28);
       ctx!.fillStyle = 'rgba(208,216,226,0.12)';
       ctx!.fill();
-      const ah = mh * 0.4;
-      const aw = mw * 0.1;
-      const ash = mh * 0.2;
-      const asw = mw * 0.045;
+      const ah = Wd * 0.4;
+      const aw = L * 0.1;
+      const ash = Wd * 0.2;
+      const asw = L * 0.045;
       ctx!.strokeStyle = 'rgba(208,216,226,0.055)';
-      ctx!.strokeRect(mx, my + (mh - ah) / 2, aw, ah);
-      ctx!.strokeRect(mx, my + (mh - ash) / 2, asw, ash);
-      ctx!.strokeRect(mx + mw - aw, my + (mh - ah) / 2, aw, ah);
-      ctx!.strokeRect(mx + mw - asw, my + (mh - ash) / 2, asw, ash);
-      const gh = mh * 0.2;
-      const gw = W * 0.022;
-      const gy = my + mh * 0.5 - gh / 2;
+      ctx!.strokeRect(0, (Wd - ah) / 2, aw, ah);
+      ctx!.strokeRect(0, (Wd - ash) / 2, asw, ash);
+      ctx!.strokeRect(L - aw, (Wd - ah) / 2, aw, ah);
+      ctx!.strokeRect(L - asw, (Wd - ash) / 2, asw, ash);
+      const gh = Wd * 0.2;
+      const gw = L * 0.025;
       ctx!.strokeStyle = 'rgba(208,216,226,0.22)';
       ctx!.lineWidth = 1.5;
-      ctx!.strokeRect(mx - gw, gy, gw, gh);
-      ctx!.strokeRect(mx + mw, gy, gw, gh);
+      ctx!.strokeRect(-gw, (Wd - gh) / 2, gw, gh);
+      ctx!.strokeRect(L, (Wd - gh) / 2, gw, gh);
       ctx!.restore();
 
+      // Interaction radii follow the pitch so the dots don't clump together on
+      // the smaller vertical field.
+      const near = L * 0.13;
+      const repel = L * 0.2;
       for (const p of players) {
         p.phase += 0.014;
-        let tx = p.hx * W + Math.cos(p.phase) * p.roam;
-        let ty = p.hy * H + Math.sin(p.phase * 0.8) * p.roam;
+        // Homes are anchored to the pitch, not the canvas, so the formations
+        // rotate with it.
+        let tx = mapX(p.hx, p.hy) + Math.cos(p.phase) * p.roam;
+        let ty = mapY(p.hx, p.hy) + Math.sin(p.phase * 0.8) * p.roam;
         const db = Math.hypot(ball.x - p.x, ball.y - p.y);
         if (p === ball.target || p === ball.holder) {
           tx = tx * 0.5 + ball.x * 0.5;
           ty = ty * 0.5 + ball.y * 0.5;
-        } else if (db < 160) {
+        } else if (db < near) {
           const pull =
             ball.holder && ball.holder.team === p.team ? 0.2 : 0.34;
           tx = tx * (1 - pull) + ball.x * pull;
@@ -437,9 +493,9 @@ export function LandingHome() {
           const dmx = p.x - mouse.x;
           const dmy = p.y - mouse.y;
           const dm = Math.hypot(dmx, dmy);
-          if (dm < 260) {
-            tx += (dmx / dm) * (260 - dm) * 0.8;
-            ty += (dmy / dm) * (260 - dm) * 0.8;
+          if (dm < repel) {
+            tx += (dmx / dm) * (repel - dm) * 0.8;
+            ty += (dmy / dm) * (repel - dm) * 0.8;
           }
         }
         p.vx += (tx - p.x) * 0.01;
@@ -457,7 +513,7 @@ export function LandingHome() {
           const d = Math.hypot(dx, dy) || 1;
           // Speed scales with distance so the ball eases in as it arrives, and
           // it re-aims at the (drifting) receiver each frame for an organic curve.
-          const sp = Math.max(4.5, Math.min(15, d * 0.16));
+          const sp = Math.max(4.5 * scale(), Math.min(15, d * 0.16));
           ball.vx += ((dx / d) * sp - ball.vx) * 0.22;
           ball.vy += ((dy / d) * sp - ball.vy) * 0.22;
           ball.x += ball.vx;

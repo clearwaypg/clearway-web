@@ -160,15 +160,21 @@
 }
 .heroSticky {
   position: relative;
-  min-height: clamp(560px, 88vh, 900px);
+  /* Full viewport on load: the next section must not peek below the fold.
+     svh (smallest viewport height) keeps that true on mobile browsers whose
+     URL bar is visible at load; vh is the fallback for older engines. */
+  min-height: 100vh;
+  min-height: 100svh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  /* Top padding clears the fixed nav. */
-  padding: clamp(90px, 12vh, 140px) 20px clamp(48px, 8vh, 90px);
+  /* Symmetric vertical padding so the copy sits at the true vertical centre of
+     the viewport; the top value still clears the fixed nav if the content ever
+     grows taller than the available height. */
+  padding: clamp(90px, 12vh, 140px) 20px;
 }
 
 /* The intro copy sits centred in the hero, below the ball. Static — no scroll
@@ -678,9 +684,12 @@
   grid-template-columns: repeat(3, 1fr);
   gap: clamp(20px, 2.4vw, 32px);
 }
+/* One single stacked layout — photo on top, name/role/bio below, in normal
+   flow. Same card as on the home and for-players pages. */
 .tcard {
   position: relative;
-  aspect-ratio: 3 / 4;
+  display: flex;
+  flex-direction: column;
   border-radius: 14px;
   overflow: hidden;
   /* home's --hero-bg, inlined (for-clubs doesn't define that token). */
@@ -689,22 +698,14 @@
   transition:
     border-color 0.35s ease,
     box-shadow 0.35s ease;
-  cursor: pointer;
-}
-.tcard:hover {
-  border-color: rgba(140, 185, 255, 0.75);
-  box-shadow: 0 0 16px rgba(90, 150, 255, 0.28);
 }
 .tphoto {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 48%;
-  z-index: 2;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  flex: none;
   overflow: hidden;
   background: linear-gradient(150deg, #0a3a86, #04193f);
-  transition: height 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .tphoto img {
   position: absolute;
@@ -723,48 +724,52 @@
   pointer-events: none;
   background: linear-gradient(to top, rgba(4, 18, 46, 0.5) 0%, transparent 32%);
 }
-.tcard:hover .tphoto {
-  height: 100%;
+/* Hover is opt-in for devices that actually have a pointer that can hover.
+   On touch screens a tap would otherwise stick in the hover state. */
+@media (hover: hover) and (pointer: fine) {
+  .tcard {
+    cursor: pointer;
+  }
+  .tcard:hover {
+    border-color: rgba(140, 185, 255, 0.75);
+    box-shadow: 0 0 16px rgba(90, 150, 255, 0.28);
+  }
+  .tcard:hover .tphoto img {
+    transform: scale(1.08);
+  }
 }
-.tcard:hover .tphoto img {
-  transform: scale(1.08);
-}
+/* Text block under the photo. No fixed height and no clipping, so the bio can
+   be set at a readable size and still fit. */
 .tinfo {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 52%;
-  z-index: 1;
-  padding: 14px 18px;
+  position: relative;
+  padding: 18px 20px 22px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   min-width: 0;
-  overflow: hidden;
 }
+/* Hierarchy: name (heaviest, largest) > role (small caps label) > bio. */
 .tname {
-  font-size: clamp(1.02rem, 1.5vw, 1.32rem);
+  font-size: clamp(1.25rem, 1.6vw, 1.5rem);
   font-weight: 900;
   color: #fff;
-  line-height: 1.05;
+  line-height: 1.08;
 }
 .tname span {
   font-weight: 300;
 }
 .trole {
-  font-size: 0.64rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--dew);
-  margin-top: 6px;
+  margin-top: 8px;
 }
 .tdesc {
-  font-size: clamp(0.64rem, 0.85vw, 0.78rem);
-  line-height: 1.38;
+  font-size: clamp(0.92rem, 1vw, 1.02rem);
+  line-height: 1.6;
   color: #aebac9;
-  margin-top: 7px;
+  margin-top: 12px;
 }
 
 /* ===== ENQUIRY MODAL ===== */
@@ -836,16 +841,16 @@
 .enqHead {
   margin-bottom: 30px;
 }
+/* Official wordmark, sized to the footprint the old CLEARWAY text had (~1rem
+   type) so it reads as a label and doesn't dominate the modal. */
 .enqLogo {
-  font-size: 1rem;
-  color: #fff;
-  letter-spacing: 0.01em;
+  display: block;
+  line-height: 0;
 }
-.enqLogo .c {
-  font-weight: 300;
-}
-.enqLogo .w {
-  font-weight: 900;
+.enqLogo img {
+  height: 16px;
+  width: auto;
+  display: block;
 }
 .enqProg {
   margin-top: 18px;
@@ -1351,7 +1356,9 @@
   .heroSticky {
     position: relative;
     height: auto;
-    padding: 120px 20px 60px;
+    /* Keeps the full-viewport min-height from the base rule; symmetric padding
+       so the copy stays vertically centred on small screens too. */
+    padding: 110px 20px;
     gap: 28px;
   }
   .heroStage {
