@@ -1785,14 +1785,30 @@
     /* Stacked content can exceed the viewport here — top-align so the top is
        never clipped under the nav (the section grows and scrolls instead). */
     align-items: start;
+    /* Air above the "The story begins" cue: it is pinned to the bottom of the
+       hero, and once the page is stacked it reads as the eyebrow of the truth
+       section below it, so the big gap belongs above it, not under it. */
+    padding-bottom: clamp(88px, 12vh, 120px);
+  }
+  .scroll-cue {
+    bottom: 12px;
   }
   .hero-inner {
     grid-template-columns: 1fr;
     gap: 30px;
   }
+  /* Pull the heading up towards the cue so the two read as one block. Only the
+     top padding changes; the bottom keeps feeding the gap to the process
+     section. */
+  .truth {
+    padding-top: clamp(28px, 3.5vh, 48px);
+  }
   .truthLayout {
     grid-template-columns: 1fr;
     gap: 34px;
+    /* Its 44px top margin sat between the cue and the heading, adding to the
+       section padding — the whole gap belongs above the cue instead. */
+    margin-top: 0;
   }
   .truthSil {
     height: clamp(220px, 40vh, 340px);
